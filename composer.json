@@ -25,19 +25,25 @@
     ],
     "require": {
         "php": "^7.3",
-        "ext-json": "*"
+        "ext-json": "*",
+        "laravel/framework": "^7.15",
+        "neomerx/json-api": "^4.0"
     },
     "require-dev": {
+        "cloudcreativity/json-api-testing": "^3.0",
+        "orchestra/testbench": "^5.3",
         "phpunit/phpunit": "^9.0"
     },
     "autoload": {
         "psr-4": {
-            "LaravelJsonApi\\{NAME}\\": "src/"
+            "LaravelJsonApi\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LaravelJsonApi\\{NAME}\\Tests\\": "tests/"
+            "DummyApp\\":  "tests/dummy/app",
+            "DummyApp\\Tests\\": "tests/dummy/tests",
+            "LaravelJsonApi\\Tests\\": "tests/lib"
         }
     },
     "extra": {
