@@ -9,14 +9,13 @@ use DummyApp\Providers\AuthServiceProvider;
 use DummyApp\Providers\EventServiceProvider;
 use DummyApp\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use LaravelJsonApi\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
 
     use DatabaseMigrations;
-    use MakesJsonApiRequests;
 
     /**
      * @return void
@@ -27,6 +26,8 @@ abstract class TestCase extends BaseTestCase
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->withFactories(__DIR__ . '/../database/factories');
+
+        config()->set('json-api', require __DIR__ . '/../config/json-api.php');
     }
 
     /**
@@ -36,6 +37,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
+            ServiceProvider::class,
             AppServiceProvider::class,
             AuthServiceProvider::class,
             EventServiceProvider::class,
