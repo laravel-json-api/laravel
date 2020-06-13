@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Core\Document\Links;
+use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Http\Server;
@@ -24,6 +26,16 @@ class ResourceResponse implements Responsable
     private $created = false;
 
     /**
+     * @var Hash
+     */
+    private $meta;
+
+    /**
+     * @var Links
+     */
+    private $links;
+
+    /**
      * ResourceResponse constructor.
      *
      * @param JsonApiResource|null $resource
@@ -31,6 +43,34 @@ class ResourceResponse implements Responsable
     public function __construct(?JsonApiResource $resource)
     {
         $this->resource = $resource;
+        $this->meta = new Hash();
+        $this->links = new Links();
+    }
+
+    /**
+     * Add top-level meta to the response.
+     *
+     * @param $meta
+     * @return $this
+     */
+    public function withMeta($meta): self
+    {
+        $this->meta = Hash::cast($meta);
+
+        return $this;
+    }
+
+    /**
+     * Add top-level links to the response.
+     *
+     * @param $links
+     * @return $this
+     */
+    public function withLinks($links): self
+    {
+        $this->links = Links::cast($links);
+
+        return $this;
     }
 
     /**
@@ -45,12 +85,13 @@ class ResourceResponse implements Responsable
         $document = $server->encoder()
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
-            ->withResource($this->resource);
-
-        // @TODO add meta/links.
+            ->withResource($this->resource)
+            ->withMeta($this->meta)
+            ->withLinks($this->links)
+            ->toJson();
 
         return response(
-            $document->toJson(),
+            $document,
             $this->didCreate() ? 201 : 200,
             $this->headers()
         );
