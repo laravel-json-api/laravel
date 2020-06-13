@@ -25,23 +25,6 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     public $resource;
 
     /**
-     * @var array
-     */
-    public $with = [];
-
-    /**
-     * @var array
-     */
-    public $additional = [];
-
-    /**
-     * Default include paths.
-     *
-     * @var mixed
-     */
-    protected $defaultIncludePaths = [];
-
-    /**
      * JsonApiResource constructor.
      *
      * @param $resource
