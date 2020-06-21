@@ -36,6 +36,11 @@ class ResourceResponse implements Responsable
     private $links;
 
     /**
+     * @var int
+     */
+    private $encodeOptions;
+
+    /**
      * ResourceResponse constructor.
      *
      * @param JsonApiResource|null $resource
@@ -45,6 +50,7 @@ class ResourceResponse implements Responsable
         $this->resource = $resource;
         $this->meta = new Hash();
         $this->links = new Links();
+        $this->encodeOptions = 0;
     }
 
     /**
@@ -74,6 +80,19 @@ class ResourceResponse implements Responsable
     }
 
     /**
+     * Set the JSON encode options.
+     *
+     * @param int $options
+     * @return $this
+     */
+    public function withEncodeOptions(int $options): self
+    {
+        $this->encodeOptions = $options;
+
+        return $this;
+    }
+
+    /**
      * @param Request $request
      * @return Response
      */
@@ -88,7 +107,7 @@ class ResourceResponse implements Responsable
             ->withResource($this->resource)
             ->withMeta($this->meta)
             ->withLinks($this->links)
-            ->toJson();
+            ->toJson($this->encodeOptions);
 
         return response(
             $document,
