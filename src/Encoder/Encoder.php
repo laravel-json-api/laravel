@@ -72,7 +72,7 @@ class Encoder
      */
     public function withFieldSets($fieldSets): self
     {
-        $this->fieldSets = $fieldSets;
+        $this->fieldSets = FieldSets::cast($fieldSets);
 
         return $this;
     }
@@ -94,7 +94,9 @@ class Encoder
      */
     public function withResources(iterable $resources): CompoundDocument
     {
-        return $this->withData($resources);
+        return $this->withData(
+            $this->container->cursor($resources)
+        );
     }
 
     /**

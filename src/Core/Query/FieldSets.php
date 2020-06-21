@@ -49,6 +49,10 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
             return self::fromArray($value);
         }
 
+        if (is_null($value)) {
+            return new self();
+        }
+
         throw new UnexpectedValueException('Unexpected field sets value.');
     }
 

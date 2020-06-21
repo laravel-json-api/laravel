@@ -79,7 +79,7 @@ class CompoundDocument implements Serializable
      */
     public function withLinks($links): self
     {
-        $this->links = $links;
+        $this->links = Links::cast($links);
 
         return $this;
     }

@@ -6,14 +6,12 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Query\FieldSets;
-use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Http\Server;
 
 class ResourceResponse implements Responsable
 {
+
+    use Concerns\CreatesResponse;
 
     /**
      * @var JsonApiResource|null
@@ -26,21 +24,6 @@ class ResourceResponse implements Responsable
     private $created = false;
 
     /**
-     * @var Hash
-     */
-    private $meta;
-
-    /**
-     * @var Links
-     */
-    private $links;
-
-    /**
-     * @var int
-     */
-    private $encodeOptions;
-
-    /**
      * ResourceResponse constructor.
      *
      * @param JsonApiResource|null $resource
@@ -48,46 +31,16 @@ class ResourceResponse implements Responsable
     public function __construct(?JsonApiResource $resource)
     {
         $this->resource = $resource;
-        $this->meta = new Hash();
-        $this->links = new Links();
-        $this->encodeOptions = 0;
     }
 
     /**
-     * Add top-level meta to the response.
+     * Mark the resource as created.
      *
-     * @param $meta
      * @return $this
      */
-    public function withMeta($meta): self
+    public function didCreate(): self
     {
-        $this->meta = Hash::cast($meta);
-
-        return $this;
-    }
-
-    /**
-     * Add top-level links to the response.
-     *
-     * @param $links
-     * @return $this
-     */
-    public function withLinks($links): self
-    {
-        $this->links = Links::cast($links);
-
-        return $this;
-    }
-
-    /**
-     * Set the JSON encode options.
-     *
-     * @param int $options
-     * @return $this
-     */
-    public function withEncodeOptions(int $options): self
-    {
-        $this->encodeOptions = $options;
+        $this->created = true;
 
         return $this;
     }
@@ -111,7 +64,7 @@ class ResourceResponse implements Responsable
 
         return response(
             $document,
-            $this->didCreate() ? 201 : 200,
+            $this->status(),
             $this->headers()
         );
     }
@@ -121,9 +74,11 @@ class ResourceResponse implements Responsable
      */
     protected function headers(): array
     {
-        $headers = ['Content-Type' => 'application/vnd.api+json'];
+        $headers = \collect(['Content-Type' => 'application/vnd.api+json'])
+            ->merge($this->headers ?: [])
+            ->all();
 
-        if ($this->didCreate()) {
+        if ($this->resourceWasCreated()) {
             $headers['Location'] = $this->resource->selfUrl();
         }
 
@@ -131,41 +86,31 @@ class ResourceResponse implements Responsable
     }
 
     /**
-     * @param Request $request
-     * @return IncludePaths
+     * @return int
      */
-    protected function includePaths($request): IncludePaths
+    protected function status(): int
     {
-        if ($include = $request->query('include')) {
-            return IncludePaths::fromString($include);
+        if ($this->resourceWasCreated()) {
+            return Response::HTTP_CREATED;
         }
 
-        return new IncludePaths();
-    }
-
-    /**
-     * @param Request $request
-     * @return FieldSets
-     */
-    protected function fieldSets($request): FieldSets
-    {
-        if ($fieldSets = $request->query('fields')) {
-            return FieldSets::fromArray($fieldSets);
-        }
-
-        return new FieldSets();
+        return Response::HTTP_OK;
     }
 
     /**
      * @return bool
      */
-    protected function didCreate(): bool
+    protected function resourceWasCreated(): bool
     {
+        if (true === $this->created) {
+            return true;
+        }
+
         if ($this->resource->resource instanceof Model) {
             return $this->resource->resource->wasRecentlyCreated;
         }
 
-        return $this->created;
+        return false;
     }
 
 }

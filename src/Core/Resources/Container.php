@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Resources;
 
 use Generator;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
 use LaravelJsonApi\Core\Contracts\Resources\Container as ContainerContract;
 use LaravelJsonApi\Core\Contracts\Resources\Factory;
 use LogicException;
@@ -68,7 +67,7 @@ class Container implements ContainerContract
      */
     public function resolve($value)
     {
-        if ($value instanceof ResourceObject) {
+        if ($value instanceof JsonApiResource) {
             return $value;
         }
 
@@ -97,7 +96,7 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function create($record): ResourceObject
+    public function create($record): JsonApiResource
     {
         return $this->factoryFor($record)->createResource(
             $record
@@ -110,7 +109,7 @@ class Container implements ContainerContract
     public function cursor(iterable $records): Generator
     {
         foreach ($records as $record) {
-            if ($record instanceof ResourceObject) {
+            if ($record instanceof JsonApiResource) {
                 yield $record;
             } else {
                 yield $this->create($record);

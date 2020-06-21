@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Contracts\Resources;
 
 use Generator;
-use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Container
 {
@@ -30,7 +30,7 @@ interface Container
      *
      * @param mixed $value
      *      a resource object, record or an iterable of records.
-     * @return ResourceObject|Generator
+     * @return JsonApiResource|Generator
      */
     public function resolve($value);
 
@@ -46,9 +46,9 @@ interface Container
      * Create a resource object for the supplied record.
      *
      * @param mixed $record
-     * @return ResourceObject
+     * @return JsonApiResource
      */
-    public function create($record): ResourceObject;
+    public function create($record): JsonApiResource;
 
     /**
      * Create resource objects for the supplied records.

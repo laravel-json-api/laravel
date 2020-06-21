@@ -59,6 +59,10 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
             return self::fromString($value);
         }
 
+        if (is_null($value)) {
+            return new self();
+        }
+
         throw new UnexpectedValueException('Unexpected include path value.');
     }
 

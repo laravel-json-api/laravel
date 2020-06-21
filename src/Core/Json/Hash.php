@@ -41,7 +41,7 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
             return $value;
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || is_null($value)) {
             return new self($value);
         }
 
@@ -51,11 +51,11 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
     /**
      * Hash constructor.
      *
-     * @param array $value
+     * @param array|null $value
      */
-    public function __construct(array $value = [])
+    public function __construct(array $value = null)
     {
-        $this->value = $value;
+        $this->value = $value ?: [];
         $this->sorted();
     }
 
@@ -84,6 +84,20 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
         foreach ($keys as $key) {
             unset($this->value[$key]);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param iterable $other
+     * @return $this
+     */
+    public function merge(iterable $other): self
+    {
+        $this->value = \collect($this->value)
+            ->merge($other)
+            ->sortKeys()
+            ->all();
 
         return $this;
     }

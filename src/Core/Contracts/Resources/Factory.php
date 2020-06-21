@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Resources;
 
-use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Factory
 {
@@ -35,7 +35,7 @@ interface Factory
      * Create a resource object for the supplied record.
      *
      * @param mixed $record
-     * @return ResourceObject
+     * @return JsonApiResource
      */
-    public function createResource($record): ResourceObject;
+    public function createResource($record): JsonApiResource;
 }

@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
 use LaravelJsonApi\Core\Contracts\Resources\Factory as FactoryContract;
 use LogicException;
 use Throwable;
@@ -85,7 +84,7 @@ class Factory implements FactoryContract
     /**
      * @inheritDoc
      */
-    public function createResource($record): ResourceObject
+    public function createResource($record): JsonApiResource
     {
         if (!is_object($record)) {
             throw new InvalidArgumentException('Expecting an object.');
