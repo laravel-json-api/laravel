@@ -20,6 +20,7 @@ namespace LaravelJsonApi\Core\Resources;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\DelegatesToResource;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
@@ -119,12 +120,20 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return ResourceResponse
+     */
+    public function prepareResponse($request): ResourceResponse
+    {
+        return new ResourceResponse($this);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function toResponse($request)
     {
-        return (new ResourceResponse($this))->toResponse($request);
+        return $this->prepareResponse($request)->toResponse($request);
     }
 
     /**

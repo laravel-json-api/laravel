@@ -119,22 +119,9 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     }
 
     /**
-     * @param Request $request
-     * @return Response
-     */
-    public function toResponse($request)
-    {
-        if ($this->isPaginated()) {
-            return $this->preparePaginationResponse($request);
-        }
-
-        return (new ResourceCollectionResponse($this))->toResponse($request);
-    }
-
-    /**
      * @return bool
      */
-    protected function isPaginated(): bool
+    public function isPaginated(): bool
     {
         if ($this->resources instanceof PageContract) {
             return true;
@@ -145,9 +132,30 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
 
     /**
      * @param Request $request
-     * @return Response
+     * @return ResourceCollectionResponse
      */
-    protected function preparePaginationResponse($request)
+    public function prepareResponse($request): ResourceCollectionResponse
+    {
+        if ($this->isPaginated()) {
+            return $this->preparePaginationResponse($request);
+        }
+
+        return new ResourceCollectionResponse($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        return $this->prepareResponse($request)->toResponse($request);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResourceCollectionResponse
+     */
+    protected function preparePaginationResponse($request): ResourceCollectionResponse
     {
         /** Ensure the resources are a JSON API page. */
         $this->resources = Page::cast($this->resources);
@@ -158,7 +166,7 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
             $this->resources->withQuery($this->queryParameters);
         }
 
-        return (new PaginatedResourceResponse($this))->toResponse($request);
+        return new PaginatedResourceResponse($this);
     }
 
 }
