@@ -27,7 +27,9 @@ use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Resources\PaginatedResourceResponse;
+use function array_filter;
 use function collect;
+use function count;
 use function is_null;
 
 class Page implements PageContract
@@ -42,6 +44,21 @@ class Page implements PageContract
      * @var array|null
      */
     private $queryParameters;
+
+    /**
+     * @var string|null
+     */
+    private $metaKey;
+
+    /**
+     * @var string
+     */
+    private $pageParam = 'number';
+
+    /**
+     * @var string
+     */
+    private $perPageParam = 'size';
 
     /**
      * @param PageContract|Paginator $page
@@ -75,7 +92,7 @@ class Page implements PageContract
      */
     public function meta(): array
     {
-        return \collect([
+        $meta = collect([
             'current_page' => (int) $this->paginator->currentPage(),
             'from' => (int) $this->paginator->firstItem(),
             'last_page' => $this->isLengthAware() ? (int) $this->paginator->lastPage() : null,
@@ -85,6 +102,12 @@ class Page implements PageContract
         ])->reject(function ($value) {
             return is_null($value);
         })->all();
+
+        if ($this->metaKey) {
+            return [$this->metaKey => $meta];
+        }
+
+        return $meta;
     }
 
     /**
@@ -92,7 +115,7 @@ class Page implements PageContract
      */
     public function links(): Links
     {
-        return new Links(...\array_filter([
+        return new Links(...array_filter([
             $this->first(),
             $this->prev(),
             $this->next(),
@@ -154,10 +177,10 @@ class Page implements PageContract
      */
     public function url(int $page): string
     {
-        $params = \collect($this->queryParameters)
-            ->put('page', ['number' => $page, 'size' => $this->paginator->perPage()])
-            ->sortKeys()
-            ->all();
+        $params = collect($this->queryParameters)->put('page', [
+            $this->pageParam => $page,
+            $this->perPageParam => $this->paginator->perPage(),
+        ])->sortKeys()->all();
 
         return $this->paginator->path() . '?' . Arr::query($params);
     }
@@ -167,7 +190,54 @@ class Page implements PageContract
      */
     public function withQuery(iterable $query): PageContract
     {
-        $this->paginator->appends(collect($query)->all());
+        $this->queryParameters = collect($query)->all();
+
+        return $this;
+    }
+
+    /**
+     * Nest page meta using the provided key.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function withNestedMeta(string $key = 'page'): self
+    {
+        $this->metaKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the key for the page number parameter.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function withPageParam(string $key): self
+    {
+        if (empty($key)) {
+            throw new \InvalidArgumentException('Page parameter cannot be an empty string.');
+        }
+
+        $this->pageParam = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the key for the per-page parameter.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function withPerPageParam(string $key): self
+    {
+        if (empty($key)) {
+            throw new \InvalidArgumentException('Per-page parameter cannot be an empty string.');
+        }
+
+        $this->perPageParam = $key;
 
         return $this;
     }
@@ -185,7 +255,7 @@ class Page implements PageContract
      */
     public function count()
     {
-        return \count($this->paginator);
+        return count($this->paginator);
     }
 
     /**
@@ -194,13 +264,6 @@ class Page implements PageContract
     public function toResponse($request)
     {
         return (new PaginatedResourceResponse($this))->toResponse($request);
-    }
-
-    protected function pageParameter(): array
-    {
-        return [
-            'number' => 1,
-        ];
     }
 
     /**
