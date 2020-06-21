@@ -108,7 +108,7 @@ final class TestBuilder
      */
     public function query(iterable $query): self
     {
-        $this->query = collect($query)->merge($query);
+        $this->query = collect($this->query)->merge($query);
 
         return $this;
     }
@@ -315,6 +315,6 @@ final class TestBuilder
             }
         });
 
-        return http_build_query($query);
+        return Arr::query($query);
     }
 }

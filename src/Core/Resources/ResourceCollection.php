@@ -19,22 +19,36 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources;
 
-use Exception;
+use Countable;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use IteratorAggregate;
+use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
-use Traversable;
+use LaravelJsonApi\Core\Pagination\Page;
+use function count;
 
-class ResourceCollection implements Responsable, \IteratorAggregate
+class ResourceCollection implements Responsable, IteratorAggregate, Countable
 {
 
     use Concerns\CreatesResponse;
 
     /**
-     * @var iterable
+     * @var iterable|PageContract
      */
     public $resources;
+
+    /**
+     * @var bool
+     */
+    protected $preserveAllQueryParameters = false;
+
+    /**
+     * @var array|null
+     */
+    protected $queryParameters;
 
     /**
      * ResourceCollection constructor.
@@ -44,6 +58,32 @@ class ResourceCollection implements Responsable, \IteratorAggregate
     public function __construct(iterable $resources)
     {
         $this->resources = $resources;
+    }
+
+    /**
+     * Indicate that all current query parameters should be appended to pagination links.
+     *
+     * @return $this
+     */
+    public function preserveQuery(): self
+    {
+        $this->preserveAllQueryParameters = true;
+
+        return $this;
+    }
+
+    /**
+     * Specify the query string parameters that should be present on pagination links.
+     *
+     * @param iterable $query
+     * @return $this
+     */
+    public function withQuery(iterable $query): self
+    {
+        $this->preserveAllQueryParameters = false;
+        $this->queryParameters = \collect($query)->all();
+
+        return $this;
     }
 
     /**
@@ -71,12 +111,54 @@ class ResourceCollection implements Responsable, \IteratorAggregate
     }
 
     /**
+     * @inheritDoc
+     */
+    public function count()
+    {
+        return count($this->resources);
+    }
+
+    /**
      * @param Request $request
      * @return Response
      */
     public function toResponse($request)
     {
+        if ($this->isPaginated()) {
+            return $this->preparePaginationResponse($request);
+        }
+
         return (new ResourceCollectionResponse($this))->toResponse($request);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isPaginated(): bool
+    {
+        if ($this->resources instanceof PageContract) {
+            return true;
+        }
+
+        return $this->resources instanceof Paginator;
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    protected function preparePaginationResponse($request)
+    {
+        /** Ensure the resources are a JSON API page. */
+        $this->resources = Page::cast($this->resources);
+
+        if ($this->preserveAllQueryParameters) {
+            $this->resources->withQuery($request->query());
+        } else if (\is_array($this->queryParameters)) {
+            $this->resources->withQuery($this->queryParameters);
+        }
+
+        return (new PaginatedResourceResponse($this))->toResponse($request);
     }
 
 }
