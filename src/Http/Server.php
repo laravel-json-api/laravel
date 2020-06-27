@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http;
 
-use LaravelJsonApi\Encoder\Encoder;
-use LaravelJsonApi\Encoder\Factory as EncoderFactory;
+use LaravelJsonApi\Core\Encoder\Encoder;
+use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
 
 class Server
 {

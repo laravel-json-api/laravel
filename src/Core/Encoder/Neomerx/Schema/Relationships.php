@@ -17,22 +17,21 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
+use IteratorAggregate;
 use LaravelJsonApi\Core\Contracts\Resources\Container;
+use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Encoder\Neomerx\Mapper;
-use LogicException;
-use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
-use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 
 /**
- * Class SchemaContainer
+ * Class Relationships
  *
  * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
-final class SchemaContainer implements SchemaContainerInterface
+final class Relationships implements IteratorAggregate
 {
 
     /**
@@ -46,68 +45,60 @@ final class SchemaContainer implements SchemaContainerInterface
     private $mapper;
 
     /**
+     * @var JsonApiResource
+     */
+    private $resource;
+
+    /**
      * @var SchemaFields
      */
     private $fields;
 
     /**
-     * @var array
+     * @var ContextInterface
      */
-    private $schemas;
+    private $context;
 
     /**
-     * SchemaContainer constructor.
+     * Relationships constructor.
      *
      * @param Container $container
      * @param Mapper $mapper
+     * @param JsonApiResource $resource
      * @param SchemaFields $fields
+     * @param ContextInterface $context
      */
     public function __construct(
         Container $container,
         Mapper $mapper,
-        SchemaFields $fields
+        JsonApiResource $resource,
+        SchemaFields $fields,
+        ContextInterface $context
     ) {
         $this->container = $container;
         $this->mapper = $mapper;
+        $this->resource = $resource;
         $this->fields = $fields;
-        $this->schemas = [];
+        $this->context = $context;
     }
 
     /**
-     * @param JsonApiResource $resourceObject
-     * @return SchemaInterface
+     * @inheritDoc
      */
-    public function getSchema($resourceObject): SchemaInterface
+    public function getIterator()
     {
-        if (!$resourceObject instanceof JsonApiResource) {
-            throw new LogicException('Expecting a resource object.');
+        foreach ($this->resource->relationships() as $fieldName => $relation) {
+            if ($this->fields->isFieldRequested($this->resource->type(), $fieldName)) {
+                yield $fieldName => (new Relation(
+                    $this->container,
+                    $this->mapper,
+                    $relation,
+                    $this->fields,
+                    $this->context,
+                    $fieldName
+                ))->toArray();
+            }
         }
-
-        $type = $resourceObject->type();
-
-        if (isset($this->schemas[$type])) {
-            return $this->schemas[$type];
-        }
-
-        return $this->schemas[$type] = $this->createSchema($type);
-    }
-
-    /**
-     * @param mixed $resourceObject
-     * @return bool
-     */
-    public function hasSchema($resourceObject): bool
-    {
-        return $resourceObject instanceof JsonApiResource;
-    }
-
-    /**
-     * @param string $type
-     * @return SchemaInterface
-     */
-    private function createSchema(string $type): SchemaInterface
-    {
-        return new Schema($this->container, $this->mapper, $this->fields, $type);
     }
 
 }

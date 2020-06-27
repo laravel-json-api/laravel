@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;

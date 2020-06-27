@@ -17,14 +17,14 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
 use LaravelJsonApi\Core\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
+use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Resources\Relation as ResourceRelation;
-use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\IdentifierInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;

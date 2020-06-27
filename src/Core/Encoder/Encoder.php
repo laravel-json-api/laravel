@@ -17,15 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder;
+namespace LaravelJsonApi\Core\Encoder;
 
 use LaravelJsonApi\Core\Contracts\Resources\Container;
+use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
+use LaravelJsonApi\Core\Encoder\Neomerx\Schema\SchemaContainer;
+use LaravelJsonApi\Core\Encoder\Neomerx\Schema\SchemaFields;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Encoder\Neomerx\Mapper;
-use LaravelJsonApi\Encoder\Neomerx\Schema\SchemaContainer;
-use LaravelJsonApi\Encoder\Neomerx\Schema\SchemaFields;
 use Neomerx\JsonApi\Factories\Factory;
 
 class Encoder

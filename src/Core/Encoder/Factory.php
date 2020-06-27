@@ -17,11 +17,11 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder;
+namespace LaravelJsonApi\Core\Encoder;
 
+use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\Container;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
-use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
 
 class Factory

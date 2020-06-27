@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder\Neomerx;
+namespace LaravelJsonApi\Core\Encoder\Neomerx;
 
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 

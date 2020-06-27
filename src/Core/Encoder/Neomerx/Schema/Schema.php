@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Resources\Container;
+use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use LogicException;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
