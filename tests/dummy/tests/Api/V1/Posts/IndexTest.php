@@ -23,7 +23,7 @@ use DummyApp\Post;
 use DummyApp\Tests\Api\V1\TestCase;
 use Illuminate\Support\Arr;
 
-class FetchTest extends TestCase
+class IndexTest extends TestCase
 {
 
     public function test(): void
@@ -31,7 +31,6 @@ class FetchTest extends TestCase
         $posts = factory(Post::class, 3)->create();
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->get('/api/v1/posts');
@@ -59,7 +58,6 @@ class FetchTest extends TestCase
         ];
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->page(['number' => 1, 'size' => 3])

@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Support\Arr;
+use function array_key_exists;
 use function http_build_query;
 use function is_array;
 
@@ -59,11 +60,11 @@ class QueryParameters implements Arrayable
     public static function fromArray(array $value): self
     {
         return new self(
-            isset($value['include']) ? IncludePaths::fromArray($value['include']) : null,
-            isset($value['fields']) ? FieldSets::fromArray($value['fields']) : null,
-            isset($value['sort']) ? SortFields::fromArray($value['sort']) : null,
-            isset($value['page']) ? Arr::cast($value['page']) : null,
-            isset($value['filter']) ? Arr::cast($value['filter']) : null
+            array_key_exists('include', $value) ? IncludePaths::fromArray($value['include']) : null,
+            array_key_exists('fields', $value) ? FieldSets::fromArray($value['fields']) : null,
+            array_key_exists('sort', $value) ? SortFields::fromArray($value['sort']) : null,
+            array_key_exists('page', $value) ? $value['page'] : null,
+            array_key_exists('filter', $value) ? $value['filter'] : null
         );
     }
 
@@ -121,7 +122,7 @@ class QueryParameters implements Arrayable
             $query['page'] = $this->pagination;
         }
 
-        if (is_array($this->filters) && !empty($this->pagination)) {
+        if (is_array($this->filters) && !empty($this->filters)) {
             $query['filter'] = $this->filters;
         }
 

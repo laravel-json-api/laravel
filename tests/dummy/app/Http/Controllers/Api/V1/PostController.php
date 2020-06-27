@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace DummyApp\Http\Controllers\Api\V1;
 
+use DummyApp\JsonApi\V1\Posts\PostCollectionQuery;
+use DummyApp\JsonApi\V1\Posts\PostQuery;
 use DummyApp\JsonApi\V1\Posts\PostResource;
 use DummyApp\Post;
 use Illuminate\Contracts\Support\Responsable;
@@ -29,10 +31,10 @@ class PostController
 {
 
     /**
-     * @param Request $request
+     * @param PostCollectionQuery $request
      * @return Responsable
      */
-    public function index(Request $request): Responsable
+    public function index(PostCollectionQuery $request): Responsable
     {
         if ($request->query->has('page')) {
             $posts = Post::query()->paginate($request->query('page')['size'] ?? null);
@@ -44,10 +46,11 @@ class PostController
     }
 
     /**
+     * @param PostQuery $request
      * @param Post $post
      * @return Responsable
      */
-    public function read(Post $post): Responsable
+    public function read(PostQuery $request, Post $post): Responsable
     {
         return new PostResource($post);
     }

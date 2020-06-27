@@ -27,7 +27,8 @@
         "php": "^7.3",
         "ext-json": "*",
         "laravel/framework": "^7.15",
-        "neomerx/json-api": "^4.0"
+        "neomerx/json-api": "^4.0",
+        "willdurand/negotiation": "^2.3"
     },
     "require-dev": {
         "cloudcreativity/json-api-testing": "^3.0",
