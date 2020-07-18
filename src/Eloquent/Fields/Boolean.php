@@ -17,25 +17,33 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Eloquent\Fields;
 
-use Illuminate\Database\Eloquent\Builder;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
-
-interface Paginator
+class Boolean extends Attribute
 {
 
-    /**
-     * Get the keys expected in the `page` query parameter for this paginator.
-     *
-     * @return array
-     */
-    public function keys(): array;
+    use Fillable;
+    use Sortable;
+    use SparseField;
 
     /**
-     * @param Builder $query
-     * @param array $page
-     * @return mixed
+     * Create a string attribute.
+     *
+     * @param string $fieldName
+     * @param string|null $column
+     * @return static
      */
-    public function paginate($query, array $page): Page;
+    public static function make(string $fieldName, string $column = null): self
+    {
+        return new self($fieldName, $column);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function type(): string
+    {
+        return 'boolean';
+    }
+
 }

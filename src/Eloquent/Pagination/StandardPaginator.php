@@ -50,11 +50,6 @@ class StandardPaginator implements Paginator
     protected $simplePagination;
 
     /**
-     * @var bool|null
-     */
-    protected $underscoreMeta;
-
-    /**
      * @var string|null
      */
     protected $metaKey;
@@ -72,6 +67,17 @@ class StandardPaginator implements Paginator
         $this->pageKey = 'number';
         $this->perPageKey = 'size';
         $this->metaKey = 'page';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function keys(): array
+    {
+        return [
+            $this->pageKey,
+            $this->perPageKey,
+        ];
     }
 
     /**

@@ -20,6 +20,8 @@ declare(strict_types=1);
 namespace DummyApp\JsonApi\V1\Posts;
 
 use DummyApp\Post;
+use LaravelJsonApi\Eloquent\Contracts\Paginator;
+use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
 class PostSchema extends Schema
@@ -38,5 +40,13 @@ class PostSchema extends Schema
      * @var string
      */
     protected $resource = PostResource::class;
+
+    /**
+     * @inheritDoc
+     */
+    public function pagination(): ?Paginator
+    {
+        return new StandardPaginator();
+    }
 
 }

@@ -17,27 +17,33 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Eloquent\Fields;
 
-interface Field
+trait Sortable
 {
 
     /**
-     * Get the JSON API field name.
-     *
-     * @return string
+     * @var bool
      */
-    public function name(): string;
+    private $sortable = false;
 
     /**
-     * Get the model column for the field.
+     * Mark the attribute as sortable.
      *
-     * @return string
+     * @return $this
      */
-    public function column(): string;
+    public function sortable(): self
+    {
+        $this->sortable = true;
+
+        return $this;
+    }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
-    public function isSortable(): bool;
+    public function isSortable(): bool
+    {
+        return $this->sortable;
+    }
 }

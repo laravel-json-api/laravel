@@ -17,25 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Eloquent\Fields;
 
-use Illuminate\Database\Eloquent\Builder;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
-
-interface Paginator
+trait SparseField
 {
 
     /**
-     * Get the keys expected in the `page` query parameter for this paginator.
-     *
-     * @return array
+     * @var bool
      */
-    public function keys(): array;
+    private $sparseField = true;
 
     /**
-     * @param Builder $query
-     * @param array $page
-     * @return mixed
+     * Mark the field as not allowed in sparse field sets.
+     *
+     * @return $this
      */
-    public function paginate($query, array $page): Page;
+    public function notSparseField(): self
+    {
+        $this->sparseField = false;
+
+        return $this;
+    }
+
+    /**
+     * Can the field be listed in sparse field sets?
+     *
+     * @return bool
+     */
+    public function isSparseField(): bool
+    {
+        return true === $this->sparseField;
+    }
 }

@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Eloquent;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Core\Support\Str;
+use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
 use function class_basename;
 
@@ -60,6 +61,13 @@ class Schema implements SchemaContract
      * @var Container|null
      */
     private $container;
+
+    /**
+     * Get the paginator to use when fetching collections of this resource.
+     *
+     * @return Paginator|null
+     */
+    abstract public function pagination(): ?Paginator;
 
     /**
      * @inheritDoc
