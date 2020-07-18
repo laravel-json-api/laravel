@@ -198,10 +198,10 @@ class Page implements PageContract
     /**
      * Nest page meta using the provided key.
      *
-     * @param string $key
+     * @param string|null $key
      * @return $this
      */
-    public function withNestedMeta(string $key = 'page'): self
+    public function withNestedMeta(?string $key = 'page'): self
     {
         $this->metaKey = $key;
 

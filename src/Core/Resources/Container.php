@@ -80,7 +80,7 @@ class Container implements ContainerContract
         }
 
         throw new LogicException(sprintf(
-            'Unable to resolve %s to a resource object. Check your container configuration.',
+            'Unable to resolve %s to a resource object. Check your resource configuration.',
             is_object($value) ? get_class($value) : 'non-object value'
         ));
     }

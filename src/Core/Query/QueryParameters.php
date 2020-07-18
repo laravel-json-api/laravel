@@ -269,7 +269,7 @@ class QueryParameters implements Arrayable
      */
     public function withPagination($pagination): self
     {
-        $this->pagination = Arr::cast($pagination);
+        $this->pagination = collect($pagination)->toArray();
 
         return $this;
     }
@@ -302,7 +302,7 @@ class QueryParameters implements Arrayable
      */
     public function withFilters($filters): self
     {
-        $this->filters = Arr::cast($filters);
+        $this->filters = collect($filters)->toArray();
 
         return $this;
     }
