@@ -19,11 +19,21 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http;
 
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
+use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Schema\SchemaIterator;
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 
-class Server
+abstract class Server
 {
+
+    /**
+     * @var IlluminateContainer
+     */
+    private $container;
 
     /**
      * @var string
@@ -31,16 +41,37 @@ class Server
     private $name;
 
     /**
+     * @var SchemaContainerContract|null
+     */
+    private $schemas;
+
+    /**
+     * Bootstrap the server when it is handling an HTTP request.
+     *
+     * @return void
+     */
+    abstract public function serving(): void;
+
+    /**
+     * Get the server's list of schemas.
+     *
+     * @return array
+     */
+    abstract protected function schemas(): array;
+
+    /**
      * Server constructor.
      *
+     * @param IlluminateContainer $container
      * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct(IlluminateContainer $container, string $name)
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('Expecting a non-empty string.');
+            throw new InvalidArgumentException('Expecting a non-empty string.');
         }
 
+        $this->container = $container;
         $this->name = $name;
     }
 
@@ -53,22 +84,27 @@ class Server
     }
 
     /**
-     * @return Encoder
+     * @return SchemaContainerContract
      */
-    public function encoder(): Encoder
+    public function container(): SchemaContainerContract
     {
-        return app(EncoderFactory::class)->build(
-            $this->get('resources') ?: []
+        if ($this->schemas) {
+            return $this->schemas;
+        }
+
+        return $this->schemas = new SchemaContainer(
+            new SchemaIterator($this->container, $this->schemas())
         );
     }
 
     /**
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed
+     * @return Encoder
      */
-    private function get(string $key, $default = null)
+    public function encoder(): Encoder
     {
-        return config("json-api.servers.{$this->name}.{$key}", $default);
+        return $this->container->make(EncoderFactory::class)->build(
+            $this->container()->resources()
+        );
     }
+
 }

@@ -23,9 +23,33 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
 use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Http\ServerRepository;
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 
 class BootJsonApi
 {
+
+    /**
+     * @var IlluminateContainer
+     */
+    private $container;
+
+    /**
+     * @var ServerRepository
+     */
+    private $servers;
+
+    /**
+     * BootJsonApi constructor.
+     *
+     * @param IlluminateContainer $container
+     * @param ServerRepository $servers
+     */
+    public function __construct(IlluminateContainer $container, ServerRepository $servers)
+    {
+        $this->container = $container;
+        $this->servers = $servers;
+    }
 
     /**
      * Handle the request.
@@ -37,9 +61,14 @@ class BootJsonApi
      */
     public function handle($request, Closure $next, string $name)
     {
-        app()->instance(Server::class, new Server($name));
+        $this->container->instance(
+            Server::class,
+            $server = $this->servers->server($name)
+        );
 
         $this->bindPageResolver();
+
+        $server->serving();
 
         return $next($request);
     }
@@ -52,7 +81,7 @@ class BootJsonApi
     protected function bindPageResolver(): void
     {
         /** Override the current page resolution */
-        AbstractPaginator::currentPageResolver(function ($pageName) {
+        AbstractPaginator::currentPageResolver(static function ($pageName) {
             $pagination = \request()->query($pageName);
 
             return $pagination['number'] ?? null;
