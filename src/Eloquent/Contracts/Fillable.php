@@ -19,24 +19,25 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
-interface Filter
+interface Fillable
 {
 
     /**
-     * Get the key for the filter.
+     * Is the field read-only?
      *
-     * @return string
+     * @param Request $request
+     * @return bool
      */
-    public function key(): string;
+    public function isReadOnly($request): bool;
 
     /**
-     * Apply the filter to the query.
+     * Fill the model with the value of the JSON API field.
      *
-     * @param Builder $query
+     * @param Model $model
      * @param mixed $value
-     * @return Builder
      */
-    public function apply($query, $value);
+    public function fill(Model $model, $value): void;
 }

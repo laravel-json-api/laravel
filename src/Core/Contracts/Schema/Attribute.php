@@ -17,26 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Core\Contracts\Schema;
 
-use Illuminate\Database\Eloquent\Builder;
-
-interface Filter
+interface Attribute extends Field
 {
 
     /**
-     * Get the key for the filter.
+     * Is the field sortable?
      *
-     * @return string
+     * @return bool
      */
-    public function key(): string;
+    public function isSortable(): bool;
 
-    /**
-     * Apply the filter to the query.
-     *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
-     */
-    public function apply($query, $value);
 }

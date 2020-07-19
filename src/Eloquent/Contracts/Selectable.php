@@ -19,24 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
-
-interface Filter
+interface Selectable
 {
 
     /**
-     * Get the key for the filter.
+     * Get the columns when selecting this JSON API field in sparse field sets.
      *
-     * @return string
+     * @return string[]
      */
-    public function key(): string;
-
-    /**
-     * Apply the filter to the query.
-     *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
-     */
-    public function apply($query, $value);
+    public function columnsForField(): array;
 }

@@ -22,28 +22,16 @@ namespace LaravelJsonApi\Eloquent\Fields;
 class Boolean extends Attribute
 {
 
-    use Fillable;
-    use Sortable;
-    use SparseField;
-
     /**
-     * Create a string attribute.
+     * Create a boolean attribute.
      *
      * @param string $fieldName
      * @param string|null $column
-     * @return static
+     * @return Boolean
      */
     public static function make(string $fieldName, string $column = null): self
     {
         return new self($fieldName, $column);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function type(): string
-    {
-        return 'boolean';
     }
 
 }

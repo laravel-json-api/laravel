@@ -22,28 +22,16 @@ namespace LaravelJsonApi\Eloquent\Fields;
 class Str extends Attribute
 {
 
-    use Fillable;
-    use Sortable;
-    use SparseField;
-
     /**
      * Create a string attribute.
      *
      * @param string $fieldName
      * @param string|null $column
-     * @return static
+     * @return Str
      */
     public static function make(string $fieldName, string $column = null): self
     {
         return new self($fieldName, $column);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function type(): string
-    {
-        return 'string';
     }
 
 }

@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Core\Support\Str;
@@ -26,7 +27,7 @@ use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
 use function class_basename;
 
-class Schema implements SchemaContract
+abstract class Schema implements SchemaContract
 {
 
     /**
@@ -49,6 +50,13 @@ class Schema implements SchemaContract
      * @var string|null
      */
     protected $resource;
+
+    /**
+     * The key name for the resource id, or null to use the model's route key.
+     *
+     * @var string|null
+     */
+    protected $primaryKey;
 
     /**
      * The relationships that should always be eager loaded.
@@ -106,6 +114,18 @@ class Schema implements SchemaContract
     }
 
     /**
+     * @return string
+     */
+    public function idName(): string
+    {
+        if ($this->primaryKey) {
+            return $this->primaryKey;
+        }
+
+        return $this->primaryKey = $this->newInstance()->getRouteKeyName();
+    }
+
+    /**
      * @inheritDoc
      */
     public function withContainer(Container $container): void
@@ -127,6 +147,16 @@ class Schema implements SchemaContract
         }
 
         throw new LogicException('Expecting schemas to have access to their schema container.');
+    }
+
+    /**
+     * @return Model
+     */
+    protected function newInstance(): Model
+    {
+        $class = $this->model();
+
+        return new $class;
     }
 
     /**

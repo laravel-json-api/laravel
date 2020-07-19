@@ -17,26 +17,36 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Core\Contracts\Schema;
 
-use Illuminate\Database\Eloquent\Builder;
-
-interface Filter
+interface Relation extends Field
 {
 
     /**
-     * Get the key for the filter.
+     * Is this a to-one relation?
+     *
+     * @return bool
+     */
+    public function toOne(): bool;
+
+    /**
+     * Is this a to-many relation?
+     *
+     * @return bool
+     */
+    public function toMany(): bool;
+
+    /**
+     * Get the inverse resource type.
      *
      * @return string
      */
-    public function key(): string;
+    public function inverse(): string;
 
     /**
-     * Apply the filter to the query.
+     * Is the relation allowed as an include path?
      *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
+     * @return bool
      */
-    public function apply($query, $value);
+    public function isIncludePath(): bool;
 }

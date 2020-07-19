@@ -17,33 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Fields;
+namespace LaravelJsonApi\Eloquent\Contracts;
 
-trait Sortable
+use Illuminate\Database\Eloquent\Builder;
+
+interface Sortable
 {
 
     /**
-     * @var bool
-     */
-    private $sortable = false;
-
-    /**
-     * Mark the attribute as sortable.
+     * Apply the sort order to the query.
      *
-     * @return $this
+     * @param Builder $query
+     * @param bool $ascending
+     * @return Builder
      */
-    public function sortable(): self
-    {
-        $this->sortable = true;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isSortable(): bool
-    {
-        return $this->sortable;
-    }
+    public function sort($query, bool $ascending);
 }

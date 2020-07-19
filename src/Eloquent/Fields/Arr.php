@@ -17,26 +17,21 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Eloquent\Fields;
 
-use Illuminate\Database\Eloquent\Builder;
-
-interface Filter
+class Arr extends Attribute
 {
 
     /**
-     * Get the key for the filter.
+     * Create an array attribute.
      *
-     * @return string
+     * @param string $fieldName
+     * @param string|null $column
+     * @return Arr
      */
-    public function key(): string;
+    public static function make(string $fieldName, string $column = null): self
+    {
+        return new self($fieldName, $column);
+    }
 
-    /**
-     * Apply the filter to the query.
-     *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
-     */
-    public function apply($query, $value);
 }

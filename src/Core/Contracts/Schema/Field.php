@@ -17,48 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Core\Contracts\Schema;
 
-use Illuminate\Http\Request;
-
-interface Attribute
+interface Field
 {
 
     /**
-     * Get the JSON API field name.
+     * The JSON API field name.
      *
      * @return string
      */
     public function name(): string;
-
-    /**
-     * Get the model column for the field.
-     *
-     * @return string
-     */
-    public function column(): string;
-
-    /**
-     * Get the JSON type of the field.
-     *
-     * @return string
-     */
-    public function type(): string;
-
-    /**
-     * Can resources be sorted by the field?
-     *
-     * @return bool
-     */
-    public function isSortable(): bool;
-
-    /**
-     * Is the field read-only?
-     *
-     * @param Request $request
-     * @return bool
-     */
-    public function isReadOnly($request): bool;
 
     /**
      * Can the field be listed in sparse field sets?
@@ -66,5 +35,4 @@ interface Attribute
      * @return bool
      */
     public function isSparseField(): bool;
-
 }

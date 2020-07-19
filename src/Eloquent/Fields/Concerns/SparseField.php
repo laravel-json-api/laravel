@@ -17,26 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Eloquent\Fields\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
-
-interface Filter
+trait SparseField
 {
 
     /**
-     * Get the key for the filter.
-     *
-     * @return string
+     * @var bool
      */
-    public function key(): string;
+    private $sparseField = true;
 
     /**
-     * Apply the filter to the query.
+     * Mark the field as not allowed in sparse field sets.
      *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
+     * @return $this
      */
-    public function apply($query, $value);
+    public function notSparseField(): self
+    {
+        $this->sparseField = false;
+
+        return $this;
+    }
+
+    /**
+     * Can the field be listed in sparse field sets?
+     *
+     * @return bool
+     */
+    public function isSparseField(): bool
+    {
+        return true === $this->sparseField;
+    }
 }

@@ -17,35 +17,33 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Fields;
+namespace LaravelJsonApi\Eloquent\Fields\Concerns;
 
-trait SparseField
+trait Sortable
 {
 
     /**
      * @var bool
      */
-    private $sparseField = true;
+    private $sortable = false;
 
     /**
-     * Mark the field as not allowed in sparse field sets.
+     * Mark the attribute as sortable.
      *
      * @return $this
      */
-    public function notSparseField(): self
+    public function sortable(): self
     {
-        $this->sparseField = false;
+        $this->sortable = true;
 
         return $this;
     }
 
     /**
-     * Can the field be listed in sparse field sets?
-     *
-     * @return bool
+     * @inheritDoc
      */
-    public function isSparseField(): bool
+    public function isSortable(): bool
     {
-        return true === $this->sparseField;
+        return $this->sortable;
     }
 }

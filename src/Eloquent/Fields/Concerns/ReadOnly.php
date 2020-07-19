@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Fields;
+namespace LaravelJsonApi\Eloquent\Fields\Concerns;
 
 use Closure;
 use Illuminate\Http\Request;
 
-trait Fillable
+trait ReadOnly
 {
 
     /**
