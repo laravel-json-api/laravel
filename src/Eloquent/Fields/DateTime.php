@@ -39,6 +39,18 @@ class DateTime extends Attribute
     private $tz;
 
     /**
+     * Create a datetime field.
+     *
+     * @param string $fieldName
+     * @param string|null $column
+     * @return static
+     */
+    public static function make(string $fieldName, string $column = null): self
+    {
+        return new self($fieldName, $column);
+    }
+
+    /**
      * Use the provided timezone.
      *
      * @param string $tz

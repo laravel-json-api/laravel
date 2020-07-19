@@ -19,13 +19,17 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent;
 
-use Illuminate\Database\Eloquent\Model;
+use LaravelJsonApi\Core\Contracts\Schema\Attribute;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Core\Contracts\Schema\Field;
+use LaravelJsonApi\Core\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
 use function class_basename;
+use function collect;
+use function sprintf;
 
 abstract class Schema implements SchemaContract
 {
@@ -69,6 +73,25 @@ abstract class Schema implements SchemaContract
      * @var Container|null
      */
     private $container;
+
+    /**
+     * @var array
+     */
+    private $fields;
+
+    /**
+     * Get the resource attributes.
+     *
+     * @return array
+     */
+    abstract public function fields(): array;
+
+    /**
+     * Get the filters for the resource.
+     *
+     * @return array
+     */
+    abstract public function filters(): array;
 
     /**
      * Get the paginator to use when fetching collections of this resource.
@@ -116,13 +139,73 @@ abstract class Schema implements SchemaContract
     /**
      * @return string
      */
-    public function idName(): string
+    public function idName(): ?string
     {
-        if ($this->primaryKey) {
-            return $this->primaryKey;
+        return $this->primaryKey;
+    }
+
+    /**
+     * @return iterable
+     */
+    public function attributes(): iterable
+    {
+        foreach ($this->allFields() as $name => $field) {
+            if ($field instanceof Attribute) {
+                yield $name => $field;
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return Attribute
+     */
+    public function attribute(string $name): Attribute
+    {
+        $this->fields ?: $this->allFields();
+        $field = $this->fields[$name] ?? null;
+
+        if ($field instanceof Attribute) {
+            return $field;
         }
 
-        return $this->primaryKey = $this->newInstance()->getRouteKeyName();
+        throw new LogicException(sprintf(
+            'Attribute %s does not exist on resource schema %s.',
+            $name,
+            $this->type()
+        ));
+    }
+
+    /**
+     * @return iterable
+     */
+    public function relationships(): iterable
+    {
+        foreach ($this->allFields() as $name => $field) {
+            if ($field instanceof Relation) {
+                yield $name => $field;
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return Relation
+     */
+    public function relationship(string $name): Relation
+    {
+        $this->fields ?: $this->allFields();
+        $field = $this->fields[$name] ?? null;
+
+        if ($field instanceof Relation) {
+            return $field;
+        }
+
+        throw new LogicException(sprintf(
+            'Relationship %s does not exist on resource schema %s.',
+            $name,
+            $this->type()
+        ));
     }
 
     /**
@@ -150,16 +233,6 @@ abstract class Schema implements SchemaContract
     }
 
     /**
-     * @return Model
-     */
-    protected function newInstance(): Model
-    {
-        $class = $this->model();
-
-        return new $class;
-    }
-
-    /**
      * @return string
      */
     private function guessType(): string
@@ -167,6 +240,20 @@ abstract class Schema implements SchemaContract
         $type = Str::replaceLast('Schema', '', class_basename($this));
 
         return Str::plural(Str::dasherize($type));
+    }
+
+    /**
+     * @return array
+     */
+    private function allFields(): array
+    {
+        if ($this->fields) {
+            return $this->fields;
+        }
+
+        return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
+            return $field->name();
+        })->sortKeys()->all();
     }
 
 }

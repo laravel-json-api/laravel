@@ -20,6 +20,10 @@ declare(strict_types=1);
 namespace DummyApp\JsonApi\V1\Users;
 
 use DummyApp\User;
+use LaravelJsonApi\Eloquent\Contracts\Paginator;
+use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
 class UserSchema extends Schema
@@ -38,5 +42,33 @@ class UserSchema extends Schema
      * @var string
      */
     protected $resource = UserResource::class;
+
+    /**
+     * @inheritDoc
+     */
+    public function fields(): array
+    {
+        return [
+            DateTime::make('createdAt')->readOnly(),
+            Str::make('name'),
+            DateTime::make('updatedAt')->readOnly(),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function filters(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pagination(): ?Paginator
+    {
+        return new StandardPaginator();
+    }
 
 }

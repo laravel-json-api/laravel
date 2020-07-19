@@ -21,6 +21,8 @@ namespace DummyApp\JsonApi\V1\Posts;
 
 use DummyApp\Post;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
+use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
@@ -40,6 +42,28 @@ class PostSchema extends Schema
      * @var string
      */
     protected $resource = PostResource::class;
+
+    /**
+     * @inheritDoc
+     */
+    public function fields(): array
+    {
+        return [
+            Str::make('content'),
+            DateTime::make('createdAt')->sortable()->readOnly(),
+            Str::make('synopsis'),
+            Str::make('title'),
+            Str::make('updatedAt')->readOnly(),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function filters(): array
+    {
+        return [];
+    }
 
     /**
      * @inheritDoc
