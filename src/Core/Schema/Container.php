@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Schema;
 
 use LaravelJsonApi\Core\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Contracts\Schema\Container as ContainerContract;
+use LogicException;
 use function collect;
 
 class Container implements ContainerContract
@@ -58,6 +59,18 @@ class Container implements ContainerContract
         }
 
         ksort($this->types);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function schemaFor(string $resourceType): Schema
+    {
+        if (isset($this->types[$resourceType])) {
+            return $this->types[$resourceType];
+        }
+
+        throw new LogicException("No schema for JSON API resource type {$resourceType}.");
     }
 
     /**

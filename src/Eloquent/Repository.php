@@ -21,8 +21,11 @@ namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
+use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
+use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
 
-class Repository
+class Repository implements RepositoryContract, QueriesAll
 {
 
     /**
@@ -52,7 +55,7 @@ class Repository
      * @param string $resourceId
      * @return Model|null
      */
-    public function find(string $resourceId): ?Model
+    public function find(string $resourceId)
     {
         return $this->newQuery()->where(
             $this->idName(),
@@ -72,6 +75,14 @@ class Repository
             $this->idName(),
             $resourceId
         )->exists();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function query(): QueryBuilder
+    {
+        return new Builder($this->schema, $this->newQuery());
     }
 
     /**

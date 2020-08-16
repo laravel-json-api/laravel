@@ -20,12 +20,13 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
-use LaravelJsonApi\Core\Support\Arr;
+use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
+use UnexpectedValueException;
 use function array_key_exists;
 use function http_build_query;
 use function is_array;
 
-class QueryParameters implements Arrayable
+class QueryParameters implements QueryParametersContract, Arrayable
 {
 
     /**
@@ -52,6 +53,35 @@ class QueryParameters implements Arrayable
      * @var array|null
      */
     private $filters;
+
+    /**
+     * Cast a value to query parameters.
+     *
+     * @param $value
+     * @return static
+     */
+    public static function cast($value): self
+    {
+        if ($value instanceof self) {
+            return $value;
+        }
+
+        if ($value instanceof QueryParametersContract) {
+            return new self(
+                $value->includePaths(),
+                $value->sparseFieldSets(),
+                $value->sortFields(),
+                $value->page(),
+                $value->filter()
+            );
+        }
+
+        if (is_array($value)) {
+            return self::fromArray($value);
+        }
+
+        throw new UnexpectedValueException('Expecting a valid query parameters value.');
+    }
 
     /**
      * @param array $value
@@ -161,7 +191,7 @@ class QueryParameters implements Arrayable
     /**
      * @return FieldSets|null
      */
-    public function fields(): ?FieldSets
+    public function sparseFieldSets(): ?FieldSets
     {
         return $this->fieldSets;
     }
@@ -218,7 +248,7 @@ class QueryParameters implements Arrayable
     public function withoutFieldSet(string ...$types): self
     {
         if ($this->fieldSets) {
-            $this->fieldSets->forget($types);
+            $this->fieldSets->forget(...$types);
         }
 
         return $this;
@@ -227,7 +257,7 @@ class QueryParameters implements Arrayable
     /**
      * @return SortFields|null
      */
-    public function sort(): ?SortFields
+    public function sortFields(): ?SortFields
     {
         return $this->sort;
     }

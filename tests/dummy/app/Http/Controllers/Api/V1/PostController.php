@@ -24,23 +24,25 @@ use DummyApp\JsonApi\V1\Posts\PostQuery;
 use DummyApp\JsonApi\V1\Posts\PostResource;
 use DummyApp\Post;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Store\Store;
 
 class PostController
 {
 
     /**
+     * Fetch resources.
+     *
+     * @param Store $store
      * @param PostCollectionQuery $request
      * @return Responsable
      */
-    public function index(PostCollectionQuery $request): Responsable
+    public function index(Store $store, PostCollectionQuery $request): Responsable
     {
-        if ($request->query->has('page')) {
-            $posts = Post::query()->paginate($request->query('page')['size'] ?? null);
-        } else {
-            $posts = Post::all();
-        }
+        $posts = $store
+            ->query('posts')
+            ->using($request)
+            ->getOrPaginate($request->page());
 
         return new ResourceCollection($posts);
     }

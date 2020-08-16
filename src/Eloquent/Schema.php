@@ -24,6 +24,7 @@ use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Schema\Field;
 use LaravelJsonApi\Core\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
+use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
@@ -137,6 +138,14 @@ abstract class Schema implements SchemaContract
     }
 
     /**
+     * @inheritDoc
+     */
+    public function repository(): RepositoryContract
+    {
+        return new Repository($this);
+    }
+
+    /**
      * @return string
      */
     public function idName(): ?string
@@ -231,6 +240,7 @@ abstract class Schema implements SchemaContract
 
         throw new LogicException('Expecting schemas to have access to their schema container.');
     }
+
 
     /**
      * @return string

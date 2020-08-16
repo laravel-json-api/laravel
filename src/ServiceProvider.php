@@ -19,9 +19,12 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
+use LaravelJsonApi\Http\Server;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -42,6 +45,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        // no-op
+        $this->app->bind(Store::class, static function (Application $app) {
+            return $app->make(Server::class)->store();
+        });
     }
 }

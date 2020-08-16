@@ -23,7 +23,6 @@ use Countable;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use IteratorAggregate;
 use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
@@ -38,17 +37,17 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     /**
      * @var iterable|PageContract
      */
-    public $resources;
+    public iterable $resources;
 
     /**
      * @var bool
      */
-    protected $preserveAllQueryParameters = false;
+    protected bool $preserveAllQueryParameters = false;
 
     /**
      * @var array|null
      */
-    protected $queryParameters;
+    protected ?array $queryParameters = null;
 
     /**
      * ResourceCollection constructor.

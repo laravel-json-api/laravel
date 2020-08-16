@@ -70,7 +70,7 @@ class PostSchema extends Schema
      */
     public function pagination(): ?Paginator
     {
-        return new StandardPaginator();
+        return StandardPaginator::make()->withMetaKey(null);
     }
 
 }

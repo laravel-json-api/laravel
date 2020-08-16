@@ -26,6 +26,7 @@ use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Schema\SchemaIterator;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use LaravelJsonApi\Core\Store\Store;
 
 abstract class Server
 {
@@ -95,6 +96,14 @@ abstract class Server
         return $this->schemas = new SchemaContainer(
             new SchemaIterator($this->container, $this->schemas())
         );
+    }
+
+    /**
+     * @return Store
+     */
+    public function store(): Store
+    {
+        return new Store($this->container());
     }
 
     /**

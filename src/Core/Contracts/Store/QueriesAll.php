@@ -17,23 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Core\Contracts\Store;
 
-interface Container
+interface QueriesAll
 {
 
     /**
-     * Get a schema by JSON API resource type.
+     * Query all resources.
      *
-     * @param string $resourceType
-     * @return Schema
+     * @return QueryBuilder
      */
-    public function schemaFor(string $resourceType): Schema;
-
-    /**
-     * Get a list of model classes mapped to their resource classes.
-     *
-     * @return array
-     */
-    public function resources(): array;
+    public function query(): QueryBuilder;
 }

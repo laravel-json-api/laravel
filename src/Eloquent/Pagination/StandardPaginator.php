@@ -60,6 +60,16 @@ class StandardPaginator implements Paginator
     protected $primaryKey;
 
     /**
+     * Fluent constructor.
+     *
+     * @return StandardPaginator
+     */
+    public static function make(): self
+    {
+        return new self();
+    }
+
+    /**
      * StandardStrategy constructor.
      */
     public function __construct()

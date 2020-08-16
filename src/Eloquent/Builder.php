@@ -23,32 +23,37 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
+use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
+use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Query\RelationshipPath;
 use LaravelJsonApi\Core\Query\SortField;
 use LaravelJsonApi\Core\Query\SortFields;
 use LaravelJsonApi\Eloquent\Contracts\Filter;
 use LaravelJsonApi\Eloquent\Contracts\Sortable;
 use LogicException;
 use function array_key_exists;
+use function is_null;
 use function sprintf;
 
-class Builder
+class Builder implements QueryBuilder
 {
 
     /**
      * @var Schema
      */
-    private $schema;
+    private Schema $schema;
 
     /**
      * @var EloquentBuilder
      */
-    private $query;
+    private EloquentBuilder $query;
 
     /**
      * @var QueryParameters
      */
-    private $parameters;
+    private QueryParameters $parameters;
 
     /**
      * Builder constructor.
@@ -64,13 +69,32 @@ class Builder
     }
 
     /**
-     * Filter models using JSON API filter parameters.
+     * Apply the provided query parameters.
      *
-     * @param array $filters
+     * @param QueryParametersContract $query
      * @return $this
      */
-    public function filter(array $filters): self
+    public function using(QueryParametersContract $query): self
     {
+        return $this
+            ->with($query->includePaths())
+            ->filter($query->filter())
+            ->sort($query->sortFields());
+    }
+
+    /**
+     * Filter models using JSON API filter parameters.
+     *
+     * @param array|null $filters
+     * @return $this
+     */
+    public function filter(?array $filters): self
+    {
+        if (is_null($filters)) {
+            $this->parameters->withoutFilters();
+            return $this;
+        }
+
         /** @var Filter $filter */
         foreach ($this->schema->filters() as $filter) {
             if (array_key_exists($filter->key(), $filters)) {
@@ -86,11 +110,16 @@ class Builder
     /**
      * Sort models using JSON API sort fields.
      *
-     * @param $fields
+     * @param SortFields|SortField|array|string|null $fields
      * @return $this
      */
     public function sort($fields): self
     {
+        if (is_null($fields)) {
+            $this->parameters->withoutSortFields();
+            return $this;
+        }
+
         $fields = SortFields::cast($fields);
 
         /** @var SortField $sort */
@@ -110,6 +139,24 @@ class Builder
         }
 
         $this->parameters->withSortFields($fields);
+
+        return $this;
+    }
+
+    /**
+     * Eager load resources using the provided JSON API include paths.
+     *
+     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
+     * @return $this
+     */
+    public function with($includePaths): self
+    {
+        if (is_null($includePaths)) {
+            $this->parameters->withoutIncludePaths();
+            return $this;
+        }
+
+        // TODO: Implement with() method.
 
         return $this;
     }
@@ -135,21 +182,6 @@ class Builder
     }
 
     /**
-     * Execute the query, paginating results only if page parameters are provided.
-     *
-     * @param array|null $page
-     * @return EloquentCollection|Page
-     */
-    public function getOrPaginate(?array $page)
-    {
-        if (empty($page)) {
-            return $this->get();
-        }
-
-        return $this->paginate($page);
-    }
-
-    /**
      * Return a page of models using JSON API page parameters.
      *
      * @param array $page
@@ -167,6 +199,21 @@ class Builder
             'Resource %s does not support pagination.',
             $this->schema->type()
         ));
+    }
+
+    /**
+     * Execute the query, paginating results only if page parameters are provided.
+     *
+     * @param array|null $page
+     * @return EloquentCollection|Page
+     */
+    public function getOrPaginate(?array $page): iterable
+    {
+        if (empty($page)) {
+            return $this->get();
+        }
+
+        return $this->paginate($page);
     }
 
     /**

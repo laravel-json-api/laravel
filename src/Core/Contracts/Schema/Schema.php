@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Schema;
 
+use LaravelJsonApi\Core\Contracts\Store\Repository;
+
 interface Schema
 {
 
@@ -42,6 +44,13 @@ interface Schema
      * @return string
      */
     public function resource(): string;
+
+    /**
+     * Get a repository for the resource.
+     *
+     * @return Repository
+     */
+    public function repository(): Repository;
 
     /**
      * Use the provided container to lookup other schemas.

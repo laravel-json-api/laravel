@@ -20,26 +20,22 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Query\FieldSets;
+use LaravelJsonApi\Core\Query\IncludePaths;
+use LaravelJsonApi\Core\Query\SortFields;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use function array_key_exists;
 
-class ResourceQuery extends FormRequest
+class ResourceQuery extends FormRequest implements QueryParameters
 {
 
     /**
      * @var string[]
      */
-    protected $mediaTypes = [
+    protected array $mediaTypes = [
         'application/vnd.api+json',
     ];
-
-    /**
-     * @return QueryParameters
-     */
-    public function jsonApiQuery(): QueryParameters
-    {
-        return QueryParameters::fromArray($this->validated());
-    }
 
     /**
      * @return array
@@ -47,6 +43,76 @@ class ResourceQuery extends FormRequest
     public function validationData()
     {
         return $this->query();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function includePaths(): ?IncludePaths
+    {
+        $data = $this->validated();
+
+        if (array_key_exists('include', $data)) {
+            return IncludePaths::fromString($data['include'] ?: '');
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sparseFieldSets(): ?FieldSets
+    {
+        $data = $this->validated();
+
+        if (array_key_exists('fields', $data)) {
+            return FieldSets::fromArray($data['fields']);
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sortFields(): ?SortFields
+    {
+        $data = $this->validated();
+
+        if (array_key_exists('sort', $data)) {
+            return SortFields::fromString($data['sort'] ?: '');
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function page(): ?array
+    {
+        $data = $this->validated();
+
+        if (array_key_exists('page', $data)) {
+            return $data['page'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function filter(): ?array
+    {
+        $data = $this->validated();
+
+        if (array_key_exists('filter', $data)) {
+            return $data['filter'];
+        }
+
+        return null;
     }
 
     /**

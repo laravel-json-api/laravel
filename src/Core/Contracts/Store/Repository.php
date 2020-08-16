@@ -17,23 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Core\Contracts\Store;
 
-interface Container
+use Illuminate\Database\Eloquent\Model;
+
+interface Repository
 {
 
     /**
-     * Get a schema by JSON API resource type.
+     * Get the model for the supplied resource id.
      *
-     * @param string $resourceType
-     * @return Schema
+     * @param string $resourceId
+     * @return Model|mixed|null
      */
-    public function schemaFor(string $resourceType): Schema;
+    public function find(string $resourceId);
 
     /**
-     * Get a list of model classes mapped to their resource classes.
+     * Does a model with the supplied resource id exist?
      *
-     * @return array
+     * @param string $resourceId
+     * @return bool
      */
-    public function resources(): array;
+    public function exists(string $resourceId): bool;
 }

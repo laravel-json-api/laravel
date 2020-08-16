@@ -31,6 +31,7 @@ class IndexTest extends TestCase
         $posts = factory(Post::class, 3)->create();
 
         $response = $this
+            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->get('/api/v1/posts');
@@ -58,6 +59,7 @@ class IndexTest extends TestCase
         ];
 
         $response = $this
+            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->page(['number' => 1, 'size' => 3])
