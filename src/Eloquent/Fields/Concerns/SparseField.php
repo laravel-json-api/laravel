@@ -25,7 +25,7 @@ trait SparseField
     /**
      * @var bool
      */
-    private $sparseField = true;
+    private bool $sparseField = true;
 
     /**
      * Mark the field as not allowed in sparse field sets.

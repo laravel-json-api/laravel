@@ -87,7 +87,10 @@ final class Relationships implements IteratorAggregate
      */
     public function getIterator()
     {
-        foreach ($this->resource->relationships() as $fieldName => $relation) {
+        /** @var \LaravelJsonApi\Core\Resources\Relation $relation */
+        foreach ($this->resource->relationships() as $relation) {
+            $fieldName = $relation->fieldName();
+
             if ($this->fields->isFieldRequested($this->resource->type(), $fieldName)) {
                 yield $fieldName => (new Relation(
                     $this->container,

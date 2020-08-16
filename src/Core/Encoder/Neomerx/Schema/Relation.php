@@ -33,7 +33,6 @@ use function is_null;
 /**
  * Class Relation
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
 final class Relation
@@ -96,7 +95,7 @@ final class Relation
     }
 
     /**
-     * @return ResourceObject|IdentifierInterface|iterable|null
+     * @return JsonApiResource|IdentifierInterface|iterable|null
      */
     public function data()
     {

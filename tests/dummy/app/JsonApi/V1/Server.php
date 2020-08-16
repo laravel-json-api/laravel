@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace DummyApp\JsonApi\V1;
 
 use DummyApp\JsonApi\V1\Posts\PostSchema;
+use DummyApp\JsonApi\V1\Users\UserSchema;
 use LaravelJsonApi\Http\Server as BaseServer;
 
 class Server extends BaseServer
@@ -44,6 +45,7 @@ class Server extends BaseServer
     {
         return [
             PostSchema::class,
+            UserSchema::class,
         ];
     }
 }

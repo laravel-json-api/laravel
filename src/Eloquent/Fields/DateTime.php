@@ -31,12 +31,12 @@ class DateTime extends Attribute
      *
      * @var bool
      */
-    private $useTz = true;
+    private bool $useTz = true;
 
     /**
      * @var string|null
      */
-    private $tz;
+    private ?string $tz = null;
 
     /**
      * Create a datetime field.

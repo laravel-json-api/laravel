@@ -153,10 +153,9 @@ class Builder implements QueryBuilder
     {
         if (is_null($includePaths)) {
             $this->parameters->withoutIncludePaths();
-            return $this;
+        } else {
+            $this->parameters->withIncludePaths($includePaths);
         }
-
-        // TODO: Implement with() method.
 
         return $this;
     }
@@ -168,6 +167,8 @@ class Builder implements QueryBuilder
      */
     public function first(): ?Model
     {
+        $this->eagerLoad();
+
         return $this->query->first();
     }
 
@@ -178,6 +179,8 @@ class Builder implements QueryBuilder
      */
     public function get(): EloquentCollection
     {
+        $this->eagerLoad();
+
         return $this->query->get();
     }
 
@@ -189,6 +192,8 @@ class Builder implements QueryBuilder
      */
     public function paginate(array $page): Page
     {
+        $this->eagerLoad();
+
         if ($paginator = $this->schema->pagination()) {
             return $paginator->paginate($this->query, $page)->withQuery(
                 $this->parameters->withPagination($page)->toArray()
@@ -221,7 +226,7 @@ class Builder implements QueryBuilder
      */
     public function toQuery(): QueryParameters
     {
-        return $this->toQuery();
+        return clone $this->parameters;
     }
 
     /**
@@ -230,5 +235,18 @@ class Builder implements QueryBuilder
     public function toBase()
     {
         return $this->query;
+    }
+
+    /**
+     * Eager load relations.
+     *
+     * @return void
+     */
+    private function eagerLoad(): void
+    {
+        if ($includePaths = $this->parameters->includePaths()) {
+            $loader = new EagerLoader($this->schema, $includePaths);
+            $this->query->with($loader->all());
+        }
     }
 }

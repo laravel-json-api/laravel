@@ -25,7 +25,7 @@ trait Sortable
     /**
      * @var bool
      */
-    private $sortable = false;
+    private bool $sortable = false;
 
     /**
      * Mark the attribute as sortable.

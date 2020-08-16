@@ -17,43 +17,31 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Eloquent\Fields\Concerns;
 
-interface Relation extends Field
+trait EagerLoadable
 {
 
     /**
-     * Is this a to-one relation?
-     *
+     * @var bool
+     */
+    private bool $includePath = true;
+
+    /**
+     * @return $this
+     */
+    public function cannotEagerLoad(): self
+    {
+        $this->includePath = false;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
-    public function toOne(): bool;
-
-    /**
-     * Is this a to-many relation?
-     *
-     * @return bool
-     */
-    public function toMany(): bool;
-
-    /**
-     * Get the inverse resource type.
-     *
-     * @return string
-     */
-    public function inverse(): string;
-
-    /**
-     * Get the schema for the inverse resource type.
-     *
-     * @return Schema
-     */
-    public function schema(): Schema;
-
-    /**
-     * Is the relation allowed as an include path?
-     *
-     * @return bool
-     */
-    public function isIncludePath(): bool;
+    public function isIncludePath(): bool
+    {
+        return $this->includePath;
+    }
 }

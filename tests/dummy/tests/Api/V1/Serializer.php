@@ -21,6 +21,7 @@ namespace DummyApp\Tests\Api\V1;
 
 use DummyApp\Post;
 use LaravelJsonApi\Core\Document\ResourceObject;
+use function url;
 
 class Serializer
 {
@@ -33,7 +34,7 @@ class Serializer
      */
     public function post(Post $post): ResourceObject
     {
-        $self = "http://localhost/api/v1/posts/{$post->getRouteKey()}";
+        $self = url('/api/v1/posts', $post);
 
         return ResourceObject::create([
             'type' => 'posts',
@@ -50,6 +51,12 @@ class Serializer
                     'links' => [
                         'self' => "{$self}/relationships/author",
                         'related' => "{$self}/author",
+                    ],
+                ],
+                'comments' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/comments",
+                        'related' => "{$self}/comments",
                     ],
                 ],
             ],

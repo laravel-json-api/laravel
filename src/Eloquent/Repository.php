@@ -31,12 +31,12 @@ class Repository implements RepositoryContract, QueriesAll
     /**
      * @var Schema
      */
-    private $schema;
+    private Schema $schema;
 
     /**
      * @var Model
      */
-    private $model;
+    private Model $model;
 
     /**
      * Repository constructor.

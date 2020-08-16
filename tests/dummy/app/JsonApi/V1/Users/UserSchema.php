@@ -34,14 +34,14 @@ class UserSchema extends Schema
      *
      * @var string
      */
-    protected $model = User::class;
+    protected string $model = User::class;
 
     /**
      * The resource the schema corresponds to.
      *
      * @var string
      */
-    protected $resource = UserResource::class;
+    protected string $resource = UserResource::class;
 
     /**
      * @inheritDoc

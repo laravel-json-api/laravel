@@ -19,41 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Schema;
 
-interface Relation extends Field
+interface SchemaAware
 {
 
     /**
-     * Is this a to-one relation?
+     * Use the provided container to lookup other schemas.
      *
-     * @return bool
+     * @param Container $container
+     * @return void
      */
-    public function toOne(): bool;
-
-    /**
-     * Is this a to-many relation?
-     *
-     * @return bool
-     */
-    public function toMany(): bool;
-
-    /**
-     * Get the inverse resource type.
-     *
-     * @return string
-     */
-    public function inverse(): string;
-
-    /**
-     * Get the schema for the inverse resource type.
-     *
-     * @return Schema
-     */
-    public function schema(): Schema;
-
-    /**
-     * Is the relation allowed as an include path?
-     *
-     * @return bool
-     */
-    public function isIncludePath(): bool;
+    public function withContainer(Container $container): void;
 }

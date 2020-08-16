@@ -17,43 +17,41 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Eloquent\Fields\Relations;
 
-interface Relation extends Field
+use LaravelJsonApi\Core\Support\Str;
+
+class BelongsTo extends Relation
 {
 
     /**
-     * Is this a to-one relation?
+     * Create a to-one relation.
      *
-     * @return bool
+     * @param string $fieldName
+     * @param string|null $relation
+     * @return BelongsTo
      */
-    public function toOne(): bool;
+    public static function make(string $fieldName, string $relation = null): BelongsTo
+    {
+        return new self($fieldName, $relation);
+    }
 
     /**
-     * Is this a to-many relation?
-     *
-     * @return bool
+     * @inheritDoc
      */
-    public function toMany(): bool;
+    public function toOne(): bool
+    {
+        return true;
+    }
 
     /**
-     * Get the inverse resource type.
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function inverse(): string;
+    protected function guessInverse(): string
+    {
+        return Str::dasherize(
+            Str::plural($this->name())
+        );
+    }
 
-    /**
-     * Get the schema for the inverse resource type.
-     *
-     * @return Schema
-     */
-    public function schema(): Schema;
-
-    /**
-     * Is the relation allowed as an include path?
-     *
-     * @return bool
-     */
-    public function isIncludePath(): bool;
 }

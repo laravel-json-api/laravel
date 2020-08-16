@@ -69,4 +69,33 @@ class IndexTest extends TestCase
             ->assertMeta($meta)
             ->assertLinks($links);
     }
+
+    public function testIncludeAuthor(): void
+    {
+        $posts = factory(Post::class, 2)->create();
+
+        $expected1 = $this->serializer->post($posts[0])->toArray();
+        $expected1['relationships']['author']['data'] = $user1 = [
+            'type' => 'users',
+            'id' => (string) $posts[0]->author->getRouteKey(),
+        ];
+
+        $expected2 = $this->serializer->post($posts[1])->toArray();
+        $expected2['relationships']['author']['data'] = $user2 = [
+            'type' => 'users',
+            'id' => (string) $posts[1]->author->getRouteKey(),
+        ];
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->includePaths('author')
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany([$expected1, $expected2])->assertIncluded([
+            $user1,
+            $user2,
+        ]);
+    }
 }

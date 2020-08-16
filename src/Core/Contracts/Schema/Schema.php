@@ -52,11 +52,4 @@ interface Schema
      */
     public function repository(): Repository;
 
-    /**
-     * Use the provided container to lookup other schemas.
-     *
-     * @param Container $container
-     * @return void
-     */
-    public function withContainer(Container $container): void;
 }

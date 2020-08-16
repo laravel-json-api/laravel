@@ -146,7 +146,7 @@ class CompoundDocument implements Serializable
     public function jsonSerialize()
     {
         try {
-            $this->reset();
+            $this->prepareEncoder();
 
             return $this->encoder->serializeData($this->data);
         } catch (\Throwable $ex) {
@@ -160,7 +160,7 @@ class CompoundDocument implements Serializable
     public function toJson($options = 0)
     {
         try {
-            $this->reset();
+            $this->prepareEncoder();
 
             return $this->encoder
                 ->withEncodeOptions($options | JSON_THROW_ON_ERROR)
@@ -175,10 +175,8 @@ class CompoundDocument implements Serializable
      *
      * @return void
      */
-    private function reset(): void
+    private function prepareEncoder(): void
     {
-        $this->encoder->reset();
-
         if ($version = $this->jsonApi->version()) {
             $this->encoder->withJsonApiVersion($version);
         }

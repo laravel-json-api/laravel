@@ -23,6 +23,7 @@ use LaravelJsonApi\Core\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Contracts\Schema\Container as ContainerContract;
 use LogicException;
 use function collect;
+use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
 
 class Container implements ContainerContract
 {
@@ -52,7 +53,9 @@ class Container implements ContainerContract
                 throw new \InvalidArgumentException('Expecting a schema.');
             }
 
-            $schema->withContainer($this);
+            if ($schema instanceof SchemaAwareContract) {
+                $schema->withContainer($this);
+            }
 
             $this->types[$schema->type()] = $schema;
             $this->models[$schema->model()] = $schema;

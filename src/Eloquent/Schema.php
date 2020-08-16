@@ -24,61 +24,66 @@ use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Schema\Field;
 use LaravelJsonApi\Core\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
+use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
+use LaravelJsonApi\Core\Schema\SchemaAware;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
 use function class_basename;
-use function collect;
+use function is_array;
+use function ksort;
 use function sprintf;
 
-abstract class Schema implements SchemaContract
+abstract class Schema implements SchemaContract, SchemaAwareContract
 {
+
+    use SchemaAware;
 
     /**
      * The JSON API resource type the schema corresponds to.
      *
      * @var string|null
      */
-    protected $type;
+    protected ?string $type = null;
 
     /**
      * The model the schema corresponds to.
      *
-     * @var string|null
+     * @var string
      */
-    protected $model;
+    protected string $model;
 
     /**
      * The resource the schema corresponds to.
      *
-     * @var string|null
+     * @var string
      */
-    protected $resource;
+    protected string $resource;
 
     /**
      * The key name for the resource id, or null to use the model's route key.
      *
      * @var string|null
      */
-    protected $primaryKey;
+    protected ?string $primaryKey;
 
     /**
      * The relationships that should always be eager loaded.
      *
      * @var array
      */
-    protected $with = [];
+    protected array $with = [];
 
     /**
      * @var Container|null
      */
-    private $container;
+    private ?Container $container;
 
     /**
-     * @var array
+     * @var array|null
      */
-    private $fields;
+    private ?array $fields = null;
 
     /**
      * Get the resource attributes.
@@ -218,31 +223,6 @@ abstract class Schema implements SchemaContract
     }
 
     /**
-     * @inheritDoc
-     */
-    public function withContainer(Container $container): void
-    {
-        if ($this->container) {
-            throw new LogicException('Not expecting schema container to be changed.');
-        }
-
-        $this->container = $container;
-    }
-
-    /**
-     * @return Container
-     */
-    protected function schemas(): Container
-    {
-        if ($this->container) {
-            return $this->container;
-        }
-
-        throw new LogicException('Expecting schemas to have access to their schema container.');
-    }
-
-
-    /**
      * @return string
      */
     private function guessType(): string
@@ -257,13 +237,24 @@ abstract class Schema implements SchemaContract
      */
     private function allFields(): array
     {
-        if ($this->fields) {
+        if (is_array($this->fields)) {
             return $this->fields;
         }
 
-        return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
-            return $field->name();
-        })->sortKeys()->all();
+        $this->fields = [];
+
+        /** @var Field $field */
+        foreach ($this->fields() as $field) {
+            if ($field instanceof SchemaAwareContract) {
+                $field->withContainer($this->schemas());
+            }
+
+            $this->fields[$field->name()] = $field;
+        }
+
+        ksort($this->fields);
+
+        return $this->fields;
     }
 
 }

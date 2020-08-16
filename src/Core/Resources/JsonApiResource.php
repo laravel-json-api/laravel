@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\DelegatesToResource;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
+use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
 use LogicException;
 use function sprintf;
@@ -76,6 +77,17 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     public function id(): string
     {
         return (string) $this->resource->getRouteKey();
+    }
+
+    /**
+     * @return ResourceIdentifier
+     */
+    public function identifier(): ResourceIdentifier
+    {
+        return new ResourceIdentifier(
+            $this->type(),
+            $this->id()
+        );
     }
 
     /**

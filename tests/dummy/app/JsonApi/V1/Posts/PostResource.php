@@ -61,7 +61,8 @@ class PostResource extends JsonApiResource
     public function relationships(): iterable
     {
         return [
-            'author' => $this->relation('author'),
+            $this->relation('author'),
+            $this->relation('comments'),
         ];
     }
 

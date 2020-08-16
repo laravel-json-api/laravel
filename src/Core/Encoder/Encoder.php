@@ -34,27 +34,27 @@ class Encoder
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
     /**
      * @var Factory
      */
-    private $factory;
+    private Factory $factory;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var IncludePaths|null
      */
-    private $includePaths;
+    private ?IncludePaths $includePaths = null;
 
     /**
      * @var FieldSets|null
      */
-    private $fieldSets;
+    private ?FieldSets $fieldSets = null;
 
     /**
      * Encoder constructor.
@@ -138,6 +138,16 @@ class Encoder
             new SchemaFields($this->includePaths ?: new IncludePaths(), $this->fieldSets ?: new FieldSets())
         );
 
-        return new Neomerx\Encoder($this->factory, $schemas);
+        $encoder = new Neomerx\Encoder($this->factory, $schemas);
+
+        if ($this->includePaths) {
+            $encoder->withIncludedPaths($this->includePaths->toArray());
+        }
+
+        if ($this->fieldSets) {
+            $encoder->withFieldSets($this->fieldSets->toArray());
+        }
+
+        return $encoder;
     }
 }
