@@ -20,11 +20,11 @@ namespace LaravelJsonApi\Testing;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LaravelJsonApi\Core\Support\Str;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use function array_walk_recursive;
 use function collect;
-use function http_build_query;
 use function implode;
 use function is_bool;
 use function is_null;
@@ -36,32 +36,42 @@ final class TestBuilder
     /**
      * @var TestCase|MakesHttpRequests
      */
-    private $test;
-
-    /**
-     * @var string
-     */
-    private $accept;
-
-    /**
-     * @var string
-     */
-    private $contentType;
+    private TestCase $test;
 
     /**
      * @var string|null
      */
-    private $expectedResourceType;
+    private ?string $accept;
+
+    /**
+     * @var string|null
+     */
+    private ?string $contentType;
+
+    /**
+     * @var string|null
+     */
+    private ?string $expectedResourceType = null;
 
     /**
      * @var Collection
      */
-    private $query;
+    private Collection $query;
 
     /**
      * @var Collection
      */
-    private $document;
+    private Collection $headers;
+
+    /**
+     * @var Collection|null
+     */
+    private ?Collection $json = null;
+
+    /**
+     * @var Collection|null
+     */
+    private ?Collection $payload = null;
 
     /**
      * TestBuilder constructor.
@@ -73,7 +83,7 @@ final class TestBuilder
         $this->test = $test;
         $this->accept = $this->contentType = 'application/vnd.api+json';
         $this->query = collect();
-        $this->document = collect();
+        $this->headers = collect();
     }
 
     /**
@@ -116,6 +126,28 @@ final class TestBuilder
     }
 
     /**
+     * Set the request content type to 'application/x-www-form-urlencoded'.
+     *
+     * @return $this
+     */
+    public function asFormUrlEncoded(): self
+    {
+        return $this->contentType('application/x-www-form-urlencoded');
+    }
+
+    /**
+     * Set the request content type to multipart form data.
+     *
+     * @return $this
+     */
+    public function asMultiPartFormData(): self
+    {
+        return $this->contentType(
+            'multipart/form-data; boundary=----WebKitFormBoundary' . Str::random(15),
+        );
+    }
+
+    /**
      * Add query parameters to the request.
      *
      * @param iterable $query
@@ -123,7 +155,7 @@ final class TestBuilder
      */
     public function query(iterable $query): self
     {
-        $this->query = collect($this->query)->merge($query);
+        $this->query = collect($query)->merge($query);
 
         return $this;
     }
@@ -142,7 +174,7 @@ final class TestBuilder
     }
 
     /**
-     * Set the sparse fieldsets for a resource type.
+     * Set the sparse field sets for a resource type.
      *
      * @param string $resourceType
      * @param string|string[] $fieldNames
@@ -198,34 +230,65 @@ final class TestBuilder
     /**
      * Set the data member of the request JSON API document.
      *
-     * @param mixed|null $data
+     * @param iterable|null $data
      * @return $this
      */
-    public function data($data): self
+    public function withData(?iterable $data): self
     {
         if (is_null($data)) {
-            $this->document->put('data', null);
-        } else {
-            $this->document->put('data', collect($data));
+            return $this->withJson(['data' => null]);
         }
+
+        return $this->withJson(['data' => collect($data)]);
+    }
+
+    /**
+     * Set the JSON request document.
+     *
+     * @param $json
+     * @return $this
+     */
+    public function withJson($json): self
+    {
+        $this->json = collect($json);
 
         return $this;
     }
 
     /**
-     * Set the request JSON API document (HTTP request body).
+     * Set the request payload for a non-JSON API request.
      *
-     * @param mixed $document
-     * @param string|null $contentType
+     * @param mixed $parameters
      * @return $this
      */
-    public function content($document, string $contentType = null): self
+    public function withPayload($parameters): self
     {
-        $this->document = collect($document);
+        $this->payload = collect($parameters);
+        // we need a content length as it is used by the JSON API implementation to determine if there is body.
+        $this->headers['CONTENT_LENGTH'] = '1';
 
-        if ($contentType) {
-            $this->contentType($contentType);
-        }
+        return $this;
+    }
+
+    /**
+     * @param iterable $headers
+     * @return $this
+     */
+    public function withHeaders(iterable $headers): self
+    {
+        $this->headers = $this->headers->merge($headers);
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value): self
+    {
+        $this->headers->put($name, $value);
 
         return $this;
     }
@@ -267,6 +330,16 @@ final class TestBuilder
     }
 
     /**
+     * @param string $uri
+     * @param array|iterable $headers
+     * @return TestResponse
+     */
+    public function put(string $uri, iterable $headers = []): TestResponse
+    {
+        return $this->call('PUT', $uri, $headers);
+    }
+
+    /**
      * Visit the given URI with a DELETE request, expecting JSON API content.
      *
      * @param string $uri
@@ -290,17 +363,24 @@ final class TestBuilder
             $uri .= '?' . $this->buildQuery();
         }
 
-        $headers = collect([
-            'Accept' => $this->accept,
-            'CONTENT_TYPE' => $this->contentType,
-        ])->filter()->merge($headers);
+        $headers = $this->buildHeaders($headers);
 
-        $response = TestResponse::cast($this->test->json(
-            $method,
-            $uri,
-            $this->document->toArray(),
-            $headers->toArray()
-        ));
+        if ($this->payload) {
+            $response = $this->test->{strtolower($method)}(
+                $uri,
+                $this->payload->toArray(),
+                $headers
+            );
+        } else {
+            $response = $this->test->json(
+                $method,
+                $uri,
+                $this->json ? $this->json->toArray() : [],
+                $headers
+            );
+        }
+
+        $response = TestResponse::cast($response);
 
         if ($this->expectedResourceType) {
             $response->willSeeResourceType($this->expectedResourceType);
@@ -331,5 +411,18 @@ final class TestBuilder
         });
 
         return Arr::query($query);
+    }
+
+    /**
+     * @param iterable $headers
+     * @return array
+     */
+    private function buildHeaders(iterable $headers): array
+    {
+        return collect(['Accept' => $this->accept, 'CONTENT_TYPE' => $this->contentType])
+            ->filter()
+            ->merge($this->headers)
+            ->merge($headers)
+            ->toArray();
     }
 }
