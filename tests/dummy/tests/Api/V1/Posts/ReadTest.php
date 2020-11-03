@@ -25,7 +25,7 @@ class ReadTest extends TestCase
 
     public function test(): void
     {
-        $post = factory(Post::class)->create();
+        $post = Post::factory()->create();
         $expected = $this->serializer->post($post)->toArray();
 
         $response = $this
@@ -39,7 +39,7 @@ class ReadTest extends TestCase
 
     public function testInvalidMediaType(): void
     {
-        $post = factory(Post::class)->create();
+        $post = Post::factory()->create();
 
         $this->jsonApi()
             ->accept('text/html')

@@ -15,17 +15,35 @@
  * limitations under the License.
  */
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+declare(strict_types=1);
+
+namespace Database\Factories;
 
 use DummyApp\Post;
 use DummyApp\User;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Post::class, function (Faker $faker) {
-    return [
-        'author_id' => factory(User::class),
-        'content' => $faker->text,
-        'synopsis' => $faker->sentence,
-        'title' => $faker->words(3, true),
-    ];
-});
+class PostFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Post::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'author_id' => User::factory(),
+            'content' => $this->faker->text,
+            'synopsis' => $this->faker->sentence,
+            'title' => $this->faker->words(3, true),
+        ];
+    }
+}

@@ -26,14 +26,13 @@
     "require": {
         "php": "^7.4",
         "ext-json": "*",
-        "laravel/framework": "^7.15",
-        "neomerx/json-api": "^4.0",
-        "willdurand/negotiation": "^2.3"
+        "laravel/framework": "^8.0",
+        "neomerx/json-api": "^4.0"
     },
     "require-dev": {
-        "cloudcreativity/json-api-testing": "^3.0",
-        "orchestra/testbench": "^5.3",
-        "phpunit/phpunit": "^9.0"
+        "cloudcreativity/json-api-testing": "^3.1",
+        "orchestra/testbench": "^6.3",
+        "phpunit/phpunit": "^9.4"
     },
     "autoload": {
         "psr-4": {
@@ -42,6 +41,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Database\\Factories\\": "tests/dummy/database/factories",
             "DummyApp\\":  "tests/dummy/app",
             "DummyApp\\Tests\\": "tests/dummy/tests",
             "LaravelJsonApi\\Tests\\": "tests/lib"

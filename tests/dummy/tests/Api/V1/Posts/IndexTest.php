@@ -28,7 +28,7 @@ class IndexTest extends TestCase
 
     public function test(): void
     {
-        $posts = factory(Post::class, 3)->create();
+        $posts = Post::factory()->count(3)->create();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -41,7 +41,7 @@ class IndexTest extends TestCase
 
     public function testPaginated(): void
     {
-        $posts = factory(Post::class, 5)->create();
+        $posts = Post::factory()->count(5)->create();
 
         $meta = [
             'current_page' => 1,
@@ -72,7 +72,7 @@ class IndexTest extends TestCase
 
     public function testIncludeAuthor(): void
     {
-        $posts = factory(Post::class, 2)->create();
+        $posts = Post::factory()->count(2)->create();
 
         $expected1 = $this->serializer->post($posts[0])->toArray();
         $expected1['relationships']['author']['data'] = $user1 = [

@@ -40,7 +40,6 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->withFactories(__DIR__ . '/../database/factories');
 
         config()->set('json-api', require __DIR__ . '/../config/json-api.php');
     }
