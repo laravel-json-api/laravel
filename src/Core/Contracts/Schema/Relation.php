@@ -44,13 +44,6 @@ interface Relation extends Field
     public function inverse(): string;
 
     /**
-     * Get the schema for the inverse resource type.
-     *
-     * @return Schema
-     */
-    public function schema(): Schema;
-
-    /**
      * Is the relation allowed as an include path?
      *
      * @return bool

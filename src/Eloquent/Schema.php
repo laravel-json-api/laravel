@@ -147,7 +147,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
      */
     public function repository(): RepositoryContract
     {
-        return new Repository($this);
+        return new Repository($this->schemas(), $this);
     }
 
     /**

@@ -20,20 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent\Fields\Relations;
 
 use LaravelJsonApi\Core\Contracts\Schema\Relation as RelationContract;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
-use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
-use LaravelJsonApi\Core\Schema\SchemaAware;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Fields\Concerns\EagerLoadable;
 use LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly;
 use LaravelJsonApi\Eloquent\Fields\Concerns\SparseField;
 
-abstract class Relation implements RelationContract, SchemaAwareContract
+abstract class Relation implements RelationContract
 {
 
     use EagerLoadable;
     use ReadOnly;
-    use SchemaAware;
     use SparseField;
 
     /**
@@ -121,16 +117,6 @@ abstract class Relation implements RelationContract, SchemaAwareContract
         }
 
         return $this->inverse = $this->guessInverse();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function schema(): Schema
-    {
-        return $this->schemas()->schemaFor(
-            $this->inverse()
-        );
     }
 
     /**

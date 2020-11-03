@@ -21,12 +21,18 @@ namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
 
 class Repository implements RepositoryContract, QueriesAll
 {
+
+    /**
+     * @var Container
+     */
+    private Container $schemas;
 
     /**
      * @var Schema
@@ -41,10 +47,12 @@ class Repository implements RepositoryContract, QueriesAll
     /**
      * Repository constructor.
      *
+     * @param Container $schemas
      * @param Schema $schema
      */
-    public function __construct(Schema $schema)
+    public function __construct(Container $schemas, Schema $schema)
     {
+        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->model = $this->newInstance();
     }
@@ -82,7 +90,7 @@ class Repository implements RepositoryContract, QueriesAll
      */
     public function query(): QueryBuilder
     {
-        return new Builder($this->schema, $this->newQuery());
+        return new Builder($this->schemas, $this->schema, $this->newQuery());
     }
 
     /**

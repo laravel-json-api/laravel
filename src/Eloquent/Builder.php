@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
@@ -39,6 +40,11 @@ use function sprintf;
 
 class Builder implements QueryBuilder
 {
+
+    /**
+     * @var Container
+     */
+    private Container $schemas;
 
     /**
      * @var Schema
@@ -58,11 +64,13 @@ class Builder implements QueryBuilder
     /**
      * Builder constructor.
      *
+     * @param Container $schemas
      * @param Schema $schema
      * @param EloquentBuilder $query
      */
-    public function __construct(Schema $schema, $query)
+    public function __construct(Container $schemas, Schema $schema, $query)
     {
+        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->query = $query;
         $this->parameters = new QueryParameters();
@@ -245,7 +253,7 @@ class Builder implements QueryBuilder
     private function eagerLoad(): void
     {
         if ($includePaths = $this->parameters->includePaths()) {
-            $loader = new EagerLoader($this->schema, $includePaths);
+            $loader = new EagerLoader($this->schemas, $this->schema, $includePaths);
             $this->query->with($loader->all());
         }
     }

@@ -20,11 +20,17 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use IteratorAggregate;
+use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use function iterator_to_array;
 
 class EagerLoader implements IteratorAggregate
 {
+
+    /**
+     * @var Container
+     */
+    private Container $schemas;
 
     /**
      * @var Schema
@@ -39,12 +45,13 @@ class EagerLoader implements IteratorAggregate
     /**
      * EagerLoader constructor.
      *
+     * @param Container $schemas
      * @param Schema $schema
      * @param IncludePaths $paths
-     * @TODO need to support sparse fields sets when eager loading.
      */
-    public function __construct(Schema $schema, IncludePaths $paths)
+    public function __construct(Container $schemas, Schema $schema, IncludePaths $paths)
     {
+        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->paths = $paths;
     }
@@ -63,7 +70,7 @@ class EagerLoader implements IteratorAggregate
     public function getIterator()
     {
         foreach ($this->paths as $path) {
-            yield (string) new EagerLoadPath($this->schema, $path);
+            yield (string) new EagerLoadPath($this->schemas, $this->schema, $path);
         }
     }
 

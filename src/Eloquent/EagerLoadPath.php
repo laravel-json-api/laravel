@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use IteratorAggregate;
+use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\RelationshipPath;
 use LaravelJsonApi\Eloquent\Fields\Relations\Relation;
 use LogicException;
@@ -28,6 +29,11 @@ use function iterator_to_array;
 
 class EagerLoadPath implements IteratorAggregate
 {
+
+    /**
+     * @var Container
+     */
+    private Container $schemas;
 
     /**
      * @var Schema
@@ -42,11 +48,13 @@ class EagerLoadPath implements IteratorAggregate
     /**
      * EagerLoadPath constructor.
      *
+     * @param Container $schemas
      * @param Schema $schema
      * @param RelationshipPath $path
      */
-    public function __construct(Schema $schema, RelationshipPath $path)
+    public function __construct(Container $schemas, Schema $schema, RelationshipPath $path)
     {
+        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->path = $path;
     }
@@ -86,7 +94,7 @@ class EagerLoadPath implements IteratorAggregate
             $relation = $schema->relationship($field);
 
             if ($relation instanceof Relation && $relation->isIncludePath()) {
-                $schema = $relation->schema();
+                $schema = $this->schemas->schemaFor($relation->inverse());
                 yield $relation->relation();
                 continue;
             }
