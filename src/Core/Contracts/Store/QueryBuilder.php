@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
@@ -71,11 +71,11 @@ interface QueryBuilder
     public function first();
 
     /**
-     * Execute the query and get models.
+     * Get a lazy collection for the query.
      *
-     * @return iterable
+     * @return LazyCollection
      */
-    public function get(): iterable;
+    public function cursor(): LazyCollection;
 
     /**
      * Return a page of models using JSON API page parameters.
@@ -89,7 +89,7 @@ interface QueryBuilder
      * Execute the query, paginating results only if page parameters are provided.
      *
      * @param array|null $page
-     * @return Page|EloquentCollection|iterable
+     * @return Page|LazyCollection|iterable
      */
     public function getOrPaginate(?array $page): iterable;
 }

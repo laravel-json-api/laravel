@@ -64,9 +64,9 @@ class Container implements ContainerContract
         $this->models = [];
         $this->schemas = [];
 
-        foreach ($schemas as $schema) {
-            $this->types[$schema::type()] = $schema;
-            $this->models[$schema::model()] = $schema;
+        foreach ($schemas as $schemaClass) {
+            $this->types[$schemaClass::type()] = $schemaClass;
+            $this->models[$schemaClass::model()] = $schemaClass;
         }
 
         ksort($this->types);

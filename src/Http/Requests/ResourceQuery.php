@@ -21,9 +21,11 @@ namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
+use LaravelJsonApi\Core\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use function array_key_exists;
 
@@ -31,11 +33,77 @@ class ResourceQuery extends FormRequest implements QueryParameters
 {
 
     /**
+     * @var callable|null
+     */
+    private static $queryManyResolver;
+
+    /**
+     * @var callable|null
+     */
+    private static $queryOneResolver;
+
+    /**
      * @var string[]
      */
     protected array $mediaTypes = [
         'application/vnd.api+json',
     ];
+
+    /**
+     * Specify the callback to use to guess the request class for querying many resources.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessQueryManyUsing(callable $resolver): void
+    {
+        self::$queryManyResolver = $resolver;
+    }
+
+    /**
+     * Resolve the request instance when querying many resources.
+     *
+     * @param string $resourceType
+     * @return QueryParameters
+     */
+    public static function queryMany(string $resourceType): QueryParameters
+    {
+        $resolver = self::$queryManyResolver ?: function ($resourceType) {
+            return Str::replaceLast('Schema', 'CollectionQuery', get_class(
+                app(SchemaContainer::class)->schemaFor($resourceType)
+            ));
+        };
+
+        return app($resolver($resourceType));
+    }
+
+    /**
+     * Specify the callback to use to guess the request class for querying one resource.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessQueryOneUsing(callable $resolver): void
+    {
+        self::$queryOneResolver = $resolver;
+    }
+
+    /**
+     * Resolve the request instance when querying one resource.
+     *
+     * @param string $resourceType
+     * @return QueryParameters
+     */
+    public static function queryOne(string $resourceType): QueryParameters
+    {
+        $resolver = self::$queryManyResolver ?: function ($resourceType) {
+            return Str::replaceLast('Schema', 'Query', get_class(
+                app(SchemaContainer::class)->schemaFor($resourceType)
+            ));
+        };
+
+        return app($resolver($resourceType));
+    }
 
     /**
      * @return array

@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Eloquent;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
@@ -181,15 +182,15 @@ class Builder implements QueryBuilder
     }
 
     /**
-     * Execute the query and get models.
+     * Get a lazy collection for the query.
      *
-     * @return EloquentCollection
+     * @return LazyCollection
      */
-    public function get(): EloquentCollection
+    public function cursor(): LazyCollection
     {
         $this->eagerLoad();
 
-        return $this->query->get();
+        return $this->query->cursor();
     }
 
     /**
@@ -218,12 +219,12 @@ class Builder implements QueryBuilder
      * Execute the query, paginating results only if page parameters are provided.
      *
      * @param array|null $page
-     * @return EloquentCollection|Page
+     * @return LazyCollection|Page
      */
     public function getOrPaginate(?array $page): iterable
     {
         if (empty($page)) {
-            return $this->get();
+            return $this->cursor();
         }
 
         return $this->paginate($page);

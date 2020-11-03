@@ -40,8 +40,14 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
 
     use SchemaAware;
 
+    /**
+     * @var callable|null
+     */
     protected static $resourceTypeResolver;
 
+    /**
+     * @var callable|null
+     */
     protected static $resourceResolver;
 
     /**

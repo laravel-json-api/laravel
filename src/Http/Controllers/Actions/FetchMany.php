@@ -17,26 +17,32 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Http\Controllers\Api\V1;
+namespace LaravelJsonApi\Http\Controllers\Actions;
 
-use DummyApp\JsonApi\V1\Posts\PostQuery;
-use DummyApp\JsonApi\V1\Posts\PostResource;
-use DummyApp\Post;
 use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Http\Controllers\Actions;
+use Illuminate\Support\Facades\Route;
+use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Store\Store;
+use LaravelJsonApi\Http\Requests\ResourceQuery;
 
-class PostController
+trait FetchMany
 {
 
-    use Actions\FetchMany;
-
     /**
-     * @param PostQuery $request
-     * @param Post $post
+     * @param Store $store
      * @return Responsable
      */
-    public function read(PostQuery $request, Post $post): Responsable
+    public function index(Store $store): Responsable
     {
-        return new PostResource($post);
+        $request = ResourceQuery::queryMany(
+            $resourceType = Route::current()->parameter('resource_type')
+        );
+
+        $models = $store
+            ->query($resourceType)
+            ->using($request)
+            ->getOrPaginate($request->page());
+
+        return new ResourceCollection($models);
     }
 }

@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Http;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
+use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
@@ -45,6 +46,11 @@ abstract class Server
      * @var SchemaContainerContract|null
      */
     private ?SchemaContainerContract $schemas = null;
+
+    /**
+     * @var ResourceFactoryContract|null
+     */
+    private ?ResourceFactoryContract $resources = null;
 
     /**
      * Bootstrap the server when it is handling an HTTP request.
@@ -99,6 +105,20 @@ abstract class Server
     }
 
     /**
+     * @return ResourceFactoryContract
+     */
+    public function resources(): ResourceFactoryContract
+    {
+        if ($this->resources) {
+            return $this->resources;
+        }
+
+        return $this->resources = new ResourceFactory(
+            $this->container()->resources()
+        );
+    }
+
+    /**
      * @return Store
      */
     public function store(): Store
@@ -114,9 +134,7 @@ abstract class Server
         /** @var EncoderFactory $factory */
         $factory = $this->container->make(EncoderFactory::class);
 
-        return $factory->build(
-            new ResourceFactory($this->container()->resources())
-        );
+        return $factory->build($this->resources());
     }
 
 }
