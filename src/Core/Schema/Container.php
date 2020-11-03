@@ -19,14 +19,22 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use LaravelJsonApi\Core\Contracts\Schema\Container as ContainerContract;
-use LogicException;
-use function collect;
+use LaravelJsonApi\Core\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LogicException;
+use RuntimeException;
+use Throwable;
+use function collect;
 
 class Container implements ContainerContract
 {
+
+    /**
+     * @var IlluminateContainer
+     */
+    private IlluminateContainer $container;
 
     /**
      * @var array
@@ -39,26 +47,26 @@ class Container implements ContainerContract
     private array $models;
 
     /**
+     * @var array
+     */
+    private array $schemas;
+
+    /**
      * Container constructor.
      *
+     * @param IlluminateContainer $container
      * @param iterable $schemas
      */
-    public function __construct(iterable $schemas)
+    public function __construct(IlluminateContainer $container, iterable $schemas)
     {
+        $this->container = $container;
         $this->types = [];
         $this->models = [];
+        $this->schemas = [];
 
         foreach ($schemas as $schema) {
-            if (!$schema instanceof Schema) {
-                throw new \InvalidArgumentException('Expecting a schema.');
-            }
-
-            if ($schema instanceof SchemaAwareContract) {
-                $schema->withContainer($this);
-            }
-
-            $this->types[$schema->type()] = $schema;
-            $this->models[$schema->model()] = $schema;
+            $this->types[$schema::type()] = $schema;
+            $this->models[$schema::model()] = $schema;
         }
 
         ksort($this->types);
@@ -70,7 +78,7 @@ class Container implements ContainerContract
     public function schemaFor(string $resourceType): Schema
     {
         if (isset($this->types[$resourceType])) {
-            return $this->types[$resourceType];
+            return $this->resolve($this->types[$resourceType]);
         }
 
         throw new LogicException("No schema for JSON API resource type {$resourceType}.");
@@ -81,8 +89,45 @@ class Container implements ContainerContract
      */
     public function resources(): array
     {
-        return collect($this->models)->map(function (Schema $schema) {
-            return $schema->resource();
-        })->all();
+        return collect($this->models)
+            ->map(fn($schemaClass) => $schemaClass::resource())
+            ->all();
+    }
+
+    /**
+     * @param string $schemaClass
+     * @return Schema
+     */
+    private function resolve(string $schemaClass): Schema
+    {
+        if (isset($this->schemas[$schemaClass])) {
+            return $this->schemas[$schemaClass];
+        }
+
+        return $this->schemas[$schemaClass] = $this->make($schemaClass);
+    }
+
+    /**
+     * @param string $schemaClass
+     * @return Schema
+     */
+    private function make(string $schemaClass): Schema
+    {
+        try {
+            $schema = $this->container->make($schemaClass);
+        } catch (Throwable $ex) {
+            throw new RuntimeException("Unable to create schema {$schemaClass}.", 0, $ex);
+        }
+
+        /** If the schema needs to lookup other schemas, we inject the container. */
+        if ($schema instanceof SchemaAwareContract) {
+            $schema->withContainer($this);
+        }
+
+        if ($schema instanceof Schema) {
+            return $schema;
+        }
+
+        throw new RuntimeException("Class {$schema} is not a JSON API schema.");
     }
 }

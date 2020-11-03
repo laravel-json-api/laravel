@@ -26,11 +26,11 @@ use LaravelJsonApi\Core\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
+use LaravelJsonApi\Core\Resolver\ResourceClass;
+use LaravelJsonApi\Core\Resolver\ResourceType;
 use LaravelJsonApi\Core\Schema\SchemaAware;
-use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LogicException;
-use function class_basename;
 use function is_array;
 use function ksort;
 use function sprintf;
@@ -40,26 +40,9 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
 
     use SchemaAware;
 
-    /**
-     * The JSON API resource type the schema corresponds to.
-     *
-     * @var string|null
-     */
-    protected ?string $type = null;
+    protected static $resourceTypeResolver;
 
-    /**
-     * The model the schema corresponds to.
-     *
-     * @var string
-     */
-    protected string $model;
-
-    /**
-     * The resource the schema corresponds to.
-     *
-     * @var string
-     */
-    protected string $resource;
+    protected static $resourceResolver;
 
     /**
      * The key name for the resource id, or null to use the model's route key.
@@ -107,39 +90,57 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     abstract public function pagination(): ?Paginator;
 
     /**
-     * @inheritDoc
+     * Specify the callback to use to guess the resource type from the schema class.
+     *
+     * @param callable $resolver
+     * @return void
      */
-    public function type(): string
+    public static function guessTypeUsing(callable $resolver): void
     {
-        if ($this->type) {
-            return $this->type;
-        }
-
-        return $this->type = $this->guessType();
+        static::$resourceTypeResolver = $resolver;
     }
 
     /**
      * @inheritDoc
      */
-    public function model(): string
+    public static function type(): string
     {
-        if ($this->model) {
-            return $this->model;
+        $resolver = static::$resourceResolver ?: new ResourceType();
+
+        return $resolver(static::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function model(): string
+    {
+        if (isset(static::$model)) {
+            return static::$model;
         }
 
         throw new LogicException('The model class name must be set.');
     }
 
     /**
+     * Specify the callback to use to guess the resource class from the schema class.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessResourceUsing(callable $resolver): void
+    {
+        static::$resourceResolver = $resolver;
+    }
+
+    /**
      * @inheritDoc
      */
-    public function resource(): string
+    public static function resource(): string
     {
-        if ($this->resource) {
-            return $this->resource;
-        }
+        $resolver = static::$resourceResolver ?: new ResourceClass();
 
-        throw new LogicException('The resource class name must be set.');
+        return $resolver(static::class);
     }
 
     /**
@@ -220,16 +221,6 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
             $name,
             $this->type()
         ));
-    }
-
-    /**
-     * @return string
-     */
-    private function guessType(): string
-    {
-        $type = Str::replaceLast('Schema', '', class_basename($this));
-
-        return Str::plural(Str::dasherize($type));
     }
 
     /**

@@ -26,7 +26,6 @@ use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Schema\SchemaIterator;
 use LaravelJsonApi\Core\Store\Store;
 
 abstract class Server
@@ -95,7 +94,7 @@ abstract class Server
         }
 
         return $this->schemas = new SchemaContainer(
-            new SchemaIterator($this->container, $this->schemas())
+            $this->container, $this->schemas()
         );
     }
 

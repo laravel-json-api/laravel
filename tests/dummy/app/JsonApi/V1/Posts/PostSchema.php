@@ -36,14 +36,7 @@ class PostSchema extends Schema
      *
      * @var string
      */
-    protected string $model = Post::class;
-
-    /**
-     * The resource the schema corresponds to.
-     *
-     * @var string
-     */
-    protected string $resource = PostResource::class;
+    public static string $model = Post::class;
 
     /**
      * @inheritDoc
@@ -74,7 +67,7 @@ class PostSchema extends Schema
      */
     public function pagination(): ?Paginator
     {
-        return StandardPaginator::make()->withMetaKey(null);
+        return StandardPaginator::make()->withoutNestedMeta();
     }
 
 }

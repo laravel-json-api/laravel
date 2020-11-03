@@ -29,21 +29,21 @@ interface Schema
      *
      * @return string
      */
-    public function type(): string;
+    public static function type(): string;
 
     /**
      * Get the fully-qualified class name of the model.
      *
      * @return string
      */
-    public function model(): string;
+    public static function model(): string;
 
     /**
      * Get the fully-qualified class name of the resource.
      *
      * @return string
      */
-    public function resource(): string;
+    public static function resource(): string;
 
     /**
      * Get a repository for the resource.

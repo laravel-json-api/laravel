@@ -173,6 +173,16 @@ class StandardPaginator implements Paginator
     }
 
     /**
+     * Mark the paginator as not nesting page meta.
+     *
+     * @return $this
+     */
+    public function withoutNestedMeta(): self
+    {
+        return $this->withMetaKey(null);
+    }
+
+    /**
      * @inheritDoc
      */
     public function paginate($query, array $page): PageContract
