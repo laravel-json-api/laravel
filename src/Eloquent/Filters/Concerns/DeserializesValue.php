@@ -27,7 +27,7 @@ trait DeserializesValue
     /**
      * @var Closure|null
      */
-    private $deserializer;
+    private ?Closure $deserializer = null;
 
     /**
      * @param Closure $deserializer

@@ -33,12 +33,12 @@ class ErrorSource implements Serializable
     /**
      * @var string|null
      */
-    private $pointer;
+    private ?string $pointer;
 
     /**
      * @var string|null
      */
-    private $parameter;
+    private ?string $parameter;
 
     /**
      * @param ErrorSource|array|null $value

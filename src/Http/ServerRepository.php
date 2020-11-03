@@ -31,12 +31,12 @@ class ServerRepository
     /**
      * @var IlluminateContainer
      */
-    private $container;
+    private IlluminateContainer $container;
 
     /**
      * @var Repository
      */
-    private $config;
+    private Repository $config;
 
     /**
      * ServerRepository constructor.

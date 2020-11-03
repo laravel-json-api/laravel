@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace LaravelJsonApi\Core\Resources;
 
 use Illuminate\Contracts\Support\Responsable;
@@ -31,12 +33,12 @@ class ResourceResponse implements Responsable
     /**
      * @var JsonApiResource|null
      */
-    private $resource;
+    private ?JsonApiResource $resource;
 
     /**
      * @var bool
      */
-    private $created = false;
+    private bool $created = false;
 
     /**
      * ResourceResponse constructor.

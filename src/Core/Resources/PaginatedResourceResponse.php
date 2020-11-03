@@ -30,14 +30,9 @@ class PaginatedResourceResponse extends ResourceCollectionResponse
 {
 
     /**
-     * @var ResourceCollection
-     */
-    private $resources;
-
-    /**
      * @var PageContract
      */
-    private $page;
+    private PageContract $page;
 
     /**
      * PaginatedResourceResponse constructor.

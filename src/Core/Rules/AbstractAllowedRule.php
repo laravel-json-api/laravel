@@ -29,17 +29,17 @@ abstract class AbstractAllowedRule implements Rule
     /**
      * @var bool
      */
-    private $all;
+    private bool $all;
 
     /**
      * @var Collection
      */
-    private $allowed;
+    private Collection $allowed;
 
     /**
      * The last value that was validated.
      *
-     * @var string|null
+     * @var mixed|null
      */
     private $value;
 

@@ -25,9 +25,9 @@ class ParameterNotSupported implements Rule
 {
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $name;
+    private ?string $name;
 
     /**
      * DisallowedParameter constructor.

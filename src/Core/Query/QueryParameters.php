@@ -32,27 +32,27 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * @var IncludePaths|null
      */
-    private $includePaths;
+    private ?IncludePaths $includePaths;
 
     /**
      * @var FieldSets|null
      */
-    private $fieldSets;
+    private ?FieldSets $fieldSets;
 
     /**
      * @var SortFields|null
      */
-    private $sort;
+    private ?SortFields $sort;
 
     /**
      * @var array|null
      */
-    private $pagination;
+    private ?array $pagination;
 
     /**
      * @var array|null
      */
-    private $filters;
+    private ?array $filters;
 
     /**
      * Cast a value to query parameters.

@@ -30,7 +30,7 @@ class ID implements Filter
     /**
      * @var string|null
      */
-    private $column;
+    private ?string $column;
 
     /**
      * ID constructor.

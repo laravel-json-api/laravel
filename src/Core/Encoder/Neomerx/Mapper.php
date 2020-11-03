@@ -35,7 +35,7 @@ class Mapper
     /**
      * @var FactoryInterface
      */
-    private $factory;
+    private FactoryInterface $factory;
 
     /**
      * Mapper constructor.

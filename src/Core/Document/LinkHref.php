@@ -34,12 +34,12 @@ class LinkHref implements JsonSerializable
     /**
      * @var string
      */
-    private $uri;
+    private string $uri;
 
     /**
      * @var array|null
      */
-    private $query;
+    private ?array $query = null;
 
     /**
      * @param LinkHref|static|string $value

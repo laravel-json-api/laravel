@@ -30,12 +30,12 @@ class SortField
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var bool
      */
-    private $ascending;
+    private bool $ascending;
 
     /**
      * @param SortField|string $value

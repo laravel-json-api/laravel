@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\Concerns;
 
-use LaravelJsonApi\Core\Document\Document;
 use LaravelJsonApi\Core\Document\JsonApi;
 
 trait HasJsonApi
@@ -28,7 +27,7 @@ trait HasJsonApi
     /**
      * @var JsonApi|null
      */
-    private $jsonApi;
+    private ?JsonApi $jsonApi = null;
 
     /**
      * @return JsonApi

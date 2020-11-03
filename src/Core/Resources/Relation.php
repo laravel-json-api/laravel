@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
@@ -30,17 +32,17 @@ class Relation
     /**
      * @var JsonApiResource
      */
-    private $resource;
+    private JsonApiResource $resource;
 
     /**
      * @var string
      */
-    private $fieldName;
+    private string $fieldName;
 
     /**
      * @var string|null
      */
-    private $keyName;
+    private ?string $keyName;
 
     /**
      * @var mixed|null
@@ -50,22 +52,22 @@ class Relation
     /**
      * @var bool
      */
-    private $hasData;
+    private bool $hasData;
 
     /**
      * @var bool
      */
-    private $showData;
+    private bool $showData;
 
     /**
      * @var bool
      */
-    private $showSelf;
+    private bool $showSelf;
 
     /**
      * @var bool
      */
-    private $showRelated;
+    private bool $showRelated;
 
     /**
      * @var array|Closure

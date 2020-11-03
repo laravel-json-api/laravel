@@ -30,7 +30,7 @@ trait ArrayList
     /**
      * @var array
      */
-    private $value;
+    private array $value = [];
 
     /**
      * @inheritDoc

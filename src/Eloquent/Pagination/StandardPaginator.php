@@ -32,32 +32,32 @@ class StandardPaginator implements Paginator
     /**
      * @var string
      */
-    protected $pageKey;
+    protected string $pageKey;
 
     /**
      * @var string
      */
-    protected $perPageKey;
+    protected string  $perPageKey;
 
     /**
      * @var array|null
      */
-    protected $columns;
+    protected ?array $columns = null;
 
     /**
      * @var bool|null
      */
-    protected $simplePagination;
+    protected ?bool $simplePagination = null;
 
     /**
      * @var string|null
      */
-    protected $metaKey;
+    protected ?string $metaKey;
 
     /**
      * @var string|null
      */
-    protected $primaryKey;
+    protected ?string $primaryKey = null;
 
     /**
      * Fluent constructor.

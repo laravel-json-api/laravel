@@ -34,7 +34,7 @@ class Factory implements FactoryContract
     /**
      * @var array
      */
-    private $bindings;
+    private array $bindings;
 
     /**
      * Factory constructor.
@@ -43,6 +43,8 @@ class Factory implements FactoryContract
      */
     public function __construct(iterable $bindings = [])
     {
+        $this->bindings = [];
+
         foreach ($bindings as $record => $resource) {
             $this->attach($record, $resource);
         }

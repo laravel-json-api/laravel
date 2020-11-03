@@ -35,7 +35,7 @@ class Container implements ContainerContract
     /**
      * @var array
      */
-    private $bindings;
+    private array $bindings;
 
     /**
      * Container constructor.

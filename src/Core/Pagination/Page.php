@@ -38,27 +38,27 @@ class Page implements PageContract
     /**
      * @var Paginator|LengthAwarePaginator
      */
-    private $paginator;
+    private Paginator $paginator;
 
     /**
      * @var array|null
      */
-    private $queryParameters;
+    private ?array $queryParameters = null;
 
     /**
      * @var string|null
      */
-    private $metaKey;
+    private ?string $metaKey = null;
 
     /**
      * @var string
      */
-    private $pageParam = 'number';
+    private string $pageParam = 'number';
 
     /**
      * @var string
      */
-    private $perPageParam = 'size';
+    private string $perPageParam = 'size';
 
     /**
      * @param PageContract|Paginator $page

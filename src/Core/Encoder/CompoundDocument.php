@@ -31,12 +31,12 @@ class CompoundDocument implements Serializable
     /**
      * @var Neomerx\Encoder
      */
-    private $encoder;
+    private Neomerx\Encoder $encoder;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var mixed
@@ -46,17 +46,17 @@ class CompoundDocument implements Serializable
     /**
      * @var JsonApi
      */
-    private $jsonApi;
+    private JsonApi $jsonApi;
 
     /**
      * @var Links|null
      */
-    private $links;
+    private ?Links $links = null;
 
     /**
      * @var Hash|null
      */
-    private $meta;
+    private ?Hash $meta = null;
 
     /**
      * CompoundDocument constructor.

@@ -30,42 +30,42 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     /**
      * @var string
      */
-    private $type;
+    private string $type;
 
     /**
      * @var string|null
      */
-    private $id;
+    private ?string $id;
 
     /**
      * @var array
      */
-    private $attributes;
+    private array $attributes;
 
     /**
      * @var array
      */
-    private $relationships;
+    private array $relationships;
 
     /**
      * @var array
      */
-    private $meta;
+    private array $meta;
 
     /**
      * @var array
      */
-    private $links;
+    private array $links;
 
     /**
      * @var Collection
      */
-    private $fieldValues;
+    private Collection $fieldValues;
 
     /**
      * @var Collection
      */
-    private $fieldNames;
+    private Collection $fieldNames;
 
     /**
      * Create a resource object from the data member of a JSON document.

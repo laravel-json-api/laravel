@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace LaravelJsonApi\Core\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;

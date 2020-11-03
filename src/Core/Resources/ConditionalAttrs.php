@@ -30,12 +30,12 @@ class ConditionalAttrs implements IteratorAggregate, Skippable
     /**
      * @var bool
      */
-    private $check;
+    private bool $check;
 
     /**
      * @var iterable
      */
-    private $values;
+    private iterable $values;
 
     /**
      * ConditionalAttrs constructor.

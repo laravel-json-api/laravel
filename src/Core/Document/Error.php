@@ -38,27 +38,27 @@ class Error implements Serializable
     /**
      * @var string|null
      */
-    private $status;
+    private ?string $status = null;
 
     /**
      * @var string|null
      */
-    private $code;
+    private ?string $code = null;
 
     /**
      * @var string|null
      */
-    private $title;
+    private ?string $title = null;
 
     /**
      * @var string|null
      */
-    private $detail;
+    private ?string $detail = null;
 
     /**
      * @var ErrorSource|null
      */
-    private $source;
+    private ?ErrorSource $source = null;
 
     /**
      * Create a JSON API error object.

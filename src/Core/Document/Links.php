@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Document;
 
 use Countable;
 use IteratorAggregate;
-use LaravelJsonApi\Core\Contracts\Document\PaginationLinks;
 use LaravelJsonApi\Core\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Json;
 use LogicException;
@@ -38,7 +37,7 @@ class Links implements Serializable, IteratorAggregate, Countable
     /**
      * @var array
      */
-    private $stack;
+    private array $stack;
 
     /**
      * Create a JSON API links object.
@@ -138,24 +137,6 @@ class Links implements Serializable, IteratorAggregate, Countable
         $link = new Link($key, LinkHref::cast($href), Json::hash($meta));
 
         return $this->push($link);
-    }
-
-    /**
-     * Add pagination links.
-     *
-     * @param PaginationLinks $links
-     * @return $this
-     */
-    public function paginate(PaginationLinks $links): self
-    {
-        $this->put(...collect([
-            $links->first(),
-            $links->last(),
-            $links->previous(),
-            $links->next(),
-        ])->filter());
-
-        return $this;
     }
 
     /**

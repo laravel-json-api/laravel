@@ -22,47 +22,36 @@ namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\RelationshipPath;
-use Neomerx\JsonApi\Contracts\Schema\DocumentInterface;
 use function array_key_exists;
 
 /**
  * Class SchemaFields
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @see https://github.com/neomerx/json-api/issues/236
  * @see https://github.com/neomerx/json-api/issues/236#issuecomment-483978443
  */
 final class SchemaFields
 {
-    /**
-     * @var string Path constant
-     */
-    private const PATH_SEPARATOR = DocumentInterface::PATH_SEPARATOR;
-
-    /**
-     * @var string Path constant
-     */
-    private const FIELD_SEPARATOR = ',';
 
     /**
      * @var array
      */
-    private $fastRelationships;
+    private array $fastRelationships;
 
     /**
      * @var array
      */
-    private $fastRelationshipLists;
+    private array $fastRelationshipLists;
 
     /**
      * @var array
      */
-    private $fastFields;
+    private array $fastFields;
 
     /**
      * @var array
      */
-    private $fastFieldLists;
+    private array $fastFieldLists;
 
     /**
      * @param IncludePaths $paths

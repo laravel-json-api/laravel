@@ -31,12 +31,12 @@ class Container implements ContainerContract
     /**
      * @var array
      */
-    private $types;
+    private array $types;
 
     /**
      * @var array
      */
-    private $models;
+    private array $models;
 
     /**
      * Container constructor.

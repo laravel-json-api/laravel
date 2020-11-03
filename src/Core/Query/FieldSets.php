@@ -33,7 +33,7 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     /**
      * @var array
      */
-    private $stack;
+    private array $stack;
 
     /**
      * @param FieldSets|array $value

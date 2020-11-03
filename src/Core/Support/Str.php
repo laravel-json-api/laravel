@@ -34,12 +34,12 @@ final class Str
     /**
      * @var array
      */
-    private static $dasherized = [];
+    private static array $dasherized = [];
 
     /**
      * @var array
      */
-    private static $underscored = [];
+    private static array $underscored = [];
 
     /**
      * @param $name

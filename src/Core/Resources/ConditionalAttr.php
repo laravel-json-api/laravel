@@ -30,7 +30,7 @@ class ConditionalAttr implements JsonSerializable, Skippable
     /**
      * @var bool
      */
-    private $check;
+    private bool $check;
 
     /**
      * @var mixed

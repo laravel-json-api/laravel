@@ -34,7 +34,7 @@ class ResourceCollectionResponse implements Responsable
     /**
      * @var ResourceCollection
      */
-    private $resources;
+    private ResourceCollection $resources;
 
     /**
      * ResourceCollectionResponse constructor.

@@ -32,12 +32,12 @@ class BootJsonApi
     /**
      * @var IlluminateContainer
      */
-    private $container;
+    private IlluminateContainer $container;
 
     /**
      * @var ServerRepository
      */
-    private $servers;
+    private ServerRepository $servers;
 
     /**
      * BootJsonApi constructor.

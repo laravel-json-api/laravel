@@ -35,7 +35,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     /**
      * @var RelationshipPath[]
      */
-    private $stack;
+    private array $stack;
 
     /**
      * @param IncludePaths|RelationshipPath|array|string $value

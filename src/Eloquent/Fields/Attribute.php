@@ -37,17 +37,17 @@ abstract class Attribute implements AttributeContract, Fillable, Selectable, Sor
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $column;
+    private string $column;
 
     /**
      * @var Closure|null
      */
-    private $deserializer;
+    private ?Closure $deserializer = null;
 
     /**
      * Attribute constructor.
@@ -119,7 +119,7 @@ abstract class Attribute implements AttributeContract, Fillable, Selectable, Sor
      * Convert the JSON value for this field for setting on the provided model.
      *
      * @param Model $model
-     * @param $value
+     * @param mixed $value
      * @return mixed
      */
     protected function deserialize(Model $model, $value)

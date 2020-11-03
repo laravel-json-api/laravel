@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace LaravelJsonApi\Core\Document;
 
 use LaravelJsonApi\Core\Contracts\Serializable;
@@ -29,9 +31,9 @@ class JsonApi implements Serializable
     use Concerns\Serializable;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $version;
+    private ?string $version;
 
     /**
      * Create a JSON API object.

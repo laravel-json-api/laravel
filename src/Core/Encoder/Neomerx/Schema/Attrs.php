@@ -28,7 +28,6 @@ use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 /**
  * Class Attrs
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
 final class Attrs implements IteratorAggregate
@@ -37,12 +36,12 @@ final class Attrs implements IteratorAggregate
     /**
      * @var JsonApiResource
      */
-    private $resource;
+    private JsonApiResource $resource;
 
     /**
      * @var ContextInterface
      */
-    private $context;
+    private ContextInterface $context;
 
     /**
      * Attrs constructor.

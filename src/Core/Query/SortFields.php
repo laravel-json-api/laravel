@@ -37,7 +37,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     /**
      * @var SortField[]
      */
-    private $stack;
+    private array $stack;
 
     /**
      * @param SortFields|SortField|array|string $value

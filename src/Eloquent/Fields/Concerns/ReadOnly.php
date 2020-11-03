@@ -52,9 +52,7 @@ trait ReadOnly
      */
     public function readOnlyOnCreate(): self
     {
-        $this->readOnly(static function ($request) {
-            return $request->isMethod('POST');
-        });
+        $this->readOnly(static fn($request) => $request->isMethod('POST'));
 
         return $this;
     }
@@ -66,9 +64,7 @@ trait ReadOnly
      */
     public function readOnlyOnUpdate(): self
     {
-        $this->readOnly(static function ($request) {
-            return $request->isMethod('PATCH');
-        });
+        $this->readOnly(static fn($request) => $request->isMethod('PATCH'));
 
         return $this;
     }

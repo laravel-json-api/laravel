@@ -29,7 +29,6 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 /**
  * Class SchemaContainer
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
 final class SchemaContainer implements SchemaContainerInterface
@@ -38,22 +37,22 @@ final class SchemaContainer implements SchemaContainerInterface
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var SchemaFields
      */
-    private $fields;
+    private SchemaFields $fields;
 
     /**
      * @var array
      */
-    private $schemas;
+    private array $schemas;
 
     /**
      * SchemaContainer constructor.

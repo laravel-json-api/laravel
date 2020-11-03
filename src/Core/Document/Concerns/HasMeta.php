@@ -28,7 +28,7 @@ trait HasMeta
     /**
      * @var Hash|null
      */
-    private $meta;
+    private ?Hash $meta = null;
 
     /**
      * Get the meta member.

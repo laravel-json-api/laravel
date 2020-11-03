@@ -28,7 +28,6 @@ use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 /**
  * Class Relationships
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
 final class Relationships implements IteratorAggregate
@@ -37,27 +36,27 @@ final class Relationships implements IteratorAggregate
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var JsonApiResource
      */
-    private $resource;
+    private JsonApiResource $resource;
 
     /**
      * @var SchemaFields
      */
-    private $fields;
+    private SchemaFields $fields;
 
     /**
      * @var ContextInterface
      */
-    private $context;
+    private ContextInterface $context;
 
     /**
      * Relationships constructor.

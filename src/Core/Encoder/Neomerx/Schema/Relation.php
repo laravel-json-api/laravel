@@ -41,32 +41,32 @@ final class Relation
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var ResourceRelation
      */
-    private $relation;
+    private ResourceRelation $relation;
 
     /**
      * @var SchemaFields
      */
-    private $fields;
+    private SchemaFields $fields;
 
     /**
      * @var ContextInterface
      */
-    private $context;
+    private ContextInterface $context;
 
     /**
      * @var string
      */
-    private $fieldName;
+    private string $fieldName;
 
     /**
      * Relation constructor.
@@ -115,7 +115,7 @@ final class Relation
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $relation = [];
         $links = $this->relation->links();

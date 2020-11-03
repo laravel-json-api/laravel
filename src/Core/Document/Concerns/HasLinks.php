@@ -27,7 +27,7 @@ trait HasLinks
     /**
      * @var Links|null
      */
-    private $links;
+    private ?Links $links = null;
 
     /**
      * Get the links member.

@@ -30,7 +30,7 @@ trait Hashable
     /**
      * @var array
      */
-    private $value;
+    private array $value = [];
 
     /**
      * @var callable|null
@@ -40,7 +40,7 @@ trait Hashable
     /**
      * @var int|null
      */
-    private $fieldNameOrder;
+    private ?int $fieldNameOrder = null;
 
     /**
      * @inheritDoc
@@ -97,9 +97,7 @@ trait Hashable
      */
     public function camelize(): self
     {
-        $this->using(static function (string $name) {
-            return Str::camel($name);
-        });
+        $this->using(static fn(string $name) => Str::camel($name));
 
         return $this;
     }
@@ -111,9 +109,7 @@ trait Hashable
      */
     public function dasherize(): self
     {
-        $this->using(static function (string $name) {
-            return Str::dasherize($name);
-        });
+        $this->using(static fn(string $name) => Str::dasherize($name));
 
         return $this;
     }
@@ -125,9 +121,7 @@ trait Hashable
      */
     public function underscore(): self
     {
-        $this->using(static function (string $name) {
-            return Str::underscore($name);
-        });
+        $this->using(static fn(string $name) => Str::underscore($name));
 
         return $this;
     }

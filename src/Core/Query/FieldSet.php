@@ -30,12 +30,12 @@ class FieldSet implements IteratorAggregate, Countable
     /**
      * @var string
      */
-    private $resourceType;
+    private string $resourceType;
 
     /**
      * @var string[]
      */
-    private $fields;
+    private array $fields;
 
     /**
      * FieldSet constructor.

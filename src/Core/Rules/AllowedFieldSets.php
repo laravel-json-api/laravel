@@ -28,12 +28,12 @@ class AllowedFieldSets implements Rule
     /**
      * @var bool
      */
-    private $all;
+    private bool $all;
 
     /**
-     * @var Collection|null
+     * @var Collection
      */
-    private $allowed;
+    private Collection $allowed;
 
     /**
      * The last value that was validated.

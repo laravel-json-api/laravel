@@ -30,17 +30,17 @@ class Where implements Filter
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $column;
+    private string $column;
 
     /**
      * @var string
      */
-    private $operator;
+    private string $operator;
 
     /**
      * Where constructor.

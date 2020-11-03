@@ -24,23 +24,28 @@ use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use function sprintf;
 
+/**
+ * Trait HasRelationLinks
+ *
+ * @TODO not sure this is in use?
+ */
 trait HasRelationLinks
 {
 
     /**
      * @var string
      */
-    protected $fieldName;
+    protected string $fieldName;
 
     /**
      * @var string
      */
-    protected $baseUri;
+    protected string $baseUri;
 
     /**
      * @var Links|null
      */
-    private $links;
+    private ?Links $links = null;
 
     /**
      * @return Links

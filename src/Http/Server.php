@@ -34,17 +34,17 @@ abstract class Server
     /**
      * @var IlluminateContainer
      */
-    private $container;
+    private IlluminateContainer $container;
 
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var SchemaContainerContract|null
      */
-    private $schemas;
+    private ?SchemaContainerContract $schemas = null;
 
     /**
      * Bootstrap the server when it is handling an HTTP request.

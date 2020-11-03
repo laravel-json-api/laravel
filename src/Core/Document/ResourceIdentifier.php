@@ -29,12 +29,12 @@ class ResourceIdentifier
     /**
      * @var string
      */
-    private $type;
+    private string $type;
 
     /**
      * @var string
      */
-    private $id;
+    private string $id;
 
     /**
      * ResourceIdentifier constructor.

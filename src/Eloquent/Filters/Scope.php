@@ -30,12 +30,12 @@ class Scope implements Filter
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $scope;
+    private string $scope;
 
     /**
      * Scope constructor.

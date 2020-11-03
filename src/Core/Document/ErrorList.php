@@ -33,7 +33,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     /**
      * @var array
      */
-    private $stack;
+    private array $stack;
 
     /**
      * Create a list of JSON API error objects.

@@ -28,7 +28,7 @@ class HasOne implements Rule
     /**
      * @var string[]
      */
-    private $types;
+    private array $types;
 
     /**
      * HasOne constructor.

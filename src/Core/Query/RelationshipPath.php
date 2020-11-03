@@ -34,7 +34,7 @@ class RelationshipPath implements IteratorAggregate, Countable
     /**
      * @var string[]
      */
-    private $names;
+    private array $names;
 
     /**
      * @param RelationshipPath|string $value

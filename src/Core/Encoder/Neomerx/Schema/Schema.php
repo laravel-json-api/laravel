@@ -33,7 +33,6 @@ use function sprintf;
 /**
  * Class Schema
  *
- * @package LaravelJsonApi\Encoder\Neomerx
  * @internal
  */
 final class Schema implements SchemaInterface
@@ -42,22 +41,22 @@ final class Schema implements SchemaInterface
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
     /**
      * @var Mapper
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var SchemaFields
      */
-    private $fields;
+    private SchemaFields $fields;
 
     /**
      * @var string
      */
-    private $type;
+    private string $type;
 
     /**
      * Schema constructor.

@@ -31,22 +31,22 @@ trait CreatesResponse
     /**
      * @var Hash|null
      */
-    private $meta;
+    private ?Hash $meta = null;
 
     /**
      * @var Links|null
      */
-    private $links;
+    private ?Links $links = null;
 
     /**
      * @var int
      */
-    private $encodeOptions = 0;
+    private int $encodeOptions = 0;
 
     /**
      * @var array|null
      */
-    private $headers;
+    private ?array $headers = null;
 
     /**
      * Add top-level meta to the response.

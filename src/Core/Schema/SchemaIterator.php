@@ -30,12 +30,12 @@ class SchemaIterator implements \IteratorAggregate
     /**
      * @var IlluminateContainer
      */
-    private $container;
+    private IlluminateContainer $container;
 
     /**
      * @var iterable
      */
-    private $schemas;
+    private iterable $schemas;
 
     /**
      * SchemaIterator constructor.
