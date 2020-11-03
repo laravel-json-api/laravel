@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Encoder;
 
+use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\Container;
-use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
 
 class Factory
@@ -30,15 +30,13 @@ class Factory
     /**
      * Build a new encoder instance.
      *
-     * @param array $resources
+     * @param ResourceFactoryContract ...$factories
      * @return Encoder
      */
-    public function build(array $resources): Encoder
+    public function build(ResourceFactoryContract ...$factories): Encoder
     {
-        $container = new Container(new ResourceFactory($resources));
-
         return new Encoder(
-            $container,
+            new Container(...$factories),
             $factory = new NeomerxFactory(),
             new Mapper($factory)
         );

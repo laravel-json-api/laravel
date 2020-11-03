@@ -19,13 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http;
 
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
+use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Schema\SchemaIterator;
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use LaravelJsonApi\Core\Store\Store;
 
 abstract class Server
@@ -111,8 +112,11 @@ abstract class Server
      */
     public function encoder(): Encoder
     {
-        return $this->container->make(EncoderFactory::class)->build(
-            $this->container()->resources()
+        /** @var EncoderFactory $factory */
+        $factory = $this->container->make(EncoderFactory::class);
+
+        return $factory->build(
+            new ResourceFactory($this->container()->resources())
         );
     }
 
