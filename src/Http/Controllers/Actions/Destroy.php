@@ -20,26 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Store\Store as ResourceStore;
+use LaravelJsonApi\Routing\Route;
 
 trait Destroy
 {
 
     /**
+     * Destroy a resource.
+     *
+     * @param Route $route
      * @param ResourceStore $store
      * @return Response
      */
-    public function destroy(ResourceStore $store): Response
+    public function destroy(Route $route, ResourceStore $store): Response
     {
-        $route = Route::current();
-        $resourceType = $route->parameter('resource_type');
-
-        $modelOrResourceId = $route->parameter(
-            $route->parameter('resource_id_name')
+        $store->delete(
+            $route->resourceType(),
+            $route->modelOrResourceId()
         );
-
-        $store->delete($resourceType, $modelOrResourceId);
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

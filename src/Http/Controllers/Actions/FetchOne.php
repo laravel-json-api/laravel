@@ -20,10 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Resources\DataResponse;
-use LaravelJsonApi\Core\Store\Store;
+use LaravelJsonApi\Core\Store\Store as ResourceStore;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Routing\Route;
 
 trait FetchOne
 {
@@ -31,23 +31,18 @@ trait FetchOne
     /**
      * Fetch one JSON API resource.
      *
-     * @param Store $store
+     * @param Route $route
+     * @param ResourceStore $store
      * @return Responsable
      */
-    public function read(Store $store): Responsable
+    public function read(Route $route, ResourceStore $store): Responsable
     {
-        $route = Route::current();
-
         $request = ResourceQuery::queryOne(
-            $resourceType = $route->parameter('resource_type')
-        );
-
-        $modelOrResourceId = $route->parameter(
-            $route->parameter('resource_id_name')
+            $resourceType = $route->resourceType()
         );
 
         $model = $store
-            ->queryOne($resourceType, $modelOrResourceId)
+            ->queryOne($resourceType, $route->modelOrResourceId())
             ->using($request)
             ->first();
 

@@ -20,11 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Resources\DataResponse;
 use LaravelJsonApi\Core\Store\Store as ResourceStore;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Routing\Route;
 
 trait Update
 {
@@ -32,25 +32,20 @@ trait Update
     /**
      * Update an existing resource.
      *
+     * @param Route $route
      * @param ResourceStore $store
      * @return Responsable
      */
-    public function update(ResourceStore $store): Responsable
+    public function update(Route $route, ResourceStore $store): Responsable
     {
-        $route = Route::current();
-
         $request = ResourceRequest::forResource(
-            $resourceType = $route->parameter('resource_type')
-        );
-
-        $modelOrResourceId = $route->parameter(
-            $route->parameter('resource_id_name')
+            $resourceType = $route->resourceType()
         );
 
         $query = ResourceQuery::queryOne($resourceType);
 
         $model = $store
-            ->update($resourceType, $modelOrResourceId)
+            ->update($resourceType, $route->modelOrResourceId())
             ->using($query)
             ->store($request->validated());
 

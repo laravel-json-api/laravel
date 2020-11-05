@@ -20,11 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Resources\DataResponse;
 use LaravelJsonApi\Core\Store\Store as ResourceStore;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Routing\Route;
 
 trait Store
 {
@@ -32,13 +32,14 @@ trait Store
     /**
      * Create a new resource.
      *
+     * @param Route $route
      * @param ResourceStore $store
      * @return Responsable
      */
-    public function store(ResourceStore $store): Responsable
+    public function store(Route $route, ResourceStore $store): Responsable
     {
         $request = ResourceRequest::forResource(
-            $resourceType = Route::current()->parameter('resource_type')
+            $resourceType = $route->resourceType()
         );
 
         $query = ResourceQuery::queryOne($resourceType);
