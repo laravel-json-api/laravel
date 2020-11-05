@@ -127,4 +127,12 @@ class IndexTest extends TestCase
 
         $response->assertFetchedOneExact($expected);
     }
+
+    public function testInvalidMediaType(): void
+    {
+        $this->jsonApi()
+            ->accept('text/html')
+            ->get('/api/v1/posts')
+            ->assertStatus(406);
+    }
 }

@@ -25,13 +25,18 @@ class FormRequest extends BaseFormRequest
 {
 
     /**
+     * @var string
+     */
+    protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
+
+    /**
      * @return bool
      */
     public function wantsJsonApi(): bool
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && 'application/vnd.api+json' === $acceptable;
+        return isset($acceptable[0]) && self::JSON_API_MEDIA_TYPE === $acceptable;
     }
 
     /**
@@ -39,6 +44,16 @@ class FormRequest extends BaseFormRequest
      */
     public function acceptsJsonApi(): bool
     {
-        return $this->accepts('application/vnd.api+json');
+        return $this->accepts(self::JSON_API_MEDIA_TYPE);
+    }
+
+    /**
+     * Determine if the request is sending JSON API content.
+     *
+     * @return bool
+     */
+    public function isJsonApi(): bool
+    {
+        return $this->matchesType(self::JSON_API_MEDIA_TYPE, $this->header('CONTENT_TYPE'));
     }
 }

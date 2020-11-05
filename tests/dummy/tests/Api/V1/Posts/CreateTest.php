@@ -58,6 +58,40 @@ class CreateTest extends TestCase
         ]);
     }
 
+    public function testNotAcceptableMediaType(): void
+    {
+        $post = Post::factory()->make();
+        $data = $this->serialize($post);
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi()
+            ->expects('posts')
+            ->accept('text/html')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertStatus(406);
+        $this->assertDatabaseMissing('posts', []);
+    }
+
+    public function testUnsupportedMediaType(): void
+    {
+        $post = Post::factory()->make();
+        $data = $this->serialize($post);
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi()
+            ->expects('posts')
+            ->contentType('application/json')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertStatus(415);
+        $this->assertDatabaseMissing('posts', []);
+    }
+
     /**
      * Serialize the post model for a valid create request.
      *

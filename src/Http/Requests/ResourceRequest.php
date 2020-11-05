@@ -19,9 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http\Requests;
 
+use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
 use LogicException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ResourceRequest extends FormRequest
 {
@@ -56,7 +58,7 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function validationData()
     {
@@ -67,5 +69,35 @@ class ResourceRequest extends FormRequest
         }
 
         throw new LogicException('Expecting data to be an array.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function prepareForValidation()
+    {
+        if (!$this->isSupportedMediaType()) {
+            throw $this->unsupportedMediaType();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isSupportedMediaType(): bool
+    {
+        return $this->isJsonApi();
+    }
+
+    /**
+     * @return HttpException
+     * @todo add translation
+     */
+    protected function unsupportedMediaType(): HttpException
+    {
+        return new HttpException(
+            Response::HTTP_UNSUPPORTED_MEDIA_TYPE,
+            'The request entity has a media type which the server or resource does not support.'
+        );
     }
 }

@@ -47,6 +47,7 @@ class UpdateTest extends TestCase
 
         $response = $this
             ->withoutExceptionHandling()
+            ->actingAs($this->post->author)
             ->jsonApi()
             ->expects('posts')
             ->withData($data)
@@ -64,6 +65,39 @@ class UpdateTest extends TestCase
             'synopsis' => $data['synopsis'],
             'title' => $data['title'],
         ]);
+    }
+
+
+    public function testNotAcceptableMediaType(): void
+    {
+        $data = $this->serialize();
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi()
+            ->expects('posts')
+            ->accept('text/html')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(406);
+        $this->assertDatabaseHas('posts', $this->post->getAttributes());
+    }
+
+    public function testUnsupportedMediaType(): void
+    {
+        $data = $this->serialize();
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi()
+            ->expects('posts')
+            ->contentType('application/json')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(415);
+        $this->assertDatabaseHas('posts', $this->post->getAttributes());
     }
 
     /**

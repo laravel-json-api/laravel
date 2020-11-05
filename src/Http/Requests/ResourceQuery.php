@@ -45,7 +45,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * @var string[]
      */
     protected array $mediaTypes = [
-        'application/vnd.api+json',
+        self::JSON_API_MEDIA_TYPE,
     ];
 
     /**
@@ -179,9 +179,17 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     protected function prepareForValidation()
     {
-        if (!$this->accepts($this->mediaTypes())) {
+        if (!$this->isAcceptableMediaType()) {
             throw $this->notAcceptable();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAcceptableMediaType(): bool
+    {
+        return $this->accepts($this->mediaTypes());
     }
 
     /**
@@ -194,6 +202,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
 
     /**
      * @return HttpException
+     * @todo add translation
      */
     protected function notAcceptable(): HttpException
     {
