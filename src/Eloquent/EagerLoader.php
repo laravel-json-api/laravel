@@ -43,6 +43,23 @@ class EagerLoader implements IteratorAggregate
     private IncludePaths $paths;
 
     /**
+     * Fluent constructor.
+     *
+     * @param Container $schemas
+     * @param Schema $schema
+     * @param mixed $includePaths
+     * @return static
+     */
+    public static function make(Container $schemas, Schema $schema, $includePaths): self
+    {
+        return new self(
+            $schemas,
+            $schema,
+            IncludePaths::cast($includePaths)
+        );
+    }
+
+    /**
      * EagerLoader constructor.
      *
      * @param Container $schemas

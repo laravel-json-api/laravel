@@ -20,13 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
-use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
+use LaravelJsonApi\Core\Contracts\Store\QueriesOne;
+use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder;
+use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
+use LogicException;
+use function is_string;
 
-class Repository implements RepositoryContract, QueriesAll
+class Repository implements RepositoryContract, QueriesAll, QueriesOne
 {
 
     /**
@@ -54,7 +57,7 @@ class Repository implements RepositoryContract, QueriesAll
     {
         $this->schemas = $schemas;
         $this->schema = $schema;
-        $this->model = $this->newInstance();
+        $this->model = $schema->newInstance();
     }
 
     /**
@@ -65,10 +68,10 @@ class Repository implements RepositoryContract, QueriesAll
      */
     public function find(string $resourceId)
     {
-        return $this->newQuery()->where(
-            $this->idName(),
-            $resourceId
-        )->first();
+        return $this
+            ->query()
+            ->whereResourceId($resourceId)
+            ->first();
     }
 
     /**
@@ -79,47 +82,54 @@ class Repository implements RepositoryContract, QueriesAll
      */
     public function exists(string $resourceId): bool
     {
-        return $this->newQuery()->where(
-            $this->idName(),
-            $resourceId
-        )->exists();
+        return $this
+            ->query()
+            ->whereResourceId($resourceId)
+            ->exists();
+    }
+
+    /**
+     * @return Builder
+     */
+    public function query(): Builder
+    {
+        return new Builder($this->schemas, $this->schema, $this->model->newQuery());
     }
 
     /**
      * @inheritDoc
      */
-    public function query(): QueryBuilder
+    public function queryAll(): QueryAllBuilder
     {
-        return new Builder($this->schemas, $this->schema, $this->newQuery());
+        return new QueryAll($this->query());
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    private function idName(): string
+    public function queryOne($modelOrResourceId): QueryOneBuilder
     {
-        if ($id = $this->schema->idName()) {
-            return $id;
+        if ($modelOrResourceId instanceof Model) {
+            return new QueryOne(
+                $this->schemas,
+                $this->schema,
+                $this->query(),
+                $modelOrResourceId,
+                strval($modelOrResourceId->{$this->schema->idName()})
+            );
         }
 
-        return $this->model->getRouteKeyName();
+        if (is_string($modelOrResourceId) && !empty($modelOrResourceId)) {
+            return new QueryOne(
+                $this->schemas,
+                $this->schema,
+                $this->query(),
+                null,
+                $modelOrResourceId
+            );
+        }
+
+        throw new LogicException('Expecting a model or non-empty string resource id.');
     }
 
-    /**
-     * @return Model
-     */
-    private function newInstance(): Model
-    {
-        $class = $this->schema->model();
-
-        return new $class;
-    }
-
-    /**
-     * @return EloquentBuilder
-     */
-    private function newQuery(): EloquentBuilder
-    {
-        return $this->model->newQuery();
-    }
 }

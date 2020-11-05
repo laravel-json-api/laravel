@@ -34,6 +34,7 @@ class CreatePostTables extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('author_id');
             $table->string('title');
+            $table->string('slug');
             $table->string('synopsis');
             $table->text('content');
 

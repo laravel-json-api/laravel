@@ -17,36 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Eloquent\Contracts;
+namespace LaravelJsonApi\Core\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
-interface Filter
+interface QueriesOne
 {
 
     /**
-     * Get the key for the filter.
-     *
-     * @return string
+     * @param Model|string $modelOrResourceId
+     * @return QueryOneBuilder
      */
-    public function key(): string;
-
-    /**
-     * Does the filter return a singular resource?
-     *
-     * Return `true` if the filter will return a singular resource, rather than a list
-     * of resources.
-     *
-     * @return bool
-     */
-    public function isSingular(): bool;
-
-    /**
-     * Apply the filter to the query.
-     *
-     * @param Builder $query
-     * @param mixed $value
-     * @return Builder
-     */
-    public function apply($query, $value);
+    public function queryOne($modelOrResourceId): QueryOneBuilder;
 }

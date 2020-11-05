@@ -42,6 +42,7 @@ class Serializer
             'attributes' => [
                 'content' => $post->content,
                 'createdAt' => $post->created_at->toJSON(),
+                'slug' => $post->slug,
                 'synopsis' => $post->synopsis,
                 'title' => $post->title,
                 'updatedAt' => $post->updated_at->toJSON(),

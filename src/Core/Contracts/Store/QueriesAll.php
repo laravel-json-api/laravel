@@ -25,7 +25,7 @@ interface QueriesAll
     /**
      * Query all resources.
      *
-     * @return QueryBuilder
+     * @return QueryAllBuilder
      */
-    public function query(): QueryBuilder;
+    public function queryAll(): QueryAllBuilder;
 }

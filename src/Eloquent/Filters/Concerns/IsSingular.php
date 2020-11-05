@@ -17,34 +17,31 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace LaravelJsonApi\Eloquent\Filters\Concerns;
 
-use DummyApp\Post;
-use DummyApp\User;
-use Illuminate\Database\Eloquent\Factories\Factory;
-
-class PostFactory extends Factory
+trait IsSingular
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Post::class;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array
+     * @var bool
      */
-    public function definition()
+    private bool $singular = false;
+
+    /**
+     * @return $this
+     */
+    public function singular(): self
     {
-        return [
-            'author_id' => User::factory(),
-            'content' => $this->faker->text,
-            'slug' => $this->faker->unique()->slug,
-            'synopsis' => $this->faker->sentence,
-            'title' => $this->faker->words(3, true),
-        ];
+        $this->singular = true;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSingular(): bool
+    {
+        return $this->singular;
     }
 }

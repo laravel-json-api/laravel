@@ -26,6 +26,7 @@ class Where implements Filter
 {
 
     use Concerns\DeserializesValue;
+    use Concerns\IsSingular;
 
     /**
      * @var string
@@ -41,6 +42,18 @@ class Where implements Filter
      * @var string
      */
     private string $operator;
+
+    /**
+     * Create a new filter.
+     *
+     * @param string $name
+     * @param string|null $column
+     * @return Where
+     */
+    public static function make(string $name, string $column = null): self
+    {
+        return new self($name, $column);
+    }
 
     /**
      * Where constructor.
@@ -122,7 +135,7 @@ class Where implements Filter
     public function apply($query, $value)
     {
         return $query->where(
-            $this->column,
+            $query->qualifyColumn($this->column),
             $this->operator,
             $this->deserialize($value)
         );

@@ -28,16 +28,27 @@ class ID implements Filter
 {
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $column;
+    private string $column;
+
+    /**
+     * Create an ID filter.
+     *
+     * @param string $column
+     * @return static
+     */
+    public static function make(string $column): self
+    {
+        return new self($column);
+    }
 
     /**
      * ID constructor.
      *
-     * @param string|null $column
+     * @param string $column
      */
-    public function __construct(string $column = null)
+    public function __construct(string $column)
     {
         $this->column = $column;
     }
@@ -53,15 +64,20 @@ class ID implements Filter
     /**
      * @inheritDoc
      */
+    public function isSingular(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function apply($query, $value)
     {
-        $resourceIds = $this->deserialize($value);
-
-        if ($this->column) {
-            return $query->whereIn($this->column, $resourceIds);
-        }
-
-        return $query->whereKey($resourceIds);
+        return $query->whereIn(
+            $query->qualifyColumn($this->column),
+            $this->deserialize($value)
+        );
     }
 
     /**

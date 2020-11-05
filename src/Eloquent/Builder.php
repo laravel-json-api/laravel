@@ -19,14 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\LazyCollection;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Traits\ForwardsCalls;
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
-use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\RelationshipPath;
@@ -35,12 +34,17 @@ use LaravelJsonApi\Core\Query\SortFields;
 use LaravelJsonApi\Eloquent\Contracts\Filter;
 use LaravelJsonApi\Eloquent\Contracts\Sortable;
 use LogicException;
-use function array_key_exists;
-use function is_null;
-use function sprintf;
+use RuntimeException;
 
-class Builder implements QueryBuilder
+/**
+ * Class Builder
+ *
+ * @mixin EloquentBuilder
+ */
+class Builder
 {
+
+    use ForwardsCalls;
 
     /**
      * @var Container
@@ -53,9 +57,9 @@ class Builder implements QueryBuilder
     private Schema $schema;
 
     /**
-     * @var EloquentBuilder
+     * @var EloquentBuilder|Relation
      */
-    private EloquentBuilder $query;
+    private $query;
 
     /**
      * @var QueryParameters
@@ -63,11 +67,16 @@ class Builder implements QueryBuilder
     private QueryParameters $parameters;
 
     /**
+     * @var bool
+     */
+    private bool $singular = false;
+
+    /**
      * Builder constructor.
      *
      * @param Container $schemas
      * @param Schema $schema
-     * @param EloquentBuilder $query
+     * @param EloquentBuilder|Relation $query
      */
     public function __construct(Container $schemas, Schema $schema, $query)
     {
@@ -78,21 +87,23 @@ class Builder implements QueryBuilder
     }
 
     /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParametersContract $query
+     * @param $name
+     * @param $arguments
      * @return $this
      */
-    public function using(QueryParametersContract $query): self
+    public function __call($name, $arguments)
     {
-        return $this
-            ->with($query->includePaths())
-            ->filter($query->filter())
-            ->sort($query->sortFields());
+        $result = $this->forwardCallTo($this->query, $name, $arguments);
+
+        if ($result === $this->query) {
+            return $this;
+        }
+
+        return $result;
     }
 
     /**
-     * Filter models using JSON API filter parameters.
+     * Apply the supplied JSON API filters.
      *
      * @param array|null $filters
      * @return $this
@@ -104,14 +115,28 @@ class Builder implements QueryBuilder
             return $this;
         }
 
-        /** @var Filter $filter */
+        $actual = [];
+
         foreach ($this->schema->filters() as $filter) {
-            if (array_key_exists($filter->key(), $filters)) {
-                $filter->apply($this->query, $filters[$filter->key()]);
+            if ($filter instanceof Filter) {
+                if (array_key_exists($key = $filter->key(), $filters)) {
+                    $filter->apply($this->query, $value = $filters[$key]);
+                    $actual[$key] = $value;
+
+                    if ($filter->isSingular()) {
+                        $this->singular = true;
+                    }
+                }
+                continue;
             }
+
+            throw new RuntimeException(sprintf(
+                'Schema %s has a filter that does not implement the filter contract.',
+                $this->schema->type()
+            ));
         }
 
-        $this->parameters->withFilters($filters);
+        $this->parameters->withFilters($actual);
 
         return $this;
     }
@@ -153,7 +178,7 @@ class Builder implements QueryBuilder
     }
 
     /**
-     * Eager load resources using the provided JSON API include paths.
+     * Set the relations that should be eager loaded using JSON API include paths.
      *
      * @param IncludePaths|RelationshipPath|array|string|null $includePaths
      * @return $this
@@ -162,47 +187,64 @@ class Builder implements QueryBuilder
     {
         if (is_null($includePaths)) {
             $this->parameters->withoutIncludePaths();
-        } else {
-            $this->parameters->withIncludePaths($includePaths);
+            return $this;
         }
+
+        $loader = new EagerLoader(
+            $this->schemas,
+            $this->schema,
+            $includePaths = IncludePaths::cast($includePaths)
+        );
+
+        $this->query->with($loader->all());
+        $this->parameters->withIncludePaths($includePaths);
 
         return $this;
     }
 
     /**
-     * Execute the query and get the first result.
+     * Add a where clause using the JSON API resource id.
      *
-     * @return Model|null
+     * @param string|array|Arrayable $resourceId
+     * @return $this
      */
-    public function first(): ?Model
+    public function whereResourceId($resourceId): self
     {
-        $this->eagerLoad();
+        $column = $this->query->qualifyColumn(
+            $this->schema->idName()
+        );
 
-        return $this->query->first();
+        if (is_string($resourceId)) {
+            $this->query->where($column, '=', $resourceId);
+            return $this;
+        }
+
+        if (is_array($resourceId) || $resourceId instanceof Arrayable) {
+            $this->query->whereIn($column, $resourceId);
+            return $this;
+        }
+
+        throw new InvalidArgumentException('Unexpected resource id value.');
     }
 
     /**
-     * Get a lazy collection for the query.
+     * Has a singular filter been applied?
      *
-     * @return LazyCollection
+     * @return bool
      */
-    public function cursor(): LazyCollection
+    public function isSingular(): bool
     {
-        $this->eagerLoad();
-
-        return $this->query->cursor();
+        return $this->singular;
     }
 
     /**
      * Return a page of models using JSON API page parameters.
      *
      * @param array $page
-     * @return Page
+     * @return Page|mixed
      */
-    public function paginate(array $page): Page
+    public function paginate(array $page)
     {
-        $this->eagerLoad();
-
         if ($paginator = $this->schema->pagination()) {
             return $paginator->paginate($this->query, $page)->withQuery(
                 $this->parameters->withPagination($page)->toArray()
@@ -216,46 +258,23 @@ class Builder implements QueryBuilder
     }
 
     /**
-     * Execute the query, paginating results only if page parameters are provided.
-     *
-     * @param array|null $page
-     * @return LazyCollection|Page
-     */
-    public function getOrPaginate(?array $page): iterable
-    {
-        if (empty($page)) {
-            return $this->cursor();
-        }
-
-        return $this->paginate($page);
-    }
-
-    /**
      * @return QueryParameters
      */
-    public function toQuery(): QueryParameters
+    public function getQueryParameters(): QueryParameters
     {
-        return clone $this->parameters;
+        return $this->parameters;
     }
 
     /**
      * @return EloquentBuilder
      */
-    public function toBase()
+    public function toBase(): EloquentBuilder
     {
+        if ($this->query instanceof Relation) {
+            return $this->query->getQuery();
+        }
+
         return $this->query;
     }
 
-    /**
-     * Eager load relations.
-     *
-     * @return void
-     */
-    private function eagerLoad(): void
-    {
-        if ($includePaths = $this->parameters->includePaths()) {
-            $loader = new EagerLoader($this->schemas, $this->schema, $includePaths);
-            $this->query->with($loader->all());
-        }
-    }
 }

@@ -26,6 +26,7 @@ class Scope implements Filter
 {
 
     use Concerns\DeserializesValue;
+    use Concerns\IsSingular;
 
     /**
      * @var string
@@ -36,6 +37,18 @@ class Scope implements Filter
      * @var string
      */
     private string $scope;
+
+    /**
+     * Create a new scope filter.
+     *
+     * @param string $name
+     * @param string|null $scope
+     * @return Scope
+     */
+    public static function make(string $name, string $scope = null)
+    {
+        return new self($name, $scope);
+    }
 
     /**
      * Scope constructor.

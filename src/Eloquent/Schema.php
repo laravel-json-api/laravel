@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Schema\Attribute;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Schema\Field;
@@ -55,7 +56,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
      *
      * @var string|null
      */
-    protected ?string $primaryKey;
+    protected ?string $primaryKey = null;
 
     /**
      * The relationships that should always be eager loaded.
@@ -158,11 +159,25 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     }
 
     /**
+     * @return Model
+     */
+    public function newInstance(): Model
+    {
+        $modelClass = $this->model();
+
+        return new $modelClass;
+    }
+
+    /**
      * @return string
      */
-    public function idName(): ?string
+    public function idName(): string
     {
-        return $this->primaryKey;
+        if ($this->primaryKey) {
+            return $this->primaryKey;
+        }
+
+        return $this->primaryKey = $this->newInstance()->getRouteKeyName();
     }
 
     /**

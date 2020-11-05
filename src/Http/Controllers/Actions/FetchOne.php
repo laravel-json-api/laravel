@@ -25,26 +25,32 @@ use LaravelJsonApi\Core\Resources\DataResponse;
 use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
 
-trait FetchMany
+trait FetchOne
 {
 
     /**
-     * Fetch zero to many JSON API resources.
+     * Fetch one JSON API resource.
      *
      * @param Store $store
      * @return Responsable
      */
-    public function index(Store $store): Responsable
+    public function read(Store $store): Responsable
     {
-        $request = ResourceQuery::queryMany(
-            $resourceType = Route::current()->parameter('resource_type')
+        $route = Route::current();
+
+        $request = ResourceQuery::queryOne(
+            $resourceType = $route->parameter('resource_type')
         );
 
-        $data = $store
-            ->queryAll($resourceType)
-            ->using($request)
-            ->firstOrPaginate($request->page());
+        $modelOrResourceId = $route->parameter(
+            $route->parameter('resource_id_name')
+        );
 
-        return new DataResponse($data);
+        $model = $store
+            ->queryOne($resourceType, $modelOrResourceId)
+            ->using($request)
+            ->first();
+
+        return new DataResponse($model);
     }
 }

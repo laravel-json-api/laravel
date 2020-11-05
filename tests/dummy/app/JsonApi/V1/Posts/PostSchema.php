@@ -25,6 +25,8 @@ use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Filters\ID;
+use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
@@ -48,6 +50,7 @@ class PostSchema extends Schema
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
+            Str::make('slug'),
             Str::make('synopsis'),
             Str::make('title')->sortable(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
@@ -59,7 +62,10 @@ class PostSchema extends Schema
      */
     public function filters(): array
     {
-        return [];
+        return [
+            ID::make($this->idName()),
+            Where::make('slug')->singular(),
+        ];
     }
 
     /**

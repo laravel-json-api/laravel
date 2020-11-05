@@ -111,9 +111,10 @@ class Container implements ContainerContract
         foreach ($records as $record) {
             if ($record instanceof JsonApiResource) {
                 yield $record;
-            } else {
-                yield $this->create($record);
+                continue;
             }
+
+            yield $this->create($record);
         }
     }
 

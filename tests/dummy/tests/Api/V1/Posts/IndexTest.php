@@ -98,4 +98,33 @@ class IndexTest extends TestCase
             $user2,
         ]);
     }
+
+    public function testIdFilter(): void
+    {
+        $posts = Post::factory()->count(4)->create();
+        $expected = $posts->take(2);
+
+        $response = $this
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['id' => $expected->map(fn(Post $post) => $post->getRouteKey())])
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany($expected);
+    }
+
+    public function testSlugFilter(): void
+    {
+        $posts = Post::factory()->count(2)->create();
+        $expected = $this->serializer->post($posts[1])->toArray();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['slug' => $posts[1]->slug])
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedOneExact($expected);
+    }
 }

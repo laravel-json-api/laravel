@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Core\Support\Arr;
 use UnexpectedValueException;
 use function array_key_exists;
-use function http_build_query;
 use function is_array;
 
 class QueryParameters implements QueryParametersContract, Arrayable
@@ -156,7 +156,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
             $query['filter'] = $this->filters;
         }
 
-        return http_build_query($query);
+        return Arr::query($query);
     }
 
     /**

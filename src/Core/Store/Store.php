@@ -22,7 +22,9 @@ namespace LaravelJsonApi\Core\Store;
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
-use LaravelJsonApi\Core\Contracts\Store\QueryBuilder;
+use LaravelJsonApi\Core\Contracts\Store\QueriesOne;
+use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder;
+use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Core\Contracts\Store\Repository;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
@@ -50,7 +52,7 @@ class Store
      * @param mixed $arguments
      * @return Repository
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, $arguments)
     {
         return $this->resources(
             Str::dasherize($name)
@@ -89,17 +91,35 @@ class Store
      * Query all resources by JSON API resource type.
      *
      * @param string $resourceType
-     * @return QueryBuilder
+     * @return QueryAllBuilder
      */
-    public function query(string $resourceType): QueryBuilder
+    public function queryAll(string $resourceType): QueryAllBuilder
     {
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesAll) {
-            return $repository->query();
+            return $repository->queryAll();
         }
 
         throw new LogicException("Querying all {$resourceType} resources is not supported.");
+    }
+
+    /**
+     * Query one resource by JSON API resource type.
+     *
+     * @param string $resourceType
+     * @param Model|string $modelOrResourceId
+     * @return QueryOneBuilder
+     */
+    public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof QueriesOne) {
+            return $repository->queryOne($modelOrResourceId);
+        }
+
+        throw new LogicException("Querying one {$resourceType} resource is not supported.");
     }
 
     /**

@@ -23,8 +23,10 @@ use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
+use LaravelJsonApi\Core\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
+use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
@@ -105,17 +107,11 @@ abstract class Server
     }
 
     /**
-     * @return ResourceFactoryContract
+     * @return ResourceContainerContract
      */
-    public function resources(): ResourceFactoryContract
+    public function resources(): ResourceContainerContract
     {
-        if ($this->resources) {
-            return $this->resources;
-        }
-
-        return $this->resources = new ResourceFactory(
-            $this->container()->resources()
-        );
+        return new ResourceContainer($this->allResources());
     }
 
     /**
@@ -134,7 +130,21 @@ abstract class Server
         /** @var EncoderFactory $factory */
         $factory = $this->container->make(EncoderFactory::class);
 
-        return $factory->build($this->resources());
+        return $factory->build($this->allResources());
+    }
+
+    /**
+     * @return ResourceFactoryContract
+     */
+    private function allResources(): ResourceFactoryContract
+    {
+        if ($this->resources) {
+            return $this->resources;
+        }
+
+        return $this->resources = new ResourceFactory(
+            $this->container()->resources()
+        );
     }
 
 }

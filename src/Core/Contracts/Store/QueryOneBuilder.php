@@ -20,15 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Contracts\Store;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\LazyCollection;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\RelationshipPath;
-use LaravelJsonApi\Core\Query\SortField;
-use LaravelJsonApi\Core\Query\SortFields;
 
-interface QueryBuilder
+interface QueryOneBuilder
 {
 
     /**
@@ -40,20 +36,12 @@ interface QueryBuilder
     public function using(QueryParameters $query): self;
 
     /**
-     * Filter models using JSON API filter parameters.
+     * Filter the model using JSON API filter parameters.
      *
      * @param array|null $filters
      * @return $this
      */
     public function filter(?array $filters): self;
-
-    /**
-     * Sort models using JSON API sort fields.
-     *
-     * @param SortFields|SortField|array|string|null $fields
-     * @return $this
-     */
-    public function sort($fields): self;
 
     /**
      * Eager load resources using the provided JSON API include paths.
@@ -69,27 +57,4 @@ interface QueryBuilder
      * @return Model|mixed|null
      */
     public function first();
-
-    /**
-     * Get a lazy collection for the query.
-     *
-     * @return LazyCollection
-     */
-    public function cursor(): LazyCollection;
-
-    /**
-     * Return a page of models using JSON API page parameters.
-     *
-     * @param array $page
-     * @return Page
-     */
-    public function paginate(array $page): Page;
-
-    /**
-     * Execute the query, paginating results only if page parameters are provided.
-     *
-     * @param array|null $page
-     * @return Page|LazyCollection|iterable
-     */
-    public function getOrPaginate(?array $page): iterable;
 }
