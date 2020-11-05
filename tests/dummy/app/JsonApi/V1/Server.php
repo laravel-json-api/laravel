@@ -21,6 +21,8 @@ namespace DummyApp\JsonApi\V1;
 
 use DummyApp\JsonApi\V1\Posts\PostSchema;
 use DummyApp\JsonApi\V1\Users\UserSchema;
+use DummyApp\Post;
+use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Http\Server as BaseServer;
 
 class Server extends BaseServer
@@ -33,7 +35,9 @@ class Server extends BaseServer
      */
     public function serving(): void
     {
-        // no-op
+        Post::creating(static function (Post $post) {
+            $post->author()->associate(Auth::user());
+        });
     }
 
     /**

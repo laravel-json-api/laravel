@@ -23,6 +23,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable, \ArrayAccess
 {
@@ -68,15 +69,25 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     private Collection $fieldNames;
 
     /**
+     * @param array $data
+     * @return static
+     * @deprecated use `fromArray`
+     */
+    public static function create(array $data): self
+    {
+        return self::fromArray($data);
+    }
+
+    /**
      * Create a resource object from the data member of a JSON document.
      *
      * @param array $data
      * @return ResourceObject
      */
-    public static function create(array $data): self
+    public static function fromArray(array $data): self
     {
         if (!isset($data['type'])) {
-            throw new \InvalidArgumentException('Expecting a resource type.');
+            throw new InvalidArgumentException('Expecting a resource type.');
         }
 
         return new self(
@@ -108,7 +119,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
         array $links = []
     ) {
         if (empty($type)) {
-            throw new \InvalidArgumentException('Expecting a non-empty string.');
+            throw new InvalidArgumentException('Expecting a non-empty string.');
         }
 
         $this->type = $type;
@@ -213,7 +224,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     public function withType(string $type): self
     {
         if (empty($type)) {
-            throw new \InvalidArgumentException('Expecting a non-empty string.');
+            throw new InvalidArgumentException('Expecting a non-empty string.');
         }
 
         $copy = clone $this;
@@ -619,7 +630,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
         $field = collect(explode('.', $key))->first();
 
         if (!$this->isRelationship($field)) {
-            throw new \InvalidArgumentException("Field {$field} is not a relationship.");
+            throw new InvalidArgumentException("Field {$field} is not a relationship.");
         }
 
         $pointer = $this->pointer($key);

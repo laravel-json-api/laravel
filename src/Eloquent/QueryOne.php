@@ -21,16 +21,10 @@ namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder as QueryOneBuilderContract;
 
 class QueryOne implements QueryOneBuilderContract
 {
-
-    /**
-     * @var SchemaContainer
-     */
-    private SchemaContainer $schemas;
 
     /**
      * @var Schema
@@ -65,20 +59,17 @@ class QueryOne implements QueryOneBuilderContract
     /**
      * QueryOne constructor.
      *
-     * @param SchemaContainer $schemas
      * @param Schema $schema
      * @param Builder $query
      * @param Model|null $model
      * @param string $resourceId
      */
     public function __construct(
-        SchemaContainer $schemas,
         Schema $schema,
         Builder $query,
         ?Model $model,
         string $resourceId
     ) {
-        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->query = $query;
         $this->model = $model;
@@ -121,9 +112,9 @@ class QueryOne implements QueryOneBuilderContract
     public function first()
     {
         if ($this->model && empty($this->filters)) {
-            return $this->model->loadMissing(
-                EagerLoader::make($this->schemas, $this->schema, $this->includePaths)->all()
-            );
+            return $this->schema->loader()
+                ->using($this->model)
+                ->loadMissing($this->includePaths);
         }
 
         return $this->query

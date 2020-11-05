@@ -17,27 +17,18 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace LaravelJsonApi\Core\Contracts\Store;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use Illuminate\Database\Eloquent\Model;
 
-class TestCase extends BaseTestCase
+interface DeletesResources
 {
 
-    use MakesJsonApiRequests;
-
     /**
-     * @var Serializer
-     */
-    protected Serializer $serializer;
-
-    /**
+     * Destroy a resource.
+     *
+     * @param Model|mixed|string $modelOrResourceId
      * @return void
      */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->serializer = new Serializer();
-    }
+    public function delete($modelOrResourceId): void;
 }

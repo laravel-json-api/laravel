@@ -155,7 +155,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
      */
     public function repository(): RepositoryContract
     {
-        return new Repository($this->schemas(), $this);
+        return new Repository($this);
     }
 
     /**
@@ -242,6 +242,14 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
             $name,
             $this->type()
         ));
+    }
+
+    /**
+     * @return EagerLoader
+     */
+    public function loader(): EagerLoader
+    {
+        return new EagerLoader($this->schemas(), $this);
     }
 
     /**

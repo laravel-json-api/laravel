@@ -17,20 +17,18 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace DummyApp\Tests\Api\V1\Posts;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use DummyApp\Post;
+use DummyApp\Tests\Api\V1\TestCase;
 
-class TestCase extends BaseTestCase
+class DeleteTest extends TestCase
 {
 
-    use MakesJsonApiRequests;
-
     /**
-     * @var Serializer
+     * @var Post
      */
-    protected Serializer $serializer;
+    private Post $post;
 
     /**
      * @return void
@@ -38,6 +36,20 @@ class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->serializer = new Serializer();
+        $this->post = Post::factory()->create();
+    }
+
+    public function test(): void
+    {
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->delete(url('api/v1/posts', $this->post));
+
+        $response->assertDeleted();
+
+        $this->assertDatabaseMissing('posts', [
+            'id' => $this->post->getKey(),
+        ]);
     }
 }

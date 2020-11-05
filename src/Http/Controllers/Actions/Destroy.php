@@ -17,27 +17,30 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace LaravelJsonApi\Http\Controllers\Actions;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Route;
+use LaravelJsonApi\Core\Store\Store as ResourceStore;
 
-class TestCase extends BaseTestCase
+trait Destroy
 {
 
-    use MakesJsonApiRequests;
-
     /**
-     * @var Serializer
+     * @param ResourceStore $store
+     * @return Response
      */
-    protected Serializer $serializer;
-
-    /**
-     * @return void
-     */
-    protected function setUp(): void
+    public function destroy(ResourceStore $store): Response
     {
-        parent::setUp();
-        $this->serializer = new Serializer();
+        $route = Route::current();
+        $resourceType = $route->parameter('resource_type');
+
+        $modelOrResourceId = $route->parameter(
+            $route->parameter('resource_id_name')
+        );
+
+        $store->delete($resourceType, $modelOrResourceId);
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

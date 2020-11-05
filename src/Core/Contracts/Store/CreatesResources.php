@@ -17,27 +17,16 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace LaravelJsonApi\Core\Contracts\Store;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
-
-class TestCase extends BaseTestCase
+interface CreatesResources
 {
 
-    use MakesJsonApiRequests;
-
     /**
-     * @var Serializer
+     * Create a new resource.
+     *
+     * @return ResourceBuilder
      */
-    protected Serializer $serializer;
+    public function create(): ResourceBuilder;
 
-    /**
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->serializer = new Serializer();
-    }
 }

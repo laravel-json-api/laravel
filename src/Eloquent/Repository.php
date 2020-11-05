@@ -20,22 +20,27 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Core\Contracts\Store\CreatesResources;
+use LaravelJsonApi\Core\Contracts\Store\DeletesResources;
 use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Core\Contracts\Store\QueriesOne;
 use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
+use LaravelJsonApi\Core\Contracts\Store\ResourceBuilder;
+use LaravelJsonApi\Core\Contracts\Store\UpdatesResources;
 use LogicException;
+use RuntimeException;
 use function is_string;
 
-class Repository implements RepositoryContract, QueriesAll, QueriesOne
+class Repository implements
+    RepositoryContract,
+    QueriesAll,
+    QueriesOne,
+    CreatesResources,
+    UpdatesResources,
+    DeletesResources
 {
-
-    /**
-     * @var Container
-     */
-    private Container $schemas;
 
     /**
      * @var Schema
@@ -50,12 +55,10 @@ class Repository implements RepositoryContract, QueriesAll, QueriesOne
     /**
      * Repository constructor.
      *
-     * @param Container $schemas
      * @param Schema $schema
      */
-    public function __construct(Container $schemas, Schema $schema)
+    public function __construct(Schema $schema)
     {
-        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->model = $schema->newInstance();
     }
@@ -93,7 +96,7 @@ class Repository implements RepositoryContract, QueriesAll, QueriesOne
      */
     public function query(): Builder
     {
-        return new Builder($this->schemas, $this->schema, $this->model->newQuery());
+        return new Builder($this->schema, $this->model->newQuery());
     }
 
     /**
@@ -111,7 +114,6 @@ class Repository implements RepositoryContract, QueriesAll, QueriesOne
     {
         if ($modelOrResourceId instanceof Model) {
             return new QueryOne(
-                $this->schemas,
                 $this->schema,
                 $this->query(),
                 $modelOrResourceId,
@@ -121,7 +123,6 @@ class Repository implements RepositoryContract, QueriesAll, QueriesOne
 
         if (is_string($modelOrResourceId) && !empty($modelOrResourceId)) {
             return new QueryOne(
-                $this->schemas,
                 $this->schema,
                 $this->query(),
                 null,
@@ -130,6 +131,63 @@ class Repository implements RepositoryContract, QueriesAll, QueriesOne
         }
 
         throw new LogicException('Expecting a model or non-empty string resource id.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function create(): ResourceBuilder
+    {
+        return new Hydrator(
+            $this->schema,
+            $this->schema->newInstance()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function update($modelOrResourceId): ResourceBuilder
+    {
+        return new Hydrator(
+            $this->schema,
+            $this->findOrFail($modelOrResourceId)
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete($modelOrResourceId): void
+    {
+        $model = $this->findOrFail($modelOrResourceId);
+
+        if (true !== $model->getConnection()->transaction(fn() => $model->forceDelete())) {
+            throw new RuntimeException('Failed to delete resource.');
+        }
+    }
+
+    /**
+     * @param Model|string $modelOrResourceId
+     * @return Model
+     */
+    private function findOrFail($modelOrResourceId): Model
+    {
+        if ($modelOrResourceId instanceof $this->model) {
+            return $modelOrResourceId;
+        }
+
+        if (is_string($modelOrResourceId)) {
+            return $this
+                ->query()
+                ->whereResourceId($modelOrResourceId)
+                ->firstOrFail();
+        }
+
+        throw new LogicException(sprintf(
+            'Expecting a %s instance or a string resource id.',
+            get_class($this->model)
+        ));
     }
 
 }

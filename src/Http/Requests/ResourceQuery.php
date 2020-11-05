@@ -21,11 +21,10 @@ namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
-use LaravelJsonApi\Core\Support\Str;
+use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use function array_key_exists;
 
@@ -68,13 +67,9 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     public static function queryMany(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: function ($resourceType) {
-            return Str::replaceLast('Schema', 'CollectionQuery', get_class(
-                app(SchemaContainer::class)->schemaFor($resourceType)
-            ));
-        };
+        $resolver = self::$queryManyResolver ?: new ResourceRequestResolver('CollectionQuery');
 
-        return app($resolver($resourceType));
+        return $resolver($resourceType);
     }
 
     /**
@@ -96,13 +91,9 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     public static function queryOne(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: function ($resourceType) {
-            return Str::replaceLast('Schema', 'Query', get_class(
-                app(SchemaContainer::class)->schemaFor($resourceType)
-            ));
-        };
+        $resolver = self::$queryManyResolver ?: new ResourceRequestResolver('Query');
 
-        return app($resolver($resourceType));
+        return $resolver($resourceType);
     }
 
     /**

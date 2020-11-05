@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Traits\ForwardsCalls;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\RelationshipPath;
@@ -45,11 +44,6 @@ class Builder
 {
 
     use ForwardsCalls;
-
-    /**
-     * @var Container
-     */
-    private Container $schemas;
 
     /**
      * @var Schema
@@ -74,13 +68,11 @@ class Builder
     /**
      * Builder constructor.
      *
-     * @param Container $schemas
      * @param Schema $schema
      * @param EloquentBuilder|Relation $query
      */
-    public function __construct(Container $schemas, Schema $schema, $query)
+    public function __construct(Schema $schema, $query)
     {
-        $this->schemas = $schemas;
         $this->schema = $schema;
         $this->query = $query;
         $this->parameters = new QueryParameters();
@@ -190,13 +182,10 @@ class Builder
             return $this;
         }
 
-        $loader = new EagerLoader(
-            $this->schemas,
-            $this->schema,
-            $includePaths = IncludePaths::cast($includePaths)
-        );
+        $this->schema->loader()
+            ->using($this->query)
+            ->with($includePaths);
 
-        $this->query->with($loader->all());
         $this->parameters->withIncludePaths($includePaths);
 
         return $this;

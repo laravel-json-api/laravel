@@ -19,12 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent;
 
-use IteratorAggregate;
+use Generator;
+use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\IncludePaths;
+use LogicException;
 use function iterator_to_array;
 
-class EagerLoader implements IteratorAggregate
+class EagerLoader
 {
 
     /**
@@ -38,55 +40,103 @@ class EagerLoader implements IteratorAggregate
     private Schema $schema;
 
     /**
-     * @var IncludePaths
+     * @var Model|null
      */
-    private IncludePaths $paths;
+    private ?Model $model = null;
 
     /**
-     * Fluent constructor.
-     *
-     * @param Container $schemas
-     * @param Schema $schema
-     * @param mixed $includePaths
-     * @return static
+     * @var \Illuminate\Database\Eloquent\Builder|null
      */
-    public static function make(Container $schemas, Schema $schema, $includePaths): self
-    {
-        return new self(
-            $schemas,
-            $schema,
-            IncludePaths::cast($includePaths)
-        );
-    }
+    private $query;
 
     /**
      * EagerLoader constructor.
      *
      * @param Container $schemas
      * @param Schema $schema
-     * @param IncludePaths $paths
      */
-    public function __construct(Container $schemas, Schema $schema, IncludePaths $paths)
+    public function __construct(Container $schemas, Schema $schema)
     {
         $this->schemas = $schemas;
         $this->schema = $schema;
-        $this->paths = $paths;
     }
 
     /**
+     * @param Model|\Illuminate\Database\Eloquent\Builder $modelOrQuery
+     * @return $this
+     */
+    public function using($modelOrQuery): self
+    {
+        if ($modelOrQuery instanceof Model) {
+            $this->model = $modelOrQuery;
+        } else {
+            $this->query = $modelOrQuery;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $includePaths
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function with($includePaths)
+    {
+        if ($this->query) {
+            return $this->query->with(
+                $this->toRelations($includePaths)
+            );
+        }
+
+        throw new LogicException('No query to load relations on.');
+    }
+
+    /**
+     * @param $includePaths
+     * @return Model
+     */
+    public function load($includePaths): Model
+    {
+        if ($this->model) {
+            return $this->model->load(
+                $this->toRelations($includePaths)
+            );
+        }
+
+        throw new LogicException('No model to load relations on.');
+    }
+
+    /**
+     * @param $includePaths
+     * @return Model
+     */
+    public function loadMissing($includePaths): Model
+    {
+        if ($this->model) {
+            return $this->model->loadMissing(
+                $this->toRelations($includePaths)
+            );
+        }
+
+        throw new LogicException('No model to load relations on.');
+    }
+
+    /**
+     * @param $includePaths
      * @return array
      */
-    public function all(): array
+    public function toRelations($includePaths): array
     {
-        return iterator_to_array($this);
+        return iterator_to_array($this->cursor($includePaths));
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $includePaths
+     * @return Generator
      */
-    public function getIterator()
+    public function cursor($includePaths): Generator
     {
-        foreach ($this->paths as $path) {
+        foreach (IncludePaths::cast($includePaths) as $path) {
             yield (string) new EagerLoadPath($this->schemas, $this->schema, $path);
         }
     }

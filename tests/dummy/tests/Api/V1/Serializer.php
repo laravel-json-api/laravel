@@ -36,7 +36,7 @@ class Serializer
     {
         $self = url('/api/v1/posts', $post);
 
-        return ResourceObject::create([
+        return ResourceObject::fromArray([
             'type' => 'posts',
             'id' => (string) $post->getRouteKey(),
             'attributes' => [

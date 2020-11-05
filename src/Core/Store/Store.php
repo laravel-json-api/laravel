@@ -21,11 +21,15 @@ namespace LaravelJsonApi\Core\Store;
 
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Core\Contracts\Store\CreatesResources;
+use LaravelJsonApi\Core\Contracts\Store\DeletesResources;
 use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Core\Contracts\Store\QueriesOne;
 use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Core\Contracts\Store\Repository;
+use LaravelJsonApi\Core\Contracts\Store\ResourceBuilder;
+use LaravelJsonApi\Core\Contracts\Store\UpdatesResources;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 
@@ -120,6 +124,58 @@ class Store
         }
 
         throw new LogicException("Querying one {$resourceType} resource is not supported.");
+    }
+
+    /**
+     * Create a new resource.
+     *
+     * @param string $resourceType
+     * @return ResourceBuilder
+     */
+    public function create(string $resourceType): ResourceBuilder
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof CreatesResources) {
+            return $repository->create();
+        }
+
+        throw new LogicException("Creating a {$resourceType} resource is not supported.");
+    }
+
+    /**
+     * Update an existing resource.
+     *
+     * @param string $resourceType
+     * @param Model|mixed|string $modelOrResourceId
+     * @return ResourceBuilder
+     */
+    public function update(string $resourceType, $modelOrResourceId): ResourceBuilder
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof UpdatesResources) {
+            return $repository->update($modelOrResourceId);
+        }
+
+        throw new LogicException("Updating a {$resourceType} resource is not supported.");
+    }
+
+    /**
+     * @param string $resourceType
+     * @param $modelOrResourceId
+     * @return void
+     */
+    public function delete(string $resourceType, $modelOrResourceId): void
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof DeletesResources) {
+            $repository->delete($modelOrResourceId);
+            return;
+        }
+
+        throw new LogicException("Deleting a {$resourceType} resource is not supported.");
     }
 
     /**

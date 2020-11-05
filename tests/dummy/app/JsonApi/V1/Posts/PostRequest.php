@@ -17,27 +17,24 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace DummyApp\JsonApi\V1\Posts;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use Illuminate\Validation\Rule;
+use LaravelJsonApi\Http\Requests\ResourceRequest;
 
-class TestCase extends BaseTestCase
+class PostRequest extends ResourceRequest
 {
 
-    use MakesJsonApiRequests;
-
     /**
-     * @var Serializer
+     * @return array
      */
-    protected Serializer $serializer;
-
-    /**
-     * @return void
-     */
-    protected function setUp(): void
+    public function rules(): array
     {
-        parent::setUp();
-        $this->serializer = new Serializer();
+        return [
+            'content' => ['required', 'string'],
+            'slug' => ['required', 'string', Rule::unique('posts')],
+            'synopsis' => ['required', 'string'],
+            'title' => ['required', 'string'],
+        ];
     }
 }

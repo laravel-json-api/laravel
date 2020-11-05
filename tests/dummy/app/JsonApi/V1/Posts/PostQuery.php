@@ -38,7 +38,7 @@ class PostQuery extends ResourceQuery
             'include' => [
                 'nullable',
                 'string',
-                JsonApiRule::includePaths('author'),
+                JsonApiRule::includePaths(['author']),
             ],
             'page' => JsonApiRule::notSupported(),
             'sort' => JsonApiRule::notSupported(),
