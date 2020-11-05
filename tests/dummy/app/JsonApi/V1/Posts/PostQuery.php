@@ -33,7 +33,7 @@ class PostQuery extends ResourceQuery
             'filter' => [
                 'nullable',
                 'array',
-                JsonApiRule::filter([]),
+                JsonApiRule::filter(['slug']),
             ],
             'include' => [
                 'nullable',

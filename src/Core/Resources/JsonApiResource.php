@@ -80,6 +80,18 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * @return bool
+     */
+    public function wasCreated(): bool
+    {
+        if ($this->resource instanceof Model) {
+            return $this->resource->wasRecentlyCreated;
+        }
+
+        return false;
+    }
+
+    /**
      * @return ResourceIdentifier
      */
     public function identifier(): ResourceIdentifier

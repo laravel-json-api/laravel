@@ -37,6 +37,33 @@ class ReadTest extends TestCase
         $response->assertFetchedOneExact($expected);
     }
 
+    public function testSlugFilter(): void
+    {
+        $post = Post::factory()->create();
+        $expected = $this->serializer->post($post)->toArray();
+
+        $response = $this
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['slug' => $post->slug])
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected);
+    }
+
+    public function testSlugFilterDoesNotMatch(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['slug' => 'foobar'])
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedNull();
+    }
+
     public function testInvalidMediaType(): void
     {
         $post = Post::factory()->create();

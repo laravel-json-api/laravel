@@ -123,8 +123,8 @@ class ResourceResponse implements Responsable
             return true;
         }
 
-        if ($this->resource->resource instanceof Model) {
-            return $this->resource->resource->wasRecentlyCreated;
+        if ($this->resource) {
+            return $this->resource->wasCreated();
         }
 
         return false;
