@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Resources;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
+use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Pagination\Page;

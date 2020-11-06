@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Resolver;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Http\FormRequest;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function app;

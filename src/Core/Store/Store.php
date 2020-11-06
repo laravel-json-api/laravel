@@ -20,16 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Store;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
-use LaravelJsonApi\Core\Contracts\Store\CreatesResources;
-use LaravelJsonApi\Core\Contracts\Store\DeletesResources;
-use LaravelJsonApi\Core\Contracts\Store\QueriesAll;
-use LaravelJsonApi\Core\Contracts\Store\QueriesOne;
-use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder;
-use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder;
-use LaravelJsonApi\Core\Contracts\Store\Repository;
-use LaravelJsonApi\Core\Contracts\Store\ResourceBuilder;
-use LaravelJsonApi\Core\Contracts\Store\UpdatesResources;
+use LaravelJsonApi\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Store\CreatesResources;
+use LaravelJsonApi\Contracts\Store\DeletesResources;
+use LaravelJsonApi\Contracts\Store\QueriesAll;
+use LaravelJsonApi\Contracts\Store\QueriesOne;
+use LaravelJsonApi\Contracts\Store\QueryAllBuilder;
+use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
+use LaravelJsonApi\Contracts\Store\Repository;
+use LaravelJsonApi\Contracts\Store\ResourceBuilder;
+use LaravelJsonApi\Contracts\Store\UpdatesResources;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 

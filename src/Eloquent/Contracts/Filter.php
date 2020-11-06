@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaravelJsonApi\Core\Contracts\Schema\Filter as BaseFilter;
+use LaravelJsonApi\Contracts\Schema\Filter as BaseFilter;
 
 interface Filter extends BaseFilter
 {

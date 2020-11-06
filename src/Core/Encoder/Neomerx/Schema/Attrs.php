@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
 use IteratorAggregate;
-use LaravelJsonApi\Core\Contracts\Resources\Skippable;
+use LaravelJsonApi\Contracts\Resources\Skippable;
 use LaravelJsonApi\Core\Resources\ConditionalAttrs;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;

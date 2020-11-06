@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
 
-use LaravelJsonApi\Core\Contracts\Resources\Container;
+use LaravelJsonApi\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Json\Hash;

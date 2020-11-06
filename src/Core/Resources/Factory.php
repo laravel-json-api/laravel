@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Resources\Factory as FactoryContract;
+use LaravelJsonApi\Contracts\Resources\Factory as FactoryContract;
 use LogicException;
 use Throwable;
 use function array_keys;

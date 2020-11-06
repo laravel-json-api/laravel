@@ -23,7 +23,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
+use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Resources\PaginatedResourceResponse;

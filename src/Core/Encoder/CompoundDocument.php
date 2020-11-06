@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Encoder;
 
-use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;

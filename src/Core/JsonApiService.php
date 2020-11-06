@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use LaravelJsonApi\Core\Contracts\Http\Repository;
-use LaravelJsonApi\Core\Contracts\Http\Server;
-use LaravelJsonApi\Core\Contracts\Routing\Route;
+use LaravelJsonApi\Contracts\Http\Repository;
+use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Routing\Route;
 use LogicException;
 
 class JsonApiService

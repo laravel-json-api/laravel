@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Eloquent;
 
 use Generator;
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LogicException;
 use function iterator_to_array;

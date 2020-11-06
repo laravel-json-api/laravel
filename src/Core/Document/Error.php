@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
-use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
 use function array_filter;
 

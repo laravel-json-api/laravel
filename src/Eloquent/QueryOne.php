@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
-use LaravelJsonApi\Core\Contracts\Store\QueryOneBuilder as QueryOneBuilderContract;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Store\QueryOneBuilder as QueryOneBuilderContract;
 
 class QueryOne implements QueryOneBuilderContract
 {

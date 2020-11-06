@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Resources;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
+use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Facades\JsonApi;
 use function is_null;
 

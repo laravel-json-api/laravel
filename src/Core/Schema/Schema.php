@@ -19,11 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
-use LaravelJsonApi\Core\Contracts\Schema\Attribute;
-use LaravelJsonApi\Core\Contracts\Schema\Field;
-use LaravelJsonApi\Core\Contracts\Schema\Relation;
-use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
-use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Contracts\Schema\Attribute;
+use LaravelJsonApi\Contracts\Schema\Field;
+use LaravelJsonApi\Contracts\Schema\Relation;
+use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
+use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LogicException;
 use function sprintf;
 

@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Tests\Unit\Core\Schema;
 
-use LaravelJsonApi\Core\Contracts\Schema\Container;
-use LaravelJsonApi\Core\Contracts\Schema\Relation;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Schema\Relation;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Schema\IncludePathIterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

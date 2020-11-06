@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use LaravelJsonApi\Core\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Http\Server;
 use LaravelJsonApi\Routing\Route;
 
 /**

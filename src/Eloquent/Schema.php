@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
-use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
+use LaravelJsonApi\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Store\Repository as RepositoryContract;
 use LaravelJsonApi\Core\Resolver\ResourceClass;
 use LaravelJsonApi\Core\Resolver\ResourceType;
 use LaravelJsonApi\Core\Schema\Schema as BaseSchema;

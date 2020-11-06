@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Eloquent\Fields\Relations;
 
-use LaravelJsonApi\Core\Contracts\Schema\Relation as RelationContract;
+use LaravelJsonApi\Contracts\Schema\Relation as RelationContract;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Fields\Concerns\EagerLoadable;
 use LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly;

@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Contracts\Schema\Field;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Core\Support\Arr;
 
 class AllowedFieldSets implements Rule

@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Traits\ForwardsCalls;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
+use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\RelationshipPath;

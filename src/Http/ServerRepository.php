@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Http;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Http\Repository as RepositoryContract;
+use LaravelJsonApi\Contracts\Http\Repository as RepositoryContract;
 use RuntimeException;
 use Throwable;
-use LaravelJsonApi\Core\Contracts\Http\Server as ServerContract;
+use LaravelJsonApi\Contracts\Http\Server as ServerContract;
 
 class ServerRepository implements RepositoryContract
 {

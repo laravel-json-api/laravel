@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Filter;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\Filter;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use function collect;
 
 class AllowedFilterParameters extends AbstractAllowedRule

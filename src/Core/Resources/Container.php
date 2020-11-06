@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core\Resources;
 
 use Generator;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Resources\Container as ContainerContract;
-use LaravelJsonApi\Core\Contracts\Resources\Factory;
+use LaravelJsonApi\Contracts\Resources\Container as ContainerContract;
+use LaravelJsonApi\Contracts\Resources\Factory;
 use LogicException;
 use function get_class;
 use function is_iterable;

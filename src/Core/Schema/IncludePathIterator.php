@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Schema;
 
 use Illuminate\Contracts\Support\Arrayable;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Contracts\Schema\Relation;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\Relation;
+use LaravelJsonApi\Contracts\Schema\Schema;
 
 class IncludePathIterator implements \IteratorAggregate, Arrayable
 {

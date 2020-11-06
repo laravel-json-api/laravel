@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Document;
 
 use Countable;
 use IteratorAggregate;
-use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
 use function collect;
 

@@ -23,8 +23,8 @@ use Closure;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
-use LaravelJsonApi\Core\Contracts\Http\Repository;
-use LaravelJsonApi\Core\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Http\Repository;
+use LaravelJsonApi\Contracts\Http\Server;
 
 class BootJsonApi
 {

@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
-use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Schema\Container;
 use LogicException;
 
 trait SchemaAware

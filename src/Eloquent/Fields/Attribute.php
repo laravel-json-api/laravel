@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Eloquent\Fields;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Attribute as AttributeContract;
+use LaravelJsonApi\Contracts\Schema\Attribute as AttributeContract;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Fillable;
 use LaravelJsonApi\Eloquent\Contracts\Selectable;

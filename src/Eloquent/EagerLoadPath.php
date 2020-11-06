@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use IteratorAggregate;
-use LaravelJsonApi\Core\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Core\Query\RelationshipPath;
 use LaravelJsonApi\Eloquent\Fields\Relations\Relation;
 use LogicException;

@@ -24,7 +24,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use IteratorAggregate;
-use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
+use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Pagination\Page;
 use function count;

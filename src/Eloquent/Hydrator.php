@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
-use LaravelJsonApi\Core\Contracts\Schema\Attribute;
-use LaravelJsonApi\Core\Contracts\Store\ResourceBuilder;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Schema\Attribute;
+use LaravelJsonApi\Contracts\Store\ResourceBuilder;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Eloquent\Contracts\Fillable;
 use RuntimeException;

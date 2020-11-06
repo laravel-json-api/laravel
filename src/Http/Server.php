@@ -21,10 +21,10 @@ namespace LaravelJsonApi\Http;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Http\Server as ServerContract;
-use LaravelJsonApi\Core\Contracts\Resources\Container as ResourceContainerContract;
-use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
+use LaravelJsonApi\Contracts\Http\Server as ServerContract;
+use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
+use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;

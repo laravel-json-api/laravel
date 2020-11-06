@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Json\Json;
 

@@ -22,7 +22,7 @@ namespace LaravelJsonApi;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use LaravelJsonApi\Core\Contracts;
+use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;

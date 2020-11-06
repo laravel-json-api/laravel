@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Eloquent\Pagination;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use LaravelJsonApi\Core\Contracts\Pagination\Page as PageContract;
+use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Pagination\Page;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 

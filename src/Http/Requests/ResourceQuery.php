@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;

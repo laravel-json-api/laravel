@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Routing;
 
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
-use LaravelJsonApi\Core\Contracts\Routing\Route as RouteContract;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
-use LaravelJsonApi\Core\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
+use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Http\Server;
 use LogicException;
 
 class Route implements RouteContract

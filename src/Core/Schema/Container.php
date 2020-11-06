@@ -20,9 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
-use LaravelJsonApi\Core\Contracts\Schema\Container as ContainerContract;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
-use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
+use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LogicException;
 use RuntimeException;
 use Throwable;

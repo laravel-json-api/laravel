@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\Schema;
 
 class AllowedSortParameters extends AbstractAllowedRule
 {

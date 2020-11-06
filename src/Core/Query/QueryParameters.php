@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Support\Arr;
 use UnexpectedValueException;
 use function array_key_exists;

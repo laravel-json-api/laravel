@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Contracts\Pagination\Paginator as BasePaginator;
+use LaravelJsonApi\Contracts\Pagination\Page;
+use LaravelJsonApi\Contracts\Pagination\Paginator as BasePaginator;
 
 interface Paginator extends BasePaginator
 {

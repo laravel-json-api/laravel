@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Encoder;
 
-use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
+use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\Container;
 use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;

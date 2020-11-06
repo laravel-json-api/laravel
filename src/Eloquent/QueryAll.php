@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
-use LaravelJsonApi\Core\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Contracts\Query\QueryParameters as QueryParametersContract;
-use LaravelJsonApi\Core\Contracts\Store\QueryAllBuilder as QueryBuilderContract;
+use LaravelJsonApi\Contracts\Pagination\Page;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Store\QueryAllBuilder as QueryBuilderContract;
 
 class QueryAll implements QueryBuilderContract
 {

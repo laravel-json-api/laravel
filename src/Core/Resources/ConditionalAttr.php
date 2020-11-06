@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
 use JsonSerializable;
-use LaravelJsonApi\Core\Contracts\Resources\Skippable;
+use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
 
 class ConditionalAttr implements JsonSerializable, Skippable
