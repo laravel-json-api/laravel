@@ -20,16 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
+use LaravelJsonApi\Core\Contracts\Schema\Filter as BaseFilter;
 
-interface Filter
+interface Filter extends BaseFilter
 {
-
-    /**
-     * Get the key for the filter.
-     *
-     * @return string
-     */
-    public function key(): string;
 
     /**
      * Does the filter return a singular resource?

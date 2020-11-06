@@ -20,9 +20,30 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Support\Collection;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Core\Schema\IncludePathIterator;
+use function collect;
 
 class AllowedIncludePaths extends AbstractAllowedRule
 {
+
+    /**
+     * Create an allowed include path rule for the supplied schema and depth.
+     *
+     * @param SchemaContainer $schemas
+     * @param Schema $schema
+     * @param int $depth
+     * @return AllowedIncludePaths
+     */
+    public static function make(SchemaContainer $schemas, Schema $schema, int $depth): self
+    {
+        return new self(new IncludePathIterator(
+            $schemas,
+            $schema,
+            $depth
+        ));
+    }
 
     /**
      * @inheritDoc

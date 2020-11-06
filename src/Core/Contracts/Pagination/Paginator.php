@@ -17,35 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace LaravelJsonApi\Core\Contracts\Pagination;
 
-use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
-
-class AllowedPageParameters extends AbstractAllowedRule
+interface Paginator
 {
 
     /**
-     * Create an allowed page parameters rule for the supplied schema.
+     * Get the keys expected in the `page` query parameter for this paginator.
      *
-     * @param Schema $schema
-     * @return AllowedPageParameters
+     * @return array
      */
-    public static function make(Schema $schema): self
-    {
-        if ($paginator = $schema->pagination()) {
-            return new self($paginator->keys());
-        }
-
-        return new self([]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function extract($value): Collection
-    {
-        return collect($value)->keys();
-    }
-
+    public function keys(): array;
 }

@@ -21,14 +21,12 @@ namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Contracts\Schema\Field;
+use LaravelJsonApi\Core\Support\Arr;
 
 class AllowedFieldSets implements Rule
 {
-
-    /**
-     * @var bool
-     */
-    private bool $all;
 
     /**
      * @var Collection
@@ -36,20 +34,43 @@ class AllowedFieldSets implements Rule
     private Collection $allowed;
 
     /**
+     * @var SchemaContainer|null
+     */
+    private ?SchemaContainer $schemas = null;
+
+    /**
+     * @var bool
+     */
+    private bool $all;
+
+    /**
      * The last value that was validated.
      *
      * @var array|null
      */
-    private $value;
+    private ?array $value = null;
+
+    /**
+     * Create an allowed field set rule for the supplied schemas.
+     *
+     * @param SchemaContainer $schemas
+     * @return AllowedFieldSets
+     */
+    public static function make(SchemaContainer $schemas): self
+    {
+        $rule = new self();
+        $rule->schemas = $schemas;
+
+        return $rule;
+    }
 
     /**
      * AllowedFieldSets constructor.
      *
-     * @param array|null $allowed
+     * @param iterable|null $allowed
      */
-    public function __construct(array $allowed = null)
+    public function __construct(iterable $allowed = [])
     {
-        $this->all = is_null($allowed);
         $this->allowed = collect($allowed);
     }
 
@@ -161,7 +182,7 @@ class AllowedFieldSets implements Rule
         $fields = collect(explode(',', $fields));
 
         if (!$this->allowed->has($resourceType)) {
-            return $fields;
+            $this->allowed[$resourceType] = $this->fieldsFor($resourceType);
         }
 
         $allowed = $this->allowed->get($resourceType);
@@ -170,11 +191,9 @@ class AllowedFieldSets implements Rule
             return collect();
         }
 
-        $allowed = collect((array) $allowed);
+        $allowed = collect(Arr::wrap($allowed));
 
-        return $fields->reject(function ($value) use ($allowed) {
-            return $allowed->contains($value);
-        });
+        return $fields->reject(fn($value) => $allowed->contains($value));
     }
 
     /**
@@ -195,6 +214,22 @@ class AllowedFieldSets implements Rule
                 return "{$type}.{$field}";
             });
         });
+    }
+
+    /**
+     * @param string $resourceType
+     * @return array
+     */
+    private function fieldsFor(string $resourceType): array
+    {
+        if ($this->schemas) {
+            return collect($this->schemas->schemaFor($resourceType)->fields())
+                ->filter(fn(Field $field) => $field->isSparseField())
+                ->map(fn(Field $field) => $field->name())
+                ->all();
+        }
+
+        return [];
     }
 
 }

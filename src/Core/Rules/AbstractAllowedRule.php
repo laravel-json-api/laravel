@@ -54,12 +54,22 @@ abstract class AbstractAllowedRule implements Rule
     /**
      * AllowedFilterParameters constructor.
      *
-     * @param array|null $allowed
+     * @param iterable $allowed
      */
-    public function __construct(array $allowed = null)
+    public function __construct(iterable $allowed = [])
     {
-        $this->all = is_null($allowed);
         $this->allowed = collect($allowed)->combine($allowed);
+        $this->all = false;
+    }
+
+    /**
+     * @return $this
+     */
+    public function allowAll(): self
+    {
+        $this->all = true;
+
+        return $this;
     }
 
     /**
@@ -141,11 +151,12 @@ abstract class AbstractAllowedRule implements Rule
     /**
      * @return Collection
      */
-    protected function invalid()
+    protected function invalid(): Collection
     {
-        return $this->extract($this->value)->reject(function ($value) {
-            return $this->allowed($value);
-        });
+        return $this
+            ->extract($this->value)
+            ->reject(fn($value) => $this->allowed($value))
+            ->sort();
     }
 
 }

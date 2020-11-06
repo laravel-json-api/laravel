@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Schema;
 
+use LaravelJsonApi\Core\Contracts\Pagination\Paginator;
 use LaravelJsonApi\Core\Contracts\Store\Repository;
 
 interface Schema
@@ -52,4 +53,38 @@ interface Schema
      */
     public function repository(): Repository;
 
+    /**
+     * Get the resource fields (attributes and relationships).
+     *
+     * @return iterable
+     */
+    public function fields(): iterable;
+
+    /**
+     * Get the resource attributes.
+     *
+     * @return iterable
+     */
+    public function attributes(): iterable;
+
+    /**
+     * Get the resource relationships.
+     *
+     * @return iterable
+     */
+    public function relationships(): iterable;
+
+    /**
+     * Get the filters for the resource.
+     *
+     * @return array
+     */
+    public function filters(): iterable;
+
+    /**
+     * Get the paginator to use when fetching collections of this resource.
+     *
+     * @return Paginator|null
+     */
+     public function pagination(): ?Paginator;
 }

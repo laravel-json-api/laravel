@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,8 @@ namespace LaravelJsonApi\Routing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
+use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use LaravelJsonApi\Http\Server;
 use LogicException;
 
 /**
@@ -38,6 +40,11 @@ class Route
     use ForwardsCalls;
 
     /**
+     * @var Server
+     */
+    private Server $server;
+
+    /**
      * @var IlluminateRoute
      */
     private IlluminateRoute $route;
@@ -45,10 +52,12 @@ class Route
     /**
      * Route constructor.
      *
+     * @param Server $server
      * @param IlluminateRoute $route
      */
-    public function __construct(IlluminateRoute $route)
+    public function __construct(Server $server, IlluminateRoute $route)
     {
+        $this->server = $server;
         $this->route = $route;
     }
 
@@ -92,5 +101,17 @@ class Route
         }
 
         throw new LogicException('No JSON API resource id set on route.');
+    }
+
+    /**
+     * Get the schema for the current route.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return $this->server->container()->schemaFor(
+            $this->resourceType()
+        );
     }
 }

@@ -31,6 +31,7 @@ use LaravelJsonApi\Core\Query\RelationshipPath;
 use LaravelJsonApi\Core\Query\SortField;
 use LaravelJsonApi\Core\Query\SortFields;
 use LaravelJsonApi\Eloquent\Contracts\Filter;
+use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Contracts\Sortable;
 use LogicException;
 use RuntimeException;
@@ -234,10 +235,19 @@ class Builder
      */
     public function paginate(array $page)
     {
-        if ($paginator = $this->schema->pagination()) {
+        $paginator = $this->schema->pagination();
+
+        if ($paginator instanceof Paginator) {
             return $paginator->paginate($this->query, $page)->withQuery(
                 $this->parameters->withPagination($page)->toArray()
             );
+        }
+
+        if ($paginator) {
+            throw new LogicException(sprintf(
+                'Expecting paginator for resource %s to be an Eloquent paginator.',
+                $this->schema->type()
+            ));
         }
 
         throw new LogicException(sprintf(

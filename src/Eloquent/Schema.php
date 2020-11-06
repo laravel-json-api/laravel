@@ -76,27 +76,6 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     private ?array $fields = null;
 
     /**
-     * Get the resource attributes.
-     *
-     * @return array
-     */
-    abstract public function fields(): array;
-
-    /**
-     * Get the filters for the resource.
-     *
-     * @return array
-     */
-    abstract public function filters(): array;
-
-    /**
-     * Get the paginator to use when fetching collections of this resource.
-     *
-     * @return Paginator|null
-     */
-    abstract public function pagination(): ?Paginator;
-
-    /**
      * Specify the callback to use to guess the resource type from the schema class.
      *
      * @param callable $resolver
@@ -181,7 +160,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     }
 
     /**
-     * @return iterable
+     * @inheritDoc
      */
     public function attributes(): iterable
     {
@@ -213,7 +192,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     }
 
     /**
-     * @return iterable
+     * @inheritDoc
      */
     public function relationships(): iterable
     {

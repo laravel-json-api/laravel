@@ -2,7 +2,7 @@
 
 namespace DummyApp\JsonApi\V1\Posts;
 
-use LaravelJsonApi\Core\Validation\Rule as JsonApiRule;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
 
 class PostQuery extends ResourceQuery
@@ -28,17 +28,17 @@ class PostQuery extends ResourceQuery
             'fields' => [
                 'nullable',
                 'array',
-                JsonApiRule::fieldSets([]),
+                JsonApiRule::fieldSets(),
             ],
             'filter' => [
                 'nullable',
                 'array',
-                JsonApiRule::filter(['slug']),
+                JsonApiRule::filter()->forget('id'),
             ],
             'include' => [
                 'nullable',
                 'string',
-                JsonApiRule::includePaths(['author']),
+                JsonApiRule::includePaths(),
             ],
             'page' => JsonApiRule::notSupported(),
             'sort' => JsonApiRule::notSupported(),

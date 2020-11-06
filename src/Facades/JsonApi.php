@@ -17,35 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace LaravelJsonApi\Facades;
 
-use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use Illuminate\Support\Facades\Facade;
+use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Routing\Route;
 
-class AllowedPageParameters extends AbstractAllowedRule
+/**
+ * Class JsonApi
+ *
+ * @method static Route route()
+ * @method static Server server()
+ */
+class JsonApi extends Facade
 {
 
     /**
-     * Create an allowed page parameters rule for the supplied schema.
-     *
-     * @param Schema $schema
-     * @return AllowedPageParameters
+     * @return string
      */
-    public static function make(Schema $schema): self
+    protected static function getFacadeAccessor()
     {
-        if ($paginator = $schema->pagination()) {
-            return new self($paginator->keys());
-        }
-
-        return new self([]);
+        return 'json-api';
     }
-
-    /**
-     * @inheritDoc
-     */
-    protected function extract($value): Collection
-    {
-        return collect($value)->keys();
-    }
-
 }

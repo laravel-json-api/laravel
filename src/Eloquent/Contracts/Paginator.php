@@ -21,21 +21,17 @@ namespace LaravelJsonApi\Eloquent\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
+use LaravelJsonApi\Core\Contracts\Pagination\Paginator as BasePaginator;
 
-interface Paginator
+interface Paginator extends BasePaginator
 {
 
     /**
-     * Get the keys expected in the `page` query parameter for this paginator.
+     * Execute the query and return a JSON API page.
      *
-     * @return array
-     */
-    public function keys(): array;
-
-    /**
      * @param Builder $query
      * @param array $page
-     * @return mixed
+     * @return Page
      */
     public function paginate($query, array $page): Page;
 }

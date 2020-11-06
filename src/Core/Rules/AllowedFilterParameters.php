@@ -20,9 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Support\Collection;
+use LaravelJsonApi\Core\Contracts\Schema\Filter;
+use LaravelJsonApi\Core\Contracts\Schema\Schema;
+use function collect;
 
 class AllowedFilterParameters extends AbstractAllowedRule
 {
+
+    /**
+     * Create an allowed filter parameters rule from the supplied schema.
+     *
+     * @param Schema $schema
+     * @return static
+     */
+    public static function make(Schema $schema): self
+    {
+        return new self(collect($schema->filters())->map(
+            fn(Filter $filter) => $filter->key()
+        ));
+    }
 
     /**
      * @inheritDoc

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Validation;
+namespace LaravelJsonApi\Validation;
 
 use Illuminate\Support\Arr;
 use LaravelJsonApi\Core\Rules\AllowedFieldSets;
@@ -29,6 +29,7 @@ use LaravelJsonApi\Core\Rules\DateTimeIso8601;
 use LaravelJsonApi\Core\Rules\ParameterNotSupported;
 use LaravelJsonApi\Core\Rules\HasMany;
 use LaravelJsonApi\Core\Rules\HasOne;
+use LaravelJsonApi\Facades\JsonApi;
 use function is_null;
 
 class Rule
@@ -47,11 +48,17 @@ class Rule
     /**
      * Get a sparse field sets constraint builder instance.
      *
-     * @param string|array|null $allowed
+     * @param array|null $allowed
      * @return AllowedFieldSets
      */
-    public static function fieldSets($allowed = null): AllowedFieldSets
+    public static function fieldSets(array $allowed = null): AllowedFieldSets
     {
+        if (is_null($allowed)) {
+            return AllowedFieldSets::make(
+                JsonApi::server()->container()
+            );
+        }
+
         return new AllowedFieldSets($allowed);
     }
 
@@ -63,22 +70,32 @@ class Rule
      */
     public static function filter($allowed = null): AllowedFilterParameters
     {
-        return new AllowedFilterParameters(
-            is_null($allowed) ? $allowed : Arr::wrap($allowed)
-        );
+        if (is_null($allowed)) {
+            return AllowedFilterParameters::make(
+                JsonApi::route()->schema()
+            );
+        }
+
+        return new AllowedFilterParameters(Arr::wrap($allowed));
     }
 
     /**
      * Get an include paths constraint builder instance.
      *
-     * @param string|string[]|null $allowed
+     * @param int|string|string[] $depthOrAllowed
      * @return AllowedIncludePaths
      */
-    public static function includePaths($allowed = null): AllowedIncludePaths
+    public static function includePaths($depthOrAllowed = 1): AllowedIncludePaths
     {
-        return new AllowedIncludePaths(
-            is_null($allowed) ? $allowed : Arr::wrap($allowed)
-        );
+        if (is_int($depthOrAllowed)) {
+            return AllowedIncludePaths::make(
+                JsonApi::server()->container(),
+                JsonApi::route()->schema(),
+                $depthOrAllowed
+            );
+        }
+
+        return new AllowedIncludePaths(Arr::wrap($depthOrAllowed));
     }
 
     /**
@@ -100,9 +117,13 @@ class Rule
      */
     public static function page($allowed = null): AllowedPageParameters
     {
-        return new AllowedPageParameters(
-            is_null($allowed) ? $allowed : Arr::wrap($allowed)
-        );
+        if (is_null($allowed)) {
+            return AllowedPageParameters::make(
+                JsonApi::route()->schema()
+            );
+        }
+
+        return new AllowedPageParameters(Arr::wrap($allowed));
     }
 
     /**
@@ -113,9 +134,13 @@ class Rule
      */
     public static function sort($allowed = null): AllowedSortParameters
     {
-        return new AllowedSortParameters(
-            is_null($allowed) ? $allowed : Arr::wrap($allowed)
-        );
+        if (is_null($allowed)) {
+            return AllowedSortParameters::make(
+                JsonApi::route()->schema()
+            );
+        }
+
+        return new AllowedSortParameters(Arr::wrap($allowed));
     }
 
     /**

@@ -58,5 +58,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(ResourceContainer::class, static function (Application $app) {
             return $app->make(Server::class)->resources();
         });
+
+        $this->app->singleton(JsonApiService::class);
+        $this->app->alias(JsonApiService::class, 'json-api');
     }
 }
