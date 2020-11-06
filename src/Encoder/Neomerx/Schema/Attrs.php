@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Encoder\Neomerx\Schema;
 
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\Skippable;

@@ -15,30 +15,17 @@
  * limitations under the License.
  */
 
-declare(strict_types=1);
+namespace LaravelJsonApi\Contracts\Encoder;
 
-namespace LaravelJsonApi\Core\Encoder;
+use LaravelJsonApi\Contracts\Http\Server;
 
-use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
-use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
-use LaravelJsonApi\Core\Resources\Container;
-use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
-
-class Factory
+interface Factory
 {
-
     /**
-     * Build a new encoder instance.
+     * Build a new encoder instance for the supplied server.
      *
-     * @param ResourceFactoryContract ...$factories
+     * @param Server $server
      * @return Encoder
      */
-    public function build(ResourceFactoryContract ...$factories): Encoder
-    {
-        return new Encoder(
-            new Container(...$factories),
-            $factory = new NeomerxFactory(),
-            new Mapper($factory)
-        );
-    }
+    public function build(Server $server): Encoder;
 }

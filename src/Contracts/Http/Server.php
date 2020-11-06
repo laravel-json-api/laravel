@@ -19,7 +19,7 @@ namespace LaravelJsonApi\Contracts\Http;
 
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Encoder\Encoder;
+use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Core\Store\Store;
 
 interface Server

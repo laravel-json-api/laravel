@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,29 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Encoder;
+namespace LaravelJsonApi\Encoder\Neomerx;
 
+use LaravelJsonApi\Contracts\Encoder\Encoder as EncoderContract;
 use LaravelJsonApi\Contracts\Resources\Container;
-use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
-use LaravelJsonApi\Core\Encoder\Neomerx\Schema\SchemaContainer;
-use LaravelJsonApi\Core\Encoder\Neomerx\Schema\SchemaFields;
+use LaravelJsonApi\Encoder\Neomerx\Mapper;
+use LaravelJsonApi\Encoder\Neomerx\Schema\SchemaContainer;
+use LaravelJsonApi\Encoder\Neomerx\Schema\SchemaFields;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use Neomerx\JsonApi\Factories\Factory;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
-class Encoder
+class Encoder implements EncoderContract
 {
 
     /**
      * @var Container
      */
-    private Container $container;
+    private Container $resources;
 
     /**
-     * @var Factory
+     * @var FactoryInterface
      */
-    private Factory $factory;
+    private FactoryInterface $factory;
 
     /**
      * @var Mapper
@@ -60,19 +61,18 @@ class Encoder
      * Encoder constructor.
      *
      * @param Container $container
-     * @param Factory $factory
+     * @param FactoryInterface $factory
      * @param Mapper $mapper
      */
-    public function __construct(Container $container, Factory $factory, Mapper $mapper)
+    public function __construct(Container $container, FactoryInterface $factory, Mapper $mapper)
     {
-        $this->container = $container;
+        $this->resources = $container;
         $this->factory = $factory;
         $this->mapper = $mapper;
     }
 
     /**
-     * @param $includePaths
-     * @return $this
+     * @inheritDoc
      */
     public function withIncludePaths($includePaths): self
     {
@@ -82,8 +82,7 @@ class Encoder
     }
 
     /**
-     * @param $fieldSets
-     * @return $this
+     * @inheritDoc
      */
     public function withFieldSets($fieldSets): self
     {
@@ -93,10 +92,7 @@ class Encoder
     }
 
     /**
-     * Create a compound document with a resource as the top-level data member.
-     *
-     * @param JsonApiResource|null $resource
-     * @return CompoundDocument
+     * @inheritDoc
      */
     public function withResource(?JsonApiResource $resource): CompoundDocument
     {
@@ -104,21 +100,17 @@ class Encoder
     }
 
     /**
-     * @param iterable $resources
-     * @return CompoundDocument
+     * @inheritDoc
      */
     public function withResources(iterable $resources): CompoundDocument
     {
         return $this->withData(
-            $this->container->cursor($resources)
+            $this->resources->cursor($resources)
         );
     }
 
     /**
-     * Create a compound document.
-     *
-     * @param $data
-     * @return CompoundDocument
+     * @inheritDoc
      */
     public function withData($data): CompoundDocument
     {
@@ -128,17 +120,17 @@ class Encoder
     /**
      * Create a new encoder instance.
      *
-     * @return Neomerx\Encoder
+     * @return \LaravelJsonApi\Encoder\Neomerx\Encoder\Encoder
      */
-    private function encoder(): Neomerx\Encoder
+    private function encoder(): Encoder\Encoder
     {
         $schemas = new SchemaContainer(
-            $this->container,
+            $this->resources,
             $this->mapper,
             new SchemaFields($this->includePaths ?: new IncludePaths(), $this->fieldSets ?: new FieldSets())
         );
 
-        $encoder = new Neomerx\Encoder($this->factory, $schemas);
+        $encoder = new Encoder\Encoder($this->factory, $schemas);
 
         if ($this->includePaths) {
             $encoder->withIncludedPaths($this->includePaths->toArray());

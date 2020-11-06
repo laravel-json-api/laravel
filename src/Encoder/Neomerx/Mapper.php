@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Encoder\Neomerx;
+namespace LaravelJsonApi\Encoder\Neomerx;
 
 use Generator;
 use LaravelJsonApi\Core\Document\Link;

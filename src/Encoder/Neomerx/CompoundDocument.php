@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +17,22 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Encoder;
+namespace LaravelJsonApi\Encoder\Neomerx;
 
+use LaravelJsonApi\Contracts\Encoder\CompoundDocument as CompoundDocumentContract;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
+use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Json\Hash;
 
-class CompoundDocument implements Serializable
+class CompoundDocument implements Serializable, CompoundDocumentContract
 {
 
     /**
-     * @var Neomerx\Encoder
+     * @var \LaravelJsonApi\Encoder\Neomerx\Encoder\Encoder
      */
-    private Neomerx\Encoder $encoder;
+    private Encoder\Encoder $encoder;
 
     /**
      * @var Mapper
@@ -61,11 +62,11 @@ class CompoundDocument implements Serializable
     /**
      * CompoundDocument constructor.
      *
-     * @param Neomerx\Encoder $encoder
+     * @param \LaravelJsonApi\Encoder\Neomerx\Encoder\Encoder $encoder
      * @param Mapper $mapper
      * @param mixed $data
      */
-    public function __construct(Neomerx\Encoder $encoder, Mapper $mapper, $data)
+    public function __construct(Encoder\Encoder $encoder, Mapper $mapper, $data)
     {
         $this->encoder = $encoder;
         $this->mapper = $mapper;
@@ -74,10 +75,7 @@ class CompoundDocument implements Serializable
     }
 
     /**
-     * Set the top-level JSON API member.
-     *
-     * @param $jsonApi
-     * @return $this
+     * @inheritDoc
      */
     public function withJsonApi($jsonApi): self
     {
@@ -87,10 +85,7 @@ class CompoundDocument implements Serializable
     }
 
     /**
-     * Set the top-level links member.
-     *
-     * @param $links
-     * @return $this
+     * @inheritDoc
      */
     public function withLinks($links): self
     {
@@ -100,10 +95,7 @@ class CompoundDocument implements Serializable
     }
 
     /**
-     * Set the top-level meta member.
-     *
-     * @param $meta
-     * @return $this
+     * @inheritDoc
      */
     public function withMeta($meta): self
     {

@@ -25,8 +25,8 @@ use LaravelJsonApi\Contracts\Http\Server as ServerContract;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
-use LaravelJsonApi\Core\Encoder\Encoder;
-use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
+use LaravelJsonApi\Contracts\Encoder\Encoder;
+use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
@@ -131,7 +131,7 @@ abstract class Server implements ServerContract
         /** @var EncoderFactory $factory */
         $factory = $this->container->make(EncoderFactory::class);
 
-        return $factory->build($this->allResources());
+        return $factory->build($this);
     }
 
     /**

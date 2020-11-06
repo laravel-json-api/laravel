@@ -37,6 +37,7 @@ class CreateTest extends TestCase
             ->toArray();
 
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($post->author)
             ->jsonApi()
             ->expects('posts')

@@ -23,12 +23,15 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
+use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
 use LaravelJsonApi\Http\Server;
 use LaravelJsonApi\Http\ServerRepository;
 use LaravelJsonApi\Routing\Route;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -49,20 +52,21 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->bindService();
+        $this->bindEncoder();
         $this->bindHttp();
+        $this->bindService();
         $this->bindRoute();
     }
 
     /**
-     * Bind the JSON API service into the service container.
+     * Bind the encoder into the service container.
      *
      * @return void
      */
-    private function bindService(): void
+    private function bindEncoder(): void
     {
-        $this->app->singleton(JsonApiService::class);
-        $this->app->alias(JsonApiService::class, 'json-api');
+        $this->app->bind(Contracts\Encoder\Factory::class, EncoderFactory::class);
+        $this->app->bind(FactoryInterface::class, NeomerxFactory::class);
     }
 
     /**
@@ -96,5 +100,16 @@ class ServiceProvider extends BaseServiceProvider
     private function bindRoute(): void
     {
         $this->app->bind(Contracts\Routing\Route::class, Route::class);
+    }
+
+    /**
+     * Bind the JSON API service into the service container.
+     *
+     * @return void
+     */
+    private function bindService(): void
+    {
+        $this->app->singleton(JsonApiService::class);
+        $this->app->alias(JsonApiService::class, 'json-api');
     }
 }

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,11 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Encoder\Neomerx\Schema;
+namespace LaravelJsonApi\Encoder\Neomerx\Schema;
 
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Resources\Container;
-use LaravelJsonApi\Core\Encoder\Neomerx\Mapper;
+use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LogicException;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
