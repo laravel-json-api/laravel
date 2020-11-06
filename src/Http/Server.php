@@ -21,9 +21,10 @@ namespace LaravelJsonApi\Http;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
-use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
+use LaravelJsonApi\Core\Contracts\Http\Server as ServerContract;
 use LaravelJsonApi\Core\Contracts\Resources\Container as ResourceContainerContract;
+use LaravelJsonApi\Core\Contracts\Resources\Factory as ResourceFactoryContract;
+use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Core\Encoder\Encoder;
 use LaravelJsonApi\Core\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
@@ -31,7 +32,7 @@ use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
 
-abstract class Server
+abstract class Server implements ServerContract
 {
 
     /**
@@ -66,7 +67,7 @@ abstract class Server
      *
      * @return array
      */
-    abstract protected function schemas(): array;
+    abstract protected function allSchemas(): array;
 
     /**
      * Server constructor.
@@ -85,7 +86,7 @@ abstract class Server
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function name(): string
     {
@@ -93,21 +94,21 @@ abstract class Server
     }
 
     /**
-     * @return SchemaContainerContract
+     * @inheritDoc
      */
-    public function container(): SchemaContainerContract
+    public function schemas(): SchemaContainerContract
     {
         if ($this->schemas) {
             return $this->schemas;
         }
 
         return $this->schemas = new SchemaContainer(
-            $this->container, $this->schemas()
+            $this->container, $this->allSchemas()
         );
     }
 
     /**
-     * @return ResourceContainerContract
+     * @inheritDoc
      */
     public function resources(): ResourceContainerContract
     {
@@ -115,15 +116,15 @@ abstract class Server
     }
 
     /**
-     * @return Store
+     * @inheritDoc
      */
     public function store(): Store
     {
-        return new Store($this->container());
+        return new Store($this->schemas());
     }
 
     /**
-     * @return Encoder
+     * @inheritDoc
      */
     public function encoder(): Encoder
     {
@@ -143,7 +144,7 @@ abstract class Server
         }
 
         return $this->resources = new ResourceFactory(
-            $this->container()->resources()
+            $this->schemas()->resources()
         );
     }
 

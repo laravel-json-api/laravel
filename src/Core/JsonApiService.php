@@ -17,12 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi;
+namespace LaravelJsonApi\Core;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use LaravelJsonApi\Http\Server;
-use LaravelJsonApi\Routing\Route;
+use LaravelJsonApi\Core\Contracts\Http\Repository;
+use LaravelJsonApi\Core\Contracts\Http\Server;
+use LaravelJsonApi\Core\Contracts\Routing\Route;
 use LogicException;
 
 class JsonApiService
@@ -52,10 +53,17 @@ class JsonApiService
     }
 
     /**
+     * Get the active server, or a named server.
+     *
+     * @param string|null $name
      * @return Server
      */
-    public function server(): Server
+    public function server(string $name = null): Server
     {
+        if (is_string($name)) {
+            return $this->servers()->server($name);
+        }
+
         try {
             return $this->container->make(Server::class);
         } catch (BindingResolutionException $ex) {
@@ -65,5 +73,13 @@ class JsonApiService
                 $ex
             );
         }
+    }
+
+    /**
+     * @return Repository
+     */
+    private function servers(): Repository
+    {
+        return $this->container->make(Repository::class);
     }
 }

@@ -45,7 +45,7 @@ class Server extends BaseServer
      *
      * @return array
      */
-    protected function schemas(): array
+    protected function allSchemas(): array
     {
         return [
             PostSchema::class,

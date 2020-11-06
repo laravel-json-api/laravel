@@ -20,11 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
-use LaravelJsonApi\Http\Server;
-use LaravelJsonApi\Http\ServerRepository;
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use LaravelJsonApi\Core\Contracts\Http\Repository;
+use LaravelJsonApi\Core\Contracts\Http\Server;
 
 class BootJsonApi
 {
@@ -35,17 +35,17 @@ class BootJsonApi
     private IlluminateContainer $container;
 
     /**
-     * @var ServerRepository
+     * @var Repository
      */
-    private ServerRepository $servers;
+    private Repository $servers;
 
     /**
      * BootJsonApi constructor.
      *
      * @param IlluminateContainer $container
-     * @param ServerRepository $servers
+     * @param Repository $servers
      */
-    public function __construct(IlluminateContainer $container, ServerRepository $servers)
+    public function __construct(IlluminateContainer $container, Repository $servers)
     {
         $this->container = $container;
         $this->servers = $servers;

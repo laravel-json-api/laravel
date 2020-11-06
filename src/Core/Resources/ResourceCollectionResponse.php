@@ -24,7 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Core\Facades\JsonApi;
 
 class ResourceCollectionResponse implements Responsable
 {
@@ -72,10 +72,7 @@ class ResourceCollectionResponse implements Responsable
      */
     public function toResponse($request)
     {
-        /** @var Server $server */
-        $server = app(Server::class);
-
-        $document = $server->encoder()
+        $document = JsonApi::server()->encoder()
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResources($this->resources)

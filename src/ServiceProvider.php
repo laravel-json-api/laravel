@@ -22,11 +22,13 @@ namespace LaravelJsonApi;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use LaravelJsonApi\Core\Contracts\Resources\Container as ResourceContainer;
-use LaravelJsonApi\Core\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Contracts;
+use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
 use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Http\ServerRepository;
+use LaravelJsonApi\Routing\Route;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -47,19 +49,52 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(Store::class, static function (Application $app) {
-            return $app->make(Server::class)->store();
-        });
+        $this->bindService();
+        $this->bindHttp();
+        $this->bindRoute();
+    }
 
-        $this->app->bind(SchemaContainer::class, static function (Application $app) {
-            return $app->make(Server::class)->container();
-        });
-
-        $this->app->bind(ResourceContainer::class, static function (Application $app) {
-            return $app->make(Server::class)->resources();
-        });
-
+    /**
+     * Bind the JSON API service into the service container.
+     *
+     * @return void
+     */
+    private function bindService(): void
+    {
         $this->app->singleton(JsonApiService::class);
         $this->app->alias(JsonApiService::class, 'json-api');
+    }
+
+    /**
+     * Bind HTTP services into the service container.
+     *
+     * @return void
+     */
+    private function bindHttp(): void
+    {
+        $this->app->bind(Contracts\Http\Repository::class, ServerRepository::class);
+        $this->app->bind(Contracts\Http\Server::class, Server::class);
+
+        $this->app->bind(Store::class, static function (Application $app) {
+            return $app->make(Contracts\Http\Server::class)->store();
+        });
+
+        $this->app->bind(Contracts\Schema\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Http\Server::class)->schemas();
+        });
+
+        $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Http\Server::class)->resources();
+        });
+    }
+
+    /**
+     * Bind the route instance into the container.
+     *
+     * @return void
+     */
+    private function bindRoute(): void
+    {
+        $this->app->bind(Contracts\Routing\Route::class, Route::class);
     }
 }

@@ -23,8 +23,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Contracts\Pagination\Page;
-use LaravelJsonApi\Http\Server;
-use function app;
+use LaravelJsonApi\Core\Facades\JsonApi;
 use function is_null;
 
 class DataResponse implements Responsable
@@ -61,9 +60,9 @@ class DataResponse implements Responsable
             return new ResourceResponse(null);
         }
 
-        /** @var Server $server */
-        $server = app(Server::class);
-        $parsed = $server->resources()->resolve($this->value);
+        $parsed = JsonApi::server()
+            ->resources()
+            ->resolve($this->value);
 
         if ($parsed instanceof JsonApiResource) {
             return $parsed->prepareResponse($request);

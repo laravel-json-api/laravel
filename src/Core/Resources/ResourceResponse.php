@@ -20,10 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Core\Facades\JsonApi;
 
 class ResourceResponse implements Responsable
 {
@@ -68,10 +67,7 @@ class ResourceResponse implements Responsable
      */
     public function toResponse($request)
     {
-        /** @var Server $server */
-        $server = app(Server::class);
-
-        $document = $server->encoder()
+        $document = JsonApi::server()->encoder()
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResource($this->resource)

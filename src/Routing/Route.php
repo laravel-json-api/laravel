@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,19 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Routing;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
+use LaravelJsonApi\Core\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Core\Contracts\Schema\Schema;
-use LaravelJsonApi\Http\Server;
+use LaravelJsonApi\Core\Contracts\Http\Server;
 use LogicException;
 
-/**
- * Class Route
- *
- * @mixin IlluminateRoute
- */
-class Route
+class Route implements RouteContract
 {
 
     public const RESOURCE_TYPE = 'resource_type';
@@ -72,9 +67,7 @@ class Route
     }
 
     /**
-     * Get the resource type.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function resourceType(): string
     {
@@ -86,9 +79,7 @@ class Route
     }
 
     /**
-     * Get the resource id or the model (if bindings have been substituted).
-     *
-     * @return Model|mixed|string|null
+     * @inheritDoc
      */
     public function modelOrResourceId()
     {
@@ -104,13 +95,11 @@ class Route
     }
 
     /**
-     * Get the schema for the current route.
-     *
-     * @return Schema
+     * @inheritDoc
      */
     public function schema(): Schema
     {
-        return $this->server->container()->schemaFor(
+        return $this->server->schemas()->schemaFor(
             $this->resourceType()
         );
     }

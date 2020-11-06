@@ -43,7 +43,7 @@ class PostSchema extends Schema
     /**
      * @inheritDoc
      */
-    protected function fields(): array
+    public function fields(): array
     {
         return [
             BelongsTo::make('author')->inverseType('users')->readOnly(),

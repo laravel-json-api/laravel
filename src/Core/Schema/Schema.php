@@ -49,7 +49,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      *
      * @return iterable
      */
-    abstract protected function fields(): iterable;
+    abstract public function fields(): iterable;
 
     /**
      * @inheritDoc

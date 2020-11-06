@@ -15,28 +15,32 @@
  * limitations under the License.
  */
 
-declare(strict_types=1);
+namespace LaravelJsonApi\Core\Contracts\Routing;
 
-namespace LaravelJsonApi\Facades;
+use Illuminate\Database\Eloquent\Model;
+use LaravelJsonApi\Core\Contracts\Schema\Schema;
 
-use Illuminate\Support\Facades\Facade;
-use LaravelJsonApi\Http\Server;
-use LaravelJsonApi\Routing\Route;
-
-/**
- * Class JsonApi
- *
- * @method static Route route()
- * @method static Server server()
- */
-class JsonApi extends Facade
+interface Route
 {
 
     /**
+     * Get the resource type.
+     *
      * @return string
      */
-    protected static function getFacadeAccessor()
-    {
-        return 'json-api';
-    }
+    public function resourceType(): string;
+
+    /**
+     * Get the resource id or the model (if bindings have been substituted).
+     *
+     * @return Model|mixed|string|null
+     */
+    public function modelOrResourceId();
+
+    /**
+     * Get the schema for the current route.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema;
 }

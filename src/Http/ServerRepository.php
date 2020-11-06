@@ -19,13 +19,15 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http;
 
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
+use LaravelJsonApi\Core\Contracts\Http\Repository as RepositoryContract;
 use RuntimeException;
 use Throwable;
+use LaravelJsonApi\Core\Contracts\Http\Server as ServerContract;
 
-class ServerRepository
+class ServerRepository implements RepositoryContract
 {
 
     /**
@@ -34,27 +36,26 @@ class ServerRepository
     private IlluminateContainer $container;
 
     /**
-     * @var Repository
+     * @var ConfigRepository
      */
-    private Repository $config;
+    private ConfigRepository $config;
 
     /**
      * ServerRepository constructor.
      *
      * @param IlluminateContainer $container
-     * @param Repository $config
+     * @param ConfigRepository $config
      */
-    public function __construct(IlluminateContainer $container, Repository $config)
+    public function __construct(IlluminateContainer $container, ConfigRepository $config)
     {
         $this->container = $container;
         $this->config = $config;
     }
 
     /**
-     * @param string $name
-     * @return Server
+     * @inheritDoc
      */
-    public function server(string $name): Server
+    public function server(string $name): ServerContract
     {
         if (empty($name)) {
             throw new InvalidArgumentException('Expecting a non-empty JSON API server name.');
@@ -68,7 +69,7 @@ class ServerRepository
             throw new RuntimeException("Unable to construct server {$name}.");
         }
 
-        if ($server instanceof Server) {
+        if ($server instanceof ServerContract) {
             return $server;
         }
 

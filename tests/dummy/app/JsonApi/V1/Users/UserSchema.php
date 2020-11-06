@@ -39,7 +39,7 @@ class UserSchema extends Schema
     /**
      * @inheritDoc
      */
-    protected function fields(): array
+    public function fields(): array
     {
         return [
             DateTime::make('createdAt')->readOnly(),

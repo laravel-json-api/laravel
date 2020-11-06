@@ -29,7 +29,7 @@ use LaravelJsonApi\Core\Rules\DateTimeIso8601;
 use LaravelJsonApi\Core\Rules\HasMany;
 use LaravelJsonApi\Core\Rules\HasOne;
 use LaravelJsonApi\Core\Rules\ParameterNotSupported;
-use LaravelJsonApi\Facades\JsonApi;
+use LaravelJsonApi\Core\Facades\JsonApi;
 use function is_null;
 
 class Rule
@@ -55,7 +55,7 @@ class Rule
     {
         if (is_null($allowed)) {
             return AllowedFieldSets::make(
-                JsonApi::server()->container()
+                JsonApi::server()->schemas()
             );
         }
 
