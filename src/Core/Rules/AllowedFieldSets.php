@@ -223,10 +223,10 @@ class AllowedFieldSets implements Rule
     private function fieldsFor(string $resourceType): array
     {
         if ($this->schemas) {
-            return collect($this->schemas->schemaFor($resourceType)->fields())
-                ->filter(fn(Field $field) => $field->isSparseField())
-                ->map(fn(Field $field) => $field->name())
-                ->all();
+            return collect($this->schemas
+                ->schemaFor($resourceType)
+                ->sparseFields()
+            )->all();
         }
 
         return [];

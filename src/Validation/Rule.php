@@ -26,9 +26,9 @@ use LaravelJsonApi\Core\Rules\AllowedIncludePaths;
 use LaravelJsonApi\Core\Rules\AllowedPageParameters;
 use LaravelJsonApi\Core\Rules\AllowedSortParameters;
 use LaravelJsonApi\Core\Rules\DateTimeIso8601;
-use LaravelJsonApi\Core\Rules\ParameterNotSupported;
 use LaravelJsonApi\Core\Rules\HasMany;
 use LaravelJsonApi\Core\Rules\HasOne;
+use LaravelJsonApi\Core\Rules\ParameterNotSupported;
 use LaravelJsonApi\Facades\JsonApi;
 use function is_null;
 
@@ -82,20 +82,18 @@ class Rule
     /**
      * Get an include paths constraint builder instance.
      *
-     * @param int|string|string[] $depthOrAllowed
+     * @param string|string[]|null $allowed
      * @return AllowedIncludePaths
      */
-    public static function includePaths($depthOrAllowed = 1): AllowedIncludePaths
+    public static function includePaths($allowed = null): AllowedIncludePaths
     {
-        if (is_int($depthOrAllowed)) {
+        if (is_null($allowed)) {
             return AllowedIncludePaths::make(
-                JsonApi::server()->container(),
-                JsonApi::route()->schema(),
-                $depthOrAllowed
+                JsonApi::route()->schema()
             );
         }
 
-        return new AllowedIncludePaths(Arr::wrap($depthOrAllowed));
+        return new AllowedIncludePaths(Arr::wrap($allowed));
     }
 
     /**

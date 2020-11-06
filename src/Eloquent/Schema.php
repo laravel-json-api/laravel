@@ -20,26 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Core\Contracts\Schema\Attribute;
 use LaravelJsonApi\Core\Contracts\Schema\Container;
-use LaravelJsonApi\Core\Contracts\Schema\Field;
-use LaravelJsonApi\Core\Contracts\Schema\Relation;
-use LaravelJsonApi\Core\Contracts\Schema\Schema as SchemaContract;
-use LaravelJsonApi\Core\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Core\Contracts\Store\Repository as RepositoryContract;
 use LaravelJsonApi\Core\Resolver\ResourceClass;
 use LaravelJsonApi\Core\Resolver\ResourceType;
-use LaravelJsonApi\Core\Schema\SchemaAware;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
+use LaravelJsonApi\Core\Schema\Schema as BaseSchema;
 use LogicException;
-use function is_array;
-use function ksort;
-use function sprintf;
 
-abstract class Schema implements SchemaContract, SchemaAwareContract
+abstract class Schema extends BaseSchema
 {
-
-    use SchemaAware;
 
     /**
      * @var callable|null
@@ -160,100 +149,11 @@ abstract class Schema implements SchemaContract, SchemaAwareContract
     }
 
     /**
-     * @inheritDoc
-     */
-    public function attributes(): iterable
-    {
-        foreach ($this->allFields() as $name => $field) {
-            if ($field instanceof Attribute) {
-                yield $name => $field;
-            }
-        }
-    }
-
-    /**
-     * @param string $name
-     * @return Attribute
-     */
-    public function attribute(string $name): Attribute
-    {
-        $this->fields ?: $this->allFields();
-        $field = $this->fields[$name] ?? null;
-
-        if ($field instanceof Attribute) {
-            return $field;
-        }
-
-        throw new LogicException(sprintf(
-            'Attribute %s does not exist on resource schema %s.',
-            $name,
-            $this->type()
-        ));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function relationships(): iterable
-    {
-        foreach ($this->allFields() as $name => $field) {
-            if ($field instanceof Relation) {
-                yield $name => $field;
-            }
-        }
-    }
-
-    /**
-     * @param string $name
-     * @return Relation
-     */
-    public function relationship(string $name): Relation
-    {
-        $this->fields ?: $this->allFields();
-        $field = $this->fields[$name] ?? null;
-
-        if ($field instanceof Relation) {
-            return $field;
-        }
-
-        throw new LogicException(sprintf(
-            'Relationship %s does not exist on resource schema %s.',
-            $name,
-            $this->type()
-        ));
-    }
-
-    /**
      * @return EagerLoader
      */
     public function loader(): EagerLoader
     {
         return new EagerLoader($this->schemas(), $this);
-    }
-
-    /**
-     * @return array
-     */
-    private function allFields(): array
-    {
-        if (is_array($this->fields)) {
-            return $this->fields;
-        }
-
-        $this->fields = [];
-
-        /** @var Field $field */
-        foreach ($this->fields() as $field) {
-            if ($field instanceof SchemaAwareContract) {
-                $field->withContainer($this->schemas());
-            }
-
-            $this->fields[$field->name()] = $field;
-        }
-
-        ksort($this->fields);
-
-        return $this->fields;
     }
 
 }

@@ -46,7 +46,6 @@ class UpdateTest extends TestCase
         $expected = $data->forget('updatedAt')->toArray();
 
         $response = $this
-            ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi()
             ->expects('posts')

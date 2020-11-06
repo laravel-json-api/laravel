@@ -21,8 +21,9 @@ namespace LaravelJsonApi\Core\Contracts\Schema;
 
 use LaravelJsonApi\Core\Contracts\Pagination\Paginator;
 use LaravelJsonApi\Core\Contracts\Store\Repository;
+use Traversable;
 
-interface Schema
+interface Schema extends Traversable
 {
 
     /**
@@ -54,30 +55,39 @@ interface Schema
     public function repository(): Repository;
 
     /**
-     * Get the resource fields (attributes and relationships).
-     *
-     * @return iterable
-     */
-    public function fields(): iterable;
-
-    /**
      * Get the resource attributes.
      *
-     * @return iterable
+     * @return Attribute[]|iterable
      */
     public function attributes(): iterable;
 
     /**
+     * Get an attribute by name.
+     *
+     * @param string $name
+     * @return Attribute
+     */
+    public function attribute(string $name): Attribute;
+
+    /**
      * Get the resource relationships.
      *
-     * @return iterable
+     * @return Relation[]|iterable
      */
     public function relationships(): iterable;
 
     /**
+     * Get a relationship by name.
+     *
+     * @param string $name
+     * @return Relation
+     */
+    public function relationship(string $name): Relation;
+
+    /**
      * Get the filters for the resource.
      *
-     * @return array
+     * @return Filter[]|iterable
      */
     public function filters(): iterable;
 
@@ -87,4 +97,25 @@ interface Schema
      * @return Paginator|null
      */
      public function pagination(): ?Paginator;
+
+    /**
+     * Get the include paths supported by this resource.
+     *
+     * @return string[]|iterable
+     */
+     public function includePaths(): iterable;
+
+    /**
+     * Get the sparse fields that are supported by this resource.
+     *
+     * @return string[]|iterable
+     */
+     public function sparseFields(): iterable;
+
+    /**
+     * Get the parameters that can be used to sort this resource.
+     *
+     * @return string[]|iterable
+     */
+     public function sortable(): iterable;
 }

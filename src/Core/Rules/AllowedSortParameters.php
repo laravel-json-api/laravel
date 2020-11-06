@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Rules;
 
 use Illuminate\Support\Collection;
-use LaravelJsonApi\Core\Contracts\Schema\Attribute;
 use LaravelJsonApi\Core\Contracts\Schema\Schema;
 
 class AllowedSortParameters extends AbstractAllowedRule
@@ -34,11 +33,7 @@ class AllowedSortParameters extends AbstractAllowedRule
      */
     public static function make(Schema $schema): self
     {
-        $keys = collect($schema->attributes())
-            ->filter(fn(Attribute $attribute) => $attribute->isSortable())
-            ->map(fn(Attribute $attribute) => $attribute->name());
-
-        return new self($keys);
+        return new self($schema->sortable());
     }
 
     /**
