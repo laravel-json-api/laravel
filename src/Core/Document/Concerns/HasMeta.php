@@ -50,7 +50,7 @@ trait HasMeta
      * @param mixed|null $meta
      * @return $this
      */
-    public function withMeta($meta): self
+    public function setMeta($meta): self
     {
         $this->meta = Json::hash($meta);
 

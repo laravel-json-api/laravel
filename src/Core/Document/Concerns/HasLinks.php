@@ -49,7 +49,7 @@ trait HasLinks
      * @param mixed|null $links
      * @return $this
      */
-    public function withLinks($links): self
+    public function setLinks($links): self
     {
         $this->links = Links::cast($links);
 

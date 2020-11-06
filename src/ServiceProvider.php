@@ -43,6 +43,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot(Router $router): void
     {
+        $this->bootTranslations();
         $router->aliasMiddleware('json-api', BootJsonApi::class);
     }
 
@@ -55,6 +56,16 @@ class ServiceProvider extends BaseServiceProvider
         $this->bindHttp();
         $this->bindService();
         $this->bindRoute();
+    }
+
+    /**
+     * Register package translations.
+     *
+     * @return void
+     */
+    protected function bootTranslations()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'jsonapi');
     }
 
     /**

@@ -48,7 +48,7 @@ class JsonApi implements Serializable
         }
 
         if ($value instanceof Hash) {
-            return (new JsonApi())->withMeta($value);
+            return (new JsonApi())->setMeta($value);
         }
 
         if (is_string($value) || is_null($value)) {
@@ -71,7 +71,7 @@ class JsonApi implements Serializable
         $member = new self($value['version'] ?? null);
 
         if (isset($value['meta'])) {
-            $member->withMeta($value['meta']);
+            $member->setMeta($value['meta']);
         }
 
         return $member;

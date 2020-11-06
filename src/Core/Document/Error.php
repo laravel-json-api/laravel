@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
 use function array_filter;
@@ -61,6 +62,16 @@ class Error implements Serializable
     private ?ErrorSource $source = null;
 
     /**
+     * Fluent constructor.
+     *
+     * @return Error
+     */
+    public static function make(): Error
+    {
+        return new static();
+    }
+
+    /**
      * Create a JSON API error object.
      *
      * @param Error|array $value
@@ -87,17 +98,15 @@ class Error implements Serializable
      */
     public static function fromArray(array $values): Error
     {
-        $error = new static();
-
-        return $error
-            ->withId($values['id'] ?? null)
-            ->withLinks($values['links'] ?? null)
-            ->withStatus($values['status'] ?? null)
-            ->withCode($values['code'] ?? null)
-            ->withTitle($values['title'] ?? null)
-            ->withDetail($values['detail'] ?? null)
-            ->withSource($values['source'] ?? null)
-            ->withMeta($values['meta'] ?? null);
+        return static::make()
+            ->setId($values['id'] ?? null)
+            ->setLinks($values['links'] ?? null)
+            ->setStatus($values['status'] ?? null)
+            ->setCode($values['code'] ?? null)
+            ->setTitle($values['title'] ?? null)
+            ->setDetail($values['detail'] ?? null)
+            ->setSource($values['source'] ?? null)
+            ->setMeta($values['meta'] ?? null);
     }
 
     /**
@@ -116,7 +125,7 @@ class Error implements Serializable
      * @param mixed $id
      * @return $this
      */
-    public function withId($id): self
+    public function setId($id): self
     {
         $this->id = $id;
 
@@ -142,7 +151,7 @@ class Error implements Serializable
      * @param null $meta
      * @return $this
      */
-    public function withAboutLink(string $href, $meta = null): self
+    public function setAboutLink(string $href, $meta = null): self
     {
         $this->links()->put('about', $href, $meta);
 
@@ -174,12 +183,16 @@ class Error implements Serializable
     /**
      * Add an HTTP status.
      *
-     * @param string|null $status
+     * @param string|int|null $status
      * @return $this
      */
-    public function withStatus(?string $status): self
+    public function setStatus($status): self
     {
-        $this->status = $status ?: null;
+        if (!is_int($status) && !is_string($status) && !is_null($status)) {
+            throw new InvalidArgumentException('Expecting an integer, string or null.');
+        }
+
+        $this->status = !is_null($status) ? strval($status) : null;
 
         return $this;
     }
@@ -212,7 +225,7 @@ class Error implements Serializable
      * @param string|null $code
      * @return $this
      */
-    public function withCode(?string $code): self
+    public function setCode(?string $code): self
     {
         $this->code = $code ?: null;
 
@@ -250,7 +263,7 @@ class Error implements Serializable
      * @param string|null $title
      * @return $this
      */
-    public function withTitle(?string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title ?: null;
 
@@ -287,7 +300,7 @@ class Error implements Serializable
      * @param string|null $detail
      * @return $this
      */
-    public function withDetail(?string $detail): self
+    public function setDetail(?string $detail): self
     {
         $this->detail = $detail ?: null;
 
@@ -326,7 +339,7 @@ class Error implements Serializable
      * @param mixed|null $source
      * @return $this
      */
-    public function withSource($source): self
+    public function setSource($source): self
     {
         $this->source = ErrorSource::cast($source);
 
@@ -339,9 +352,9 @@ class Error implements Serializable
      * @param string|null $pointer
      * @return $this
      */
-    public function withSourcePointer(?string $pointer): self
+    public function setSourcePointer(?string $pointer): self
     {
-        $this->source()->withPointer($pointer);
+        $this->source()->setPointer($pointer);
 
         return $this;
     }
@@ -352,9 +365,9 @@ class Error implements Serializable
      * @param string|null $parameter
      * @return $this
      */
-    public function withSourceParameter(?string $parameter): self
+    public function setSourceParameter(?string $parameter): self
     {
-        $this->source()->withParameter($parameter);
+        $this->source()->setParameter($parameter);
 
         return $this;
     }

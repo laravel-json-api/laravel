@@ -103,7 +103,7 @@ class ErrorSource implements Serializable
      * @param string|null $pointer
      * @return $this
      */
-    public function withPointer(?string $pointer): self
+    public function setPointer(?string $pointer): self
     {
         $this->pointer = $pointer;
 
@@ -139,7 +139,7 @@ class ErrorSource implements Serializable
      * @param string|null $parameter
      * @return $this
      */
-    public function withParameter(?string $parameter): self
+    public function setParameter(?string $parameter): self
     {
         $this->parameter = $parameter;
 

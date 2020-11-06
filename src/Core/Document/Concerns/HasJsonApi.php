@@ -45,7 +45,7 @@ trait HasJsonApi
      * @param mixed $jsonApi
      * @return $this
      */
-    public function withJsonApi($jsonApi): self
+    public function setJsonApi($jsonApi): self
     {
         $this->jsonApi = JsonApi::cast($jsonApi);
 

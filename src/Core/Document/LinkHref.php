@@ -73,7 +73,7 @@ class LinkHref implements JsonSerializable
         $this->uri = $uri;
 
         if (!is_null($query)) {
-            $this->withQuery($query);
+            $this->setQuery($query);
         }
     }
 
@@ -101,7 +101,7 @@ class LinkHref implements JsonSerializable
      * @param iterable $query
      * @return $this
      */
-    public function withQuery(iterable $query): self
+    public function setQuery(iterable $query): self
     {
         $this->query = collect($query)->toArray() ?: null;
 
