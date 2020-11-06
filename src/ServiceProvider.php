@@ -23,9 +23,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
-use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Core\JsonApiService;
-use LaravelJsonApi\Core\Store\Store;
+use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
 use LaravelJsonApi\Http\Server;
 use LaravelJsonApi\Http\ServerRepository;
@@ -79,7 +78,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Contracts\Http\Repository::class, ServerRepository::class);
         $this->app->bind(Contracts\Http\Server::class, Server::class);
 
-        $this->app->bind(Store::class, static function (Application $app) {
+        $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
             return $app->make(Contracts\Http\Server::class)->store();
         });
 

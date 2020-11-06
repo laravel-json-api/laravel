@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Store\Store as ResourceStore;
-use LaravelJsonApi\Routing\Route;
+use LaravelJsonApi\Contracts\Routing\Route;
+use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 
 trait Destroy
 {
@@ -30,10 +30,10 @@ trait Destroy
      * Destroy a resource.
      *
      * @param Route $route
-     * @param ResourceStore $store
+     * @param StoreContract $store
      * @return Response
      */
-    public function destroy(Route $route, ResourceStore $store): Response
+    public function destroy(Route $route, StoreContract $store): Response
     {
         $store->delete(
             $route->resourceType(),

@@ -20,10 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use LaravelJsonApi\Contracts\Routing\Route;
+use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Resources\DataResponse;
-use LaravelJsonApi\Core\Store\Store as ResourceStore;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
-use LaravelJsonApi\Routing\Route;
 
 trait FetchMany
 {
@@ -32,10 +32,10 @@ trait FetchMany
      * Fetch zero to many JSON API resources.
      *
      * @param Route $route
-     * @param ResourceStore $store
+     * @param StoreContract $store
      * @return Responsable
      */
-    public function index(Route $route, ResourceStore $store): Responsable
+    public function index(Route $route, StoreContract $store): Responsable
     {
         $request = ResourceQuery::queryMany(
             $resourceType = $route->resourceType()

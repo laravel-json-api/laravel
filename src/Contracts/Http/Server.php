@@ -17,10 +17,10 @@
 
 namespace LaravelJsonApi\Contracts\Http;
 
+use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Contracts\Encoder\Encoder;
-use LaravelJsonApi\Core\Store\Store;
+use LaravelJsonApi\Contracts\Store\Store;
 
 interface Server
 {

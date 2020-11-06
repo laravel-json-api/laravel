@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Store;
 
-use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
@@ -29,11 +28,12 @@ use LaravelJsonApi\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Contracts\Store\ResourceBuilder;
+use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Contracts\Store\UpdatesResources;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 
-class Store
+class Store implements StoreContract
 {
 
     /**
@@ -64,11 +64,7 @@ class Store
     }
 
     /**
-     * Get a model by JSON API resource type and id.
-     *
-     * @param string $resourceType
-     * @param string $resourceId
-     * @return Model|mixed|null
+     * @inheritDoc
      */
     public function find(string $resourceType, string $resourceId)
     {
@@ -78,11 +74,7 @@ class Store
     }
 
     /**
-     * Does a model exist for the supplied resource type and id?
-     *
-     * @param string $resourceType
-     * @param string $resourceId
-     * @return bool
+     * @inheritDoc
      */
     public function exists(string $resourceType, string $resourceId): bool
     {
@@ -92,10 +84,7 @@ class Store
     }
 
     /**
-     * Query all resources by JSON API resource type.
-     *
-     * @param string $resourceType
-     * @return QueryAllBuilder
+     * @inheritDoc
      */
     public function queryAll(string $resourceType): QueryAllBuilder
     {
@@ -109,11 +98,7 @@ class Store
     }
 
     /**
-     * Query one resource by JSON API resource type.
-     *
-     * @param string $resourceType
-     * @param Model|string $modelOrResourceId
-     * @return QueryOneBuilder
+     * @inheritDoc
      */
     public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder
     {
@@ -127,10 +112,7 @@ class Store
     }
 
     /**
-     * Create a new resource.
-     *
-     * @param string $resourceType
-     * @return ResourceBuilder
+     * @inheritDoc
      */
     public function create(string $resourceType): ResourceBuilder
     {
@@ -144,11 +126,7 @@ class Store
     }
 
     /**
-     * Update an existing resource.
-     *
-     * @param string $resourceType
-     * @param Model|mixed|string $modelOrResourceId
-     * @return ResourceBuilder
+     * @inheritDoc
      */
     public function update(string $resourceType, $modelOrResourceId): ResourceBuilder
     {
@@ -162,9 +140,7 @@ class Store
     }
 
     /**
-     * @param string $resourceType
-     * @param $modelOrResourceId
-     * @return void
+     * @inheritDoc
      */
     public function delete(string $resourceType, $modelOrResourceId): void
     {
@@ -179,10 +155,7 @@ class Store
     }
 
     /**
-     * Access a resource repository by its JSON API resource type.
-     *
-     * @param string $resourceType
-     * @return Repository
+     * @inheritDoc
      */
     public function resources(string $resourceType): Repository
     {
