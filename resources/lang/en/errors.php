@@ -64,6 +64,12 @@ return [
         'code' => '',
     ],
 
+    'member_array_expected' => [
+        'title' => 'Non-Compliant JSON API Document',
+        'detail' => 'The member :member must be an array.',
+        'code' => '',
+    ],
+
     'member_identifier_expected' => [
         'title' => 'Non-Compliant JSON API Document',
         'detail' => 'The member :member must be a resource identifier.',

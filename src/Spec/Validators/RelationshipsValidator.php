@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec\Validators;
 
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Spec\Document;
 use LaravelJsonApi\Spec\Translator;
 
@@ -52,8 +51,8 @@ class RelationshipsValidator
     {
         $data = $document->data;
 
-        if (property_exists($data, 'relationships') && $error = $this->accept($data->relationships)) {
-            $document->errors()->push($error);
+        if (property_exists($data, 'relationships') && $errors = $this->accept($data->relationships)) {
+            $document->errors()->push(...$errors);
         }
 
         return $next($document);
@@ -62,14 +61,17 @@ class RelationshipsValidator
 
     /**
      * @param $value
-     * @return Error|null
+     * @return array
      */
-    private function accept($value): ?Error
+    private function accept($value): array
     {
         if (!is_object($value)) {
-            return $this->translator->memberNotObject('/data', 'relationships');
+            return [$this->translator->memberNotObject('/data', 'relationships')];
         }
 
-        return null;
+        return collect(['type', 'id'])
+            ->filter(fn($field) => property_exists($value, $field))
+            ->map(fn($field) => $this->translator->memberFieldNotAllowed('/data', 'relationships', $field))
+            ->all();
     }
 }

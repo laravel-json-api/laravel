@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Spec;
 
 use LaravelJsonApi\Core\Document\ErrorList;
-use function json_decode;
 
 class Document
 {
@@ -31,46 +30,32 @@ class Document
     private object $document;
 
     /**
+     * @var string
+     */
+    private string $resourceType;
+
+    /**
+     * @var string|null
+     */
+    private ?string $relation;
+
+    /**
      * @var ErrorList
      */
     private ErrorList $errors;
 
     /**
-     * @param $json
-     * @return static
-     */
-    public static function cast($json): self
-    {
-        if (is_string($json)) {
-            return self::fromString($json);
-        }
-
-        if (is_object($json)) {
-            return new self($json);
-        }
-
-        throw new \UnexpectedValueException('Expecting a string or decoded JSON object.');
-    }
-
-    /**
-     * Create a document from a string.
-     *
-     * @param string $json
-     * @return Document
-     */
-    public static function fromString(string $json): self
-    {
-        return new self(json_decode($json, false, JSON_THROW_ON_ERROR));
-    }
-
-    /**
      * Document constructor.
      *
      * @param object $document
+     * @param string $resourceType
+     * @param string|null $relation
      */
-    public function __construct(object $document)
+    public function __construct(object $document, string $resourceType, string $relation = null)
     {
         $this->document = $document;
+        $this->resourceType = $resourceType;
+        $this->relation = $relation;
         $this->errors = new ErrorList();
     }
 
@@ -93,7 +78,43 @@ class Document
     }
 
     /**
-     * Get a value.
+     * Get the document's expected resource type.
+     *
+     * @return string
+     */
+    public function type(): string
+    {
+        return $this->resourceType;
+    }
+
+    /**
+     * Get the relation that the document represents.
+     *
+     * @return string|null
+     */
+    public function relation(): ?string
+    {
+        return $this->relation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRelation(): bool
+    {
+        return is_string($this->relation);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNotRelation(): bool
+    {
+        return !$this->isRelation();
+    }
+
+    /**
+     * Get a value from the document using dot notation.
      *
      * @param string $path
      * @param mixed|null $default

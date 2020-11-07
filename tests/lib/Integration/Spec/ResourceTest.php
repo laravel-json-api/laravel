@@ -19,7 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Tests\Integration\Spec;
 
+use LaravelJsonApi\Contracts\Schema\Attribute;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Spec\Builder;
+use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Tests\Integration\TestCase;
 
 class ResourceTest extends TestCase
@@ -36,7 +39,20 @@ class ResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->app->instance(Specification::class, $spec = $this->createMock(Specification::class));
         $this->builder = $this->app->make(Builder::class);
+
+        $spec->method('clientIds')->willReturnCallback(fn($type) => 'podcasts' === $type);
+        $spec->method('exists')->willReturnCallback(fn($type, $id) => '999' !== $id);
+        $spec->method('fields')->willReturnMap([
+            ['posts', [
+                $this->createAttribute('title'),
+                $this->createToOne('author'),
+                $this->createToMany('tags'),
+            ]],
+        ]);
+        $spec->method('types')->willReturn(['posts', 'users', 'comments', 'podcasts', 'tags']);
     }
 
     /**
@@ -474,8 +490,10 @@ class ResourceTest extends TestCase
                         'relationships' => [
                             'tags' => [
                                 'data' => [
-                                    'type' => 'tags',
-                                    'id' => '999',
+                                    [
+                                        'type' => 'tags',
+                                        'id' => '999',
+                                    ],
                                 ],
                             ],
                         ],
@@ -523,11 +541,50 @@ class ResourceTest extends TestCase
 
         $document = $this->builder
             ->expects('posts')
-            ->clientIds(false)
             ->build(json_encode($json));
 
         $this->assertFalse($document->valid());
         $this->assertTrue($document->invalid());
         $this->assertSame([$expected], $document->errors()->toArray());
+    }
+
+    /**
+     * @param string $name
+     * @return Attribute
+     */
+    private function createAttribute(string $name): Attribute
+    {
+        $attr = $this->createMock(Attribute::class);
+        $attr->method('name')->willReturn($name);
+
+        return $attr;
+    }
+
+    /**
+     * @param string $name
+     * @return Relation
+     */
+    private function createToOne(string $name): Relation
+    {
+        $relation = $this->createMock(Relation::class);
+        $relation->method('name')->willReturn($name);
+        $relation->method('toOne')->willReturn(true);
+        $relation->method('toMany')->willReturn(false);
+
+        return $relation;
+    }
+
+    /**
+     * @param string $name
+     * @return Relation
+     */
+    private function createToMany(string $name): Relation
+    {
+        $relation = $this->createMock(Relation::class);
+        $relation->method('name')->willReturn($name);
+        $relation->method('toOne')->willReturn(false);
+        $relation->method('toMany')->willReturn(true);
+
+        return $relation;
     }
 }

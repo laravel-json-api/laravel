@@ -21,8 +21,9 @@ namespace LaravelJsonApi\Spec\Validators;
 
 use LaravelJsonApi\Spec\Document;
 use LaravelJsonApi\Spec\Translator;
+use LaravelJsonApi\Spec\Validator;
 
-class DataValidator
+class DataValidator implements Validator
 {
 
     /**

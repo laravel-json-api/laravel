@@ -20,14 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Spec;
 
 use Illuminate\Pipeline\Pipeline;
+use function json_decode;
 
 class Builder
 {
-
-    /**
-     * @var Translator
-     */
-    private Translator $translator;
 
     /**
      * @var Pipeline
@@ -40,19 +36,12 @@ class Builder
     private ?string $expects = null;
 
     /**
-     * @var bool
-     */
-    private bool $clientIds = false;
-
-    /**
      * Builder constructor.
      *
-     * @param Translator $translator
      * @param Pipeline $pipeline
      */
-    public function __construct(Translator $translator, Pipeline $pipeline)
+    public function __construct(Pipeline $pipeline)
     {
-        $this->translator = $translator;
         $this->pipeline = $pipeline;
     }
 
@@ -70,36 +59,31 @@ class Builder
     }
 
     /**
-     * Set whether client ids are allowed.
-     *
-     * @param bool $supported
-     * @return $this
-     */
-    public function clientIds(bool $supported = true): self
-    {
-        $this->clientIds = $supported;
-
-        return $this;
-    }
-
-    /**
-     * @param $json
+     * @param string|object $json
      * @return Document
      */
     public function build($json): Document
     {
+        if (is_string($json)) {
+            $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+        }
+
+        if (!is_object($json)) {
+            throw new \InvalidArgumentException('Expecting a string or object.');
+        }
+
         $pipes = [
-            new Validators\DataValidator($this->translator),
-            new Validators\TypeValidator($this->translator, $this->expects),
-            new Validators\ClientIdValidator($this->translator, $this->expects, $this->clientIds),
-            new Validators\AttributesValidator($this->translator),
-            new Validators\RelationshipsValidator($this->translator),
-            new Validators\RelationshipValidator($this->translator),
-            new Validators\FieldsValidator($this->translator),
+            Validators\DataValidator::class,
+            Validators\TypeValidator::class,
+            Validators\ClientIdValidator::class,
+            Validators\FieldsValidator::class,
+            Validators\AttributesValidator::class,
+            Validators\RelationshipsValidator::class,
+            Validators\RelationshipValidator::class,
         ];
 
         return $this->pipeline
-            ->send(Document::cast($json))
+            ->send(new Document($json, $this->expects))
             ->through($pipes)
             ->via('validate')
             ->thenReturn();

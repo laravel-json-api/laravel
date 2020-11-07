@@ -32,20 +32,13 @@ class TypeValidator
     private Translator $translator;
 
     /**
-     * @var string
-     */
-    private string $expects;
-
-    /**
      * TypeValidator constructor.
      *
      * @param Translator $translator
-     * @param string $expects
      */
-    public function __construct(Translator $translator, string $expects)
+    public function __construct(Translator $translator)
     {
         $this->translator = $translator;
-        $this->expects = $expects;
     }
 
     /**
@@ -66,7 +59,7 @@ class TypeValidator
             return $next($document);
         }
 
-        if ($error = $this->accept($data->type)) {
+        if ($error = $this->accept($document->type(), $data->type)) {
             $document->errors()->push($error);
         }
 
@@ -74,10 +67,11 @@ class TypeValidator
     }
 
     /**
+     * @param string $expected
      * @param $value
      * @return Error|null
      */
-    private function accept($value): ?Error
+    private function accept(string $expected, $value): ?Error
     {
         if (!is_string($value)) {
             return $this->translator->memberNotString('/data', 'type');
@@ -87,7 +81,7 @@ class TypeValidator
             return $this->translator->memberEmpty('/data', 'type');
         }
 
-        if ($this->expects !== $value) {
+        if ($expected !== $value) {
             return $this->translator->resourceTypeNotSupported($value);
         }
 

@@ -23,6 +23,7 @@ use Countable;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
+use function array_merge;
 use function collect;
 
 class ErrorList implements Serializable, Countable, IteratorAggregate
@@ -95,6 +96,22 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
         }
 
         return $this;
+    }
+
+    /**
+     * Merge errors.
+     *
+     * @param iterable $errors
+     * @return $this
+     */
+    public function merge(iterable $errors): self
+    {
+        if ($errors instanceof static) {
+            $this->stack = array_merge($this->stack, $errors->stack);
+            return $this;
+        }
+
+        return $this->push(...$errors);
     }
 
     /**

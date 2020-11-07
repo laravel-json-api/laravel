@@ -43,7 +43,6 @@ class Translator
         $this->translator = $translator;
     }
 
-
     /**
      * Create an error for a member that is required.
      *
@@ -75,6 +74,23 @@ class Translator
             ->setCode($this->trans('member_object_expected', 'code'))
             ->setTitle($this->trans('member_object_expected', 'title'))
             ->setDetail($this->trans('member_object_expected', 'detail', compact('member')))
+            ->setSourcePointer($this->pointer($path, $member));
+    }
+
+    /**
+     * Create an error for a member that must be an array.
+     *
+     * @param string $path
+     * @param string $member
+     * @return Error
+     */
+    public function memberNotArray(string $path, string $member): Error
+    {
+        return Error::make()
+            ->setStatus(Response::HTTP_BAD_REQUEST)
+            ->setCode($this->trans('member_array_expected', 'code'))
+            ->setTitle($this->trans('member_array_expected', 'title'))
+            ->setDetail($this->trans('member_array_expected', 'detail', compact('member')))
             ->setSourcePointer($this->pointer($path, $member));
     }
 

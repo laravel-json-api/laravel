@@ -21,10 +21,16 @@ namespace LaravelJsonApi\Spec\Validators;
 
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Spec\Translator;
 
 class ClientIdValidator
 {
+
+    /**
+     * @var Specification
+     */
+    private Specification $spec;
 
     /**
      * @var Translator
@@ -32,27 +38,15 @@ class ClientIdValidator
     private Translator $translator;
 
     /**
-     * @var string
-     */
-    private string $type;
-
-    /**
-     * @var bool
-     */
-    private bool $supported;
-
-    /**
      * ClientIdValidator constructor.
      *
+     * @param Specification $spec
      * @param Translator $translator
-     * @param string $type
-     * @param bool $supported
      */
-    public function __construct(Translator $translator, string $type, bool $supported)
+    public function __construct(Specification $spec, Translator $translator)
     {
+        $this->spec = $spec;
         $this->translator = $translator;
-        $this->type = $type;
-        $this->supported = $supported;
     }
 
     /**
@@ -70,9 +64,9 @@ class ClientIdValidator
             return $next($document);
         }
 
-        if (false === $this->supported) {
+        if (false === $this->spec->clientIds($document->type())) {
             $document->errors()->push(
-                $this->translator->resourceDoesNotSupportClientIds($this->type)
+                $this->translator->resourceDoesNotSupportClientIds($document->type())
             );
         }
 

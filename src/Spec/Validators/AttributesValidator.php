@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec\Validators;
 
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Spec\Document;
 use LaravelJsonApi\Spec\Translator;
 
