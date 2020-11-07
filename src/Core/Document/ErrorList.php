@@ -20,13 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use Countable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
 use function array_merge;
 use function collect;
 
-class ErrorList implements Serializable, Countable, IteratorAggregate
+class ErrorList implements Serializable, Countable, IteratorAggregate, Responsable
 {
 
     use Concerns\Serializable;
@@ -89,6 +91,33 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     public function __clone()
     {
         $this->stack = array_map(fn($error) => clone $error, $this->stack);
+    }
+
+    /**
+     * Get the most applicable HTTP status code.
+     *
+     * When a server encounters multiple problems for a single request, the most generally applicable HTTP error
+     * code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate for multiple
+     * 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
+     *
+     * @param int the default status to return, if there are no statuses.
+     * @return int
+     * @see https://jsonapi.org/format/#errors
+     */
+    public function status(int $default = Response::HTTP_INTERNAL_SERVER_ERROR): int
+    {
+        $statuses = collect($this->stack)
+            ->map(fn(Error $error) => intval($error->status()))
+            ->filter()
+            ->unique();
+
+        if (2 > count($statuses)) {
+            return $statuses->first() ?: $default;
+        }
+
+        $only4xx = $statuses->every(fn(int $status) => 400 <= $status && 499 >= $status);
+
+        return $only4xx ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 
     /**
@@ -169,5 +198,25 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     {
         return $this->stack;
     }
+
+    /**
+     * @param $request
+     * @return ErrorResponse
+     */
+    public function prepareResponse($request): ErrorResponse
+    {
+        return new ErrorResponse($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        return $this
+            ->prepareResponse($request)
+            ->toResponse($request);
+    }
+
 
 }

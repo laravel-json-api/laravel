@@ -20,10 +20,17 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Http\Response;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
+use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
+use LaravelJsonApi\Http\Exceptions\JsonApiException;
+use LaravelJsonApi\Spec\ResourceBuilder;
+use LaravelJsonApi\Spec\UnexpectedDocumentException;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ResourceRequest extends FormRequest
 {
@@ -58,6 +65,22 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * @return bool
+     */
+    public function isCreating(): bool
+    {
+        return $this->isMethod('POST');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdating(): bool
+    {
+        return $this->isMethod('PATCH');
+    }
+
+    /**
      * @inheritDoc
      */
     public function validationData()
@@ -76,9 +99,13 @@ class ResourceRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
+        /** Content negotiation. */
         if (!$this->isSupportedMediaType()) {
             throw $this->unsupportedMediaType();
         }
+
+        /** JSON API spec compliance. */
+        $this->validateDocument();
     }
 
     /**
@@ -90,14 +117,91 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * @return HttpException
+     * Get an exception if the media type is not supported.
+     *
+     * @return HttpExceptionInterface
      * @todo add translation
      */
-    protected function unsupportedMediaType(): HttpException
+    protected function unsupportedMediaType(): HttpExceptionInterface
     {
         return new HttpException(
             Response::HTTP_UNSUPPORTED_MEDIA_TYPE,
             'The request entity has a media type which the server or resource does not support.'
         );
     }
+
+    /**
+     * Get an exception if the JSON is invalid.
+     *
+     * @param \JsonException $ex
+     * @return HttpExceptionInterface
+     * @todo add translation
+     */
+    protected function invalidJson(\JsonException $ex): HttpExceptionInterface
+    {
+        return new JsonApiException(Error::make()
+            ->setStatus(Response::HTTP_BAD_REQUEST)
+            ->setCode($ex->getCode())
+            ->setTitle('Invalid JSON')
+            ->setDetail($ex->getMessage())
+        );
+    }
+
+    /**
+     * Get an exception if the JSON is not an object.
+     *
+     * @param UnexpectedDocumentException $ex
+     * @return HttpExceptionInterface
+     * @todo add translation
+     */
+    protected function unexpectedDocument(UnexpectedDocumentException $ex): HttpExceptionInterface
+    {
+        return new JsonApiException(Error::make()
+            ->setStatus(Response::HTTP_BAD_REQUEST)
+            ->setTitle('Invalid JSON')
+            ->setDetail($ex->getMessage())
+        );
+    }
+
+    /**
+     * Get an exception for a JSON document that has failed JSON-API specification validation.
+     *
+     * @param ErrorList $errors
+     * @return HttpExceptionInterface
+     * @todo add translation
+     */
+    protected function invalidDocument(ErrorList $errors): HttpExceptionInterface
+    {
+        return new JsonApiException($errors);
+    }
+
+    /**
+     * Validate the JSON API document.
+     *
+     * @return void
+     * @throws HttpExceptionInterface
+     */
+    private function validateDocument(): void
+    {
+        $route = JsonApi::route();
+        $id = $this->isUpdating() ? $route->resourceId() : null;
+
+        /** @var ResourceBuilder $builder */
+        $builder = app(ResourceBuilder::class);
+
+        try {
+            $document = $builder
+                ->expects($route->resourceType(), $id)
+                ->build($this->getContent());
+        } catch (\JsonException $ex) {
+            throw $this->invalidJson($ex);
+        } catch (UnexpectedDocumentException $ex) {
+            throw $this->unexpectedDocument($ex);
+        }
+
+        if ($document->invalid()) {
+            throw $this->invalidDocument($document->errors());
+        }
+    }
+
 }

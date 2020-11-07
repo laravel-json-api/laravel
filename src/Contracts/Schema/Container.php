@@ -31,6 +31,13 @@ interface Container
     public function schemaFor(string $resourceType): Schema;
 
     /**
+     * Get a list of all the supported resource types.
+     *
+     * @return array
+     */
+    public function types(): array;
+
+    /**
      * Get a list of model classes mapped to their resource classes.
      *
      * @return array

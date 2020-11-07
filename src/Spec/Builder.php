@@ -71,7 +71,8 @@ abstract class Builder
     /**
      * @param string $json
      * @return Document
-     * @throws DocumentException
+     * @throws JsonException
+     * @throws UnexpectedDocumentException
      */
     public function build(string $json): Document
     {
@@ -91,21 +92,19 @@ abstract class Builder
     /**
      * @param string $json
      * @return object
+     * @throws JsonException
+     * @throws UnexpectedDocumentException
      */
     private function decode(string $json): object
     {
-        try {
-            if (is_string($json)) {
-                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-            }
-        } catch (JsonException $ex) {
-            throw new DocumentException('Invalid JSON string.', 0, $ex);
+        if (is_string($json)) {
+            $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
         }
 
         if (is_object($json)) {
             return $json;
         }
 
-        throw new DocumentException('JSON does not decode to a string or object.');
+        throw new UnexpectedDocumentException('Expecting JSON to decode to an object.');
     }
 }

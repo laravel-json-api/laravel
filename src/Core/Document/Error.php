@@ -222,12 +222,16 @@ class Error implements Serializable
     /**
      * Add an application-specific error code.
      *
-     * @param string|null $code
+     * @param string|int|null $code
      * @return $this
      */
-    public function setCode(?string $code): self
+    public function setCode($code): self
     {
-        $this->code = $code ?: null;
+        if (!is_int($code) && !is_string($code) && !is_null($code)) {
+            throw new InvalidArgumentException('Expecting an integer, string or null.');
+        }
+
+        $this->code = !is_null($code) ? strval($code) : null;
 
         return $this;
     }

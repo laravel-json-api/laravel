@@ -87,6 +87,14 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
+    public function types(): array
+    {
+        return array_keys($this->types);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function resources(): array
     {
         return collect($this->models)

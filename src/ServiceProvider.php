@@ -54,8 +54,9 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->bindEncoder();
         $this->bindHttp();
-        $this->bindService();
         $this->bindRoute();
+        $this->bindService();
+        $this->bindSpecification();
     }
 
     /**
@@ -121,5 +122,16 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->app->singleton(JsonApiService::class);
         $this->app->alias(JsonApiService::class, 'json-api');
+    }
+
+    /**
+     * Bind the JSON API specification into the service container.
+     *
+     * @return void
+     */
+    private function bindSpecification(): void
+    {
+        $this->app->bind(Spec\Specification::class, Spec\ServerSpecification::class);
+        $this->app->singleton(Spec\Translator::class);
     }
 }

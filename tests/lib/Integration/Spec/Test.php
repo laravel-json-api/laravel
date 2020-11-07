@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Tests\Integration\Spec;
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Spec\Document;
-use LaravelJsonApi\Spec\DocumentException;
+use LaravelJsonApi\Spec\UnexpectedDocumentException;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LaravelJsonApi\Spec\Specification;
@@ -978,7 +978,7 @@ class Test extends TestCase
 
     public function testInvalidJson(): void
     {
-        $this->expectException(DocumentException::class);
+        $this->expectException(\JsonException::class);
 
         /** @var ResourceBuilder $builder */
         $builder = $this->app->make(ResourceBuilder::class);
@@ -988,14 +988,36 @@ class Test extends TestCase
         );
     }
 
-    public function testNonObject(): void
+    /**
+     * @return array
+     */
+    public function nonObjectProvider(): array
     {
-        $this->expectException(DocumentException::class);
+        return [
+            ['true'],
+            ['false'],
+            ['""'],
+            ['"foo"'],
+            ['"1"'],
+            ['1'],
+            ['0.1'],
+            ['[]'],
+        ];
+    }
+
+    /**
+     * @param string $json
+     * @throws \JsonException
+     * @dataProvider nonObjectProvider
+     */
+    public function testNonObject(string $json): void
+    {
+        $this->expectException(UnexpectedDocumentException::class);
 
         /** @var ResourceBuilder $builder */
         $builder = $this->app->make(ResourceBuilder::class);
 
-        $builder->expects('posts', '1')->build('true');
+        $builder->expects('posts', '1')->build($json);
     }
 
     public function testCustomPipe(): void

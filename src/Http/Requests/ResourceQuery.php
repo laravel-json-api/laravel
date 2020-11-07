@@ -26,6 +26,7 @@ use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
 use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
 
 class ResourceQuery extends FormRequest implements QueryParameters
@@ -201,10 +202,12 @@ class ResourceQuery extends FormRequest implements QueryParameters
     }
 
     /**
-     * @return HttpException
+     * Get an exception if the media type is not acceptable.
+     *
+     * @return HttpExceptionInterface
      * @todo add translation
      */
-    protected function notAcceptable(): HttpException
+    protected function notAcceptable(): HttpExceptionInterface
     {
         return new HttpException(
             Response::HTTP_NOT_ACCEPTABLE,

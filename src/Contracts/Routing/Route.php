@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,13 @@ interface Route
      * @return Model|mixed|string|null
      */
     public function modelOrResourceId();
+
+    /**
+     * Get the resource id.
+     *
+     * @return string
+     */
+    public function resourceId(): string;
 
     /**
      * Get the schema for the current route.

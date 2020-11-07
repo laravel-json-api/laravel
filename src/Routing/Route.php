@@ -97,6 +97,23 @@ class Route implements RouteContract
     /**
      * @inheritDoc
      */
+    public function resourceId(): string
+    {
+        $modelOrResourceId = $this->modelOrResourceId();
+
+        if (is_object($modelOrResourceId)) {
+            return $this->server
+                ->resources()
+                ->create($modelOrResourceId)
+                ->id();
+        }
+
+        return $modelOrResourceId;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function schema(): Schema
     {
         return $this->server->schemas()->schemaFor(

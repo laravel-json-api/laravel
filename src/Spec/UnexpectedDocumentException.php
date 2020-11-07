@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Spec;
 
 use UnexpectedValueException;
 
-class DocumentException extends UnexpectedValueException
+class UnexpectedDocumentException extends UnexpectedValueException
 {
 
 }

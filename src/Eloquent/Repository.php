@@ -85,6 +85,8 @@ class Repository implements
      */
     public function exists(string $resourceId): bool
     {
+        // @TODO check the resource id against a regex querying the database.
+
         return $this
             ->query()
             ->whereResourceId($resourceId)
