@@ -19,11 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec;
 
-use Illuminate\Pipeline\Pipeline;
-use LogicException;
-use function json_decode;
+use Illuminate\Routing\Pipeline;
+use Illuminate\Support\Arr;
+use JsonException;
 
-class Builder
+abstract class Builder
 {
 
     /**
@@ -32,14 +32,20 @@ class Builder
     private Pipeline $pipeline;
 
     /**
-     * @var string|null
+     * @var array
      */
-    private ?string $expectedType = null;
+    private array $pipes = [];
 
     /**
-     * @var string|null
+     * @param object $json
+     * @return Document
      */
-    private ?string $expectedId = null;
+    abstract protected function create(object $json): Document;
+
+    /**
+     * @return array
+     */
+    abstract protected function pipes(): array;
 
     /**
      * Builder constructor.
@@ -52,58 +58,54 @@ class Builder
     }
 
     /**
-     * Expect the supplied resource type and id.
-     *
-     * @param string $resourceType
-     * @param string|null $resourceId
+     * @param $pipes
      * @return $this
      */
-    public function expects(string $resourceType, ?string $resourceId): self
+    public function using($pipes): self
     {
-        $this->expectedType = $resourceType;
-        $this->expectedId = $resourceId;
+        $this->pipes = array_merge($this->pipes, Arr::wrap($pipes));
 
         return $this;
     }
 
     /**
-     * @param string|object $json
+     * @param string $json
      * @return Document
+     * @throws DocumentException
      */
-    public function build($json): Document
+    public function build(string $json): Document
     {
-        if (is_string($json)) {
-            $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-        }
+        $document = $this->create(
+            $this->decode($json)
+        );
 
-        if (!is_object($json)) {
-            throw new \InvalidArgumentException('Expecting a string or object.');
-        }
+        $pipes = array_merge($this->pipes(), $this->pipes);
 
         return $this->pipeline
-            ->send(new Document($json, $this->expectedType, $this->expectedId))
-            ->through($this->pipes())
+            ->send($document)
+            ->through($pipes)
             ->via('validate')
             ->thenReturn();
     }
 
     /**
-     * @return string[]
+     * @param string $json
+     * @return object
      */
-    private function pipes(): array
+    private function decode(string $json): object
     {
-        if ($this->expectedType) {
-            return [
-                Validators\DataValidator::class,
-                Validators\TypeValidator::class,
-                Validators\ClientIdValidator::class,
-                Validators\IdValidator::class,
-                Validators\FieldsValidator::class,
-                Validators\AttributesValidator::class,
-                Validators\RelationshipsValidator::class,
-            ];
+        try {
+            if (is_string($json)) {
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+            }
+        } catch (JsonException $ex) {
+            throw new DocumentException('Invalid JSON string.', 0, $ex);
         }
 
-        throw new LogicException('Cannot determine validation pipes.');
+        if (is_object($json)) {
+            return $json;
+        }
+
+        throw new DocumentException('JSON does not decode to a string or object.');
     }
 }

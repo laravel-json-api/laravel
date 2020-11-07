@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec\Validators;
 
-use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\ResourceDocument;
 use LaravelJsonApi\Spec\Translator;
 
 class FieldsValidator
@@ -40,11 +40,11 @@ class FieldsValidator
     /**
      * Validate a resource's fields (attributes + relationships).
      *
-     * @param Document $document
+     * @param ResourceDocument $document
      * @param \Closure $next
-     * @return Document
+     * @return ResourceDocument
      */
-    public function validate(Document $document, \Closure $next): Document
+    public function validate(ResourceDocument $document, \Closure $next): ResourceDocument
     {
         $duplicates = collect((array) $document->get('data.attributes', []))
             ->intersectByKeys((array) $document->get('data.relationships', []))

@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Spec\Values;
 
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Spec\Translator;
 use LogicException;
@@ -114,7 +115,7 @@ class Identifier extends Value
 
         if ($errors->isEmpty() && !$this->spec->exists($this->value->type, $this->value->id)) {
             $errors->push($this->translator->resourceDoesNotExist(
-                $this->inList() ? $this->path : $this->parent()
+                $this->doesNotExist()
             ));
         }
 
@@ -196,5 +197,31 @@ class Identifier extends Value
     private function inList(): bool
     {
         return is_numeric($this->member());
+    }
+
+    /**
+     * @return bool
+     */
+    private function inRelationships(): bool
+    {
+        return Str::contains($this->path, '/relationships/');
+    }
+
+    /**
+     * Get the path to use if the resource does not exist.
+     *
+     * @return string
+     */
+    private function doesNotExist(): string
+    {
+        if ($this->inList()) {
+            return $this->path;
+        }
+
+        if ($this->inRelationships()) {
+            return $this->parent();
+        }
+
+        return $this->path;
     }
 }

@@ -30,43 +30,18 @@ class Document
     private object $document;
 
     /**
-     * @var string
-     */
-    private string $resourceType;
-
-    /**
-     * @var string|null
-     */
-    private ?string $resourceId;
-
-    /**
-     * @var string|null
-     */
-    private ?string $relation;
-
-    /**
      * @var ErrorList
      */
     private ErrorList $errors;
 
     /**
-     * Document constructor.
+     * BaseDocument constructor.
      *
      * @param object $document
-     * @param string $resourceType
-     * @param string|null $resourceId
-     * @param string|null $relation
      */
-    public function __construct(
-        object $document,
-        string $resourceType,
-        ?string $resourceId,
-        string $relation = null
-    ) {
+    public function __construct(object $document)
+    {
         $this->document = $document;
-        $this->resourceType = $resourceType;
-        $this->resourceId = $resourceId;
-        $this->relation = $relation;
         $this->errors = new ErrorList();
     }
 
@@ -86,50 +61,6 @@ class Document
     public function __get($name)
     {
         return $this->document->{$name};
-    }
-
-    /**
-     * Get the document's expected resource type.
-     *
-     * @return string
-     */
-    public function type(): string
-    {
-        return $this->resourceType;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function id(): ?string
-    {
-        return $this->resourceId;
-    }
-
-    /**
-     * Get the relation that the document represents.
-     *
-     * @return string|null
-     */
-    public function relation(): ?string
-    {
-        return $this->relation;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRelation(): bool
-    {
-        return is_string($this->relation);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNotRelation(): bool
-    {
-        return !$this->isRelation();
     }
 
     /**

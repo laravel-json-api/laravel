@@ -60,7 +60,7 @@ class ToOne extends Value
     {
         $this->translator = $translator;
         $this->factory = $factory;
-        $this->path = $path;
+        $this->path = rtrim($path, '/');
         $this->value = $value;
     }
 
@@ -114,7 +114,7 @@ class ToOne extends Value
 
         if (!property_exists($this->value, 'data')) {
             return $errors->push($this->translator->memberRequired(
-                $this->path,
+                $this->path ?: '/',
                 'data'
             ));
         }

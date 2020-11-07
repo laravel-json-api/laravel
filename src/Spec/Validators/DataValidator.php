@@ -19,11 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec\Validators;
 
-use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\ResourceDocument;
 use LaravelJsonApi\Spec\Translator;
-use LaravelJsonApi\Spec\Validator;
 
-class DataValidator implements Validator
+class DataValidator
 {
 
     /**
@@ -44,11 +43,11 @@ class DataValidator implements Validator
     /**
      * Validate the `/data` member of the document.
      *
-     * @param Document $document
+     * @param ResourceDocument $document
      * @param \Closure $next
-     * @return Document
+     * @return ResourceDocument
      */
-    public function validate(Document $document, \Closure $next): Document
+    public function validate(ResourceDocument $document, \Closure $next): ResourceDocument
     {
         if (!isset($document->data)) {
             $document->errors()->push(

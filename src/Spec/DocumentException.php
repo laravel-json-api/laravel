@@ -19,15 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec;
 
-interface Validator
+use UnexpectedValueException;
+
+class DocumentException extends UnexpectedValueException
 {
 
-    /**
-     * Validate the document.
-     *
-     * @param Document $document
-     * @param \Closure $next
-     * @return Document
-     */
-    public function validate(Document $document, \Closure $next): Document;
 }

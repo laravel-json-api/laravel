@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Spec\Validators;
 
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\ResourceDocument;
 use LaravelJsonApi\Spec\Factory;
 use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Spec\Translator;
@@ -61,11 +61,11 @@ class RelationshipsValidator
     /**
      * Validate the `/data/relationships` member.
      *
-     * @param Document $document
+     * @param ResourceDocument $document
      * @param \Closure $next
-     * @return Document
+     * @return ResourceDocument
      */
-    public function validate(Document $document, \Closure $next): Document
+    public function validate(ResourceDocument $document, \Closure $next): ResourceDocument
     {
         $data = $document->data ?? null;
 

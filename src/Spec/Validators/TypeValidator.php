@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Spec\Validators;
 
 use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\ResourceDocument;
 use LaravelJsonApi\Spec\Translator;
 
 class TypeValidator
@@ -44,11 +44,11 @@ class TypeValidator
     /**
      * Validate the `/data/type` member of the document.
      *
-     * @param Document $document
+     * @param ResourceDocument $document
      * @param \Closure $next
-     * @return Document
+     * @return ResourceDocument
      */
-    public function validate(Document $document, \Closure $next): Document
+    public function validate(ResourceDocument $document, \Closure $next): ResourceDocument
     {
         $data = $document->data;
 
