@@ -301,6 +301,56 @@ class ResourceTest extends TestCase
                     'source' => ['pointer' => '/data/relationships/author/data'],
                 ],
             ],
+            'data.relationships.*.data.type:required' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => 'Hello World',
+                            'content' => '...',
+                            'slug' => 'hello-world',
+                        ],
+                        'relationships' => [
+                            'author' => [
+                                'data' => [
+                                    'id' => '123',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member data must be an object.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/relationships/author/data'],
+                ],
+            ],
+            'data.relationships.*.data.id:required' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => 'Hello World',
+                            'content' => '...',
+                            'slug' => 'hello-world',
+                        ],
+                        'relationships' => [
+                            'author' => [
+                                'data' => [
+                                    'type' => 'users',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member data must be an object.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/relationships/author/data'],
+                ],
+            ],
             'data.relationships.*.data:resource does not exist' => [
                 [
                     'data' => [
@@ -369,6 +419,36 @@ class ResourceTest extends TestCase
                                 'data' => [
                                     [
                                         'id' => '1',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member type is required.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/relationships/tags/data/0'],
+                ],
+            ],
+            'data.relationships.*.data.*.id:required' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => 'Hello World',
+                            'content' => '...',
+                            'slug' => 'hello-world',
+                        ],
+                        'relationships' => [
+                            'author' => [
+                                'data' => null,
+                            ],
+                            'tags' => [
+                                'data' => [
+                                    [
+                                        'type' => 'tags',
                                     ],
                                 ],
                             ],

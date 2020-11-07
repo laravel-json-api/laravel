@@ -98,16 +98,6 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     }
 
     /**
-     * Get the first error.
-     *
-     * @return Error|null
-     */
-    public function first(): ?Error
-    {
-        return $this->stack[0] ?? null;
-    }
-
-    /**
      * @return bool
      */
     public function isEmpty(): bool
