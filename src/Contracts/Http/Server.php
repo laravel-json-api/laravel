@@ -21,6 +21,7 @@ use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Store\Store;
+use LaravelJsonApi\Core\Document\JsonApi;
 
 interface Server
 {
@@ -37,6 +38,13 @@ interface Server
      * @return string
      */
     public function name(): string;
+
+    /**
+     * Get the server's JSON API object.
+     *
+     * @return JsonApi
+     */
+    public function jsonApi(): JsonApi;
 
     /**
      * Get the server's schemas.

@@ -17,19 +17,21 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resources;
+namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Facades\JsonApi;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Resources\ResourceCollection;
 use function is_null;
 
 class DataResponse implements Responsable
 {
 
-    use Concerns\CreatesResponse;
+    use Concerns\IsResponsable;
 
     /**
      * @var Page|Model|iterable|null
@@ -50,7 +52,34 @@ class DataResponse implements Responsable
      * @param Request $request
      * @return ResourceCollectionResponse|ResourceResponse
      */
-    public function prepareResponse($request)
+    public function prepareResponse($request): Responsable
+    {
+        return $this
+            ->prepareDataResponse($request)
+            ->withJsonApi($this->jsonApi())
+            ->withMeta($this->meta)
+            ->withLinks($this->links)
+            ->withEncodeOptions($this->encodeOptions)
+            ->withHeaders($this->headers);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        return $this
+            ->prepareResponse($request)
+            ->toResponse($request);
+    }
+
+    /**
+     * Convert the data member to a response class.
+     *
+     * @param $request
+     * @return PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
+     */
+    private function prepareDataResponse($request)
     {
         if ($this->value instanceof Page) {
             return new PaginatedResourceResponse($this->value);
@@ -69,20 +98,6 @@ class DataResponse implements Responsable
         }
 
         return (new ResourceCollection($parsed))->prepareResponse($request);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toResponse($request)
-    {
-        return $this
-            ->prepareResponse($request)
-            ->withMeta($this->meta)
-            ->withLinks($this->links)
-            ->withEncodeOptions($this->encodeOptions)
-            ->withHeaders((array) $this->headers)
-            ->toResponse($request);
     }
 
 }

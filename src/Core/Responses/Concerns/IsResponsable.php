@@ -17,16 +17,24 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resources\Concerns;
+namespace LaravelJsonApi\Core\Responses\Concerns;
 
 use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Document\JsonApi;
+use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
+use LaravelJsonApi\Core\Facades\JsonApi as JsonApiFacade;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 
-trait CreatesResponse
+trait IsResponsable
 {
+
+    /**
+     * @var JsonApi|null
+     */
+    private ?JsonApi $jsonApi = null;
 
     /**
      * @var Hash|null
@@ -44,9 +52,34 @@ trait CreatesResponse
     private int $encodeOptions = 0;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private ?array $headers = null;
+    private array $headers = [];
+
+    /**
+     * Add the top-level JSON API member to the response.
+     *
+     * @param $jsonApi
+     * @return $this
+     */
+    public function withJsonApi($jsonApi): self
+    {
+        $this->jsonApi = JsonApi::cast($jsonApi);
+
+        return $this;
+    }
+
+    /**
+     * @return JsonApi
+     */
+    public function jsonApi(): JsonApi
+    {
+        if ($this->jsonApi) {
+            return $this->jsonApi;
+        }
+
+        return $this->jsonApi = JsonApiFacade::server()->jsonApi();
+    }
 
     /**
      * Add top-level meta to the response.
@@ -62,6 +95,18 @@ trait CreatesResponse
     }
 
     /**
+     * @return Hash
+     */
+    public function meta(): Hash
+    {
+        if ($this->meta) {
+            return $this->meta;
+        }
+
+        return $this->meta = new Hash();
+    }
+
+    /**
      * Add top-level links to the response.
      *
      * @param $links
@@ -72,6 +117,18 @@ trait CreatesResponse
         $this->links = Links::cast($links);
 
         return $this;
+    }
+
+    /**
+     * @return Links
+     */
+    public function links(): Links
+    {
+        if ($this->links) {
+            return $this->links;
+        }
+
+        return $this->links = new Links();
     }
 
     /**

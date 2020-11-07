@@ -21,13 +21,14 @@ namespace LaravelJsonApi\Http;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
+use LaravelJsonApi\Contracts\Encoder\Encoder;
+use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Contracts\Http\Server as ServerContract;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
-use LaravelJsonApi\Contracts\Encoder\Encoder;
-use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
@@ -92,6 +93,14 @@ abstract class Server implements ServerContract
     public function name(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonApi(): JsonApi
+    {
+        return new JsonApi('1.0');
     }
 
     /**

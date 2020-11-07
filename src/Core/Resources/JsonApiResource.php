@@ -27,6 +27,7 @@ use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
+use LaravelJsonApi\Core\Responses\ResourceResponse;
 use LogicException;
 use function sprintf;
 

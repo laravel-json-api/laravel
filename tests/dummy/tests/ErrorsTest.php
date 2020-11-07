@@ -44,6 +44,9 @@ JSON;
                     'title' => 'Invalid JSON',
                 ],
             ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
         ]);
     }
 
@@ -61,6 +64,9 @@ JSON;
                     'status' => '400',
                     'title' => 'Invalid JSON',
                 ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
             ],
         ]);
     }

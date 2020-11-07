@@ -17,17 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resources;
+namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Facades\JsonApi;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class ResourceResponse implements Responsable
 {
 
-    use Concerns\CreatesResponse;
+    use Concerns\IsResponsable;
 
     /**
      * @var JsonApiResource|null
@@ -71,6 +72,7 @@ class ResourceResponse implements Responsable
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResource($this->resource)
+            ->withJsonApi($this->jsonApi())
             ->withMeta($this->meta)
             ->withLinks($this->links)
             ->toJson($this->encodeOptions);

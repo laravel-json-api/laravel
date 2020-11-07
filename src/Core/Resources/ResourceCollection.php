@@ -27,12 +27,12 @@ use IteratorAggregate;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Pagination\Page;
+use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Responses\ResourceCollectionResponse;
 use function count;
 
 class ResourceCollection implements Responsable, IteratorAggregate, Countable
 {
-
-    use Concerns\CreatesResponse;
 
     /**
      * @var iterable|PageContract

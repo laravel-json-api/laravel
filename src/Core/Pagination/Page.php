@@ -26,7 +26,7 @@ use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Resources\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
 use function array_filter;
 use function collect;
 use function count;
@@ -259,11 +259,20 @@ class Page implements PageContract
     }
 
     /**
+     * @param $request
+     * @return PaginatedResourceResponse
+     */
+    public function prepareResponse($request): PaginatedResourceResponse
+    {
+        return new PaginatedResourceResponse($this);
+    }
+
+    /**
      * @inheritDoc
      */
     public function toResponse($request)
     {
-        return (new PaginatedResourceResponse($this))->toResponse($request);
+        return $this->prepareResponse($request)->toResponse($request);
     }
 
     /**

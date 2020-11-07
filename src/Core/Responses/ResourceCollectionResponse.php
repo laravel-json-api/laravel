@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resources;
+namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
@@ -25,11 +25,12 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Facades\JsonApi;
+use LaravelJsonApi\Core\Resources\ResourceCollection;
 
 class ResourceCollectionResponse implements Responsable
 {
 
-    use Concerns\CreatesResponse;
+    use Concerns\IsResponsable;
 
     /**
      * @var ResourceCollection
@@ -76,6 +77,7 @@ class ResourceCollectionResponse implements Responsable
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResources($this->resources)
+            ->withJsonApi($this->jsonApi())
             ->withMeta($this->meta())
             ->withLinks($this->links())
             ->toJson($this->encodeOptions);

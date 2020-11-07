@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Serializable;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LogicException;
 use function array_merge;
 use function collect;

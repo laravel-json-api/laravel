@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resources;
+namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use InvalidArgumentException;
@@ -25,6 +25,8 @@ use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Pagination\Page;
+use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Responses\ResourceCollectionResponse;
 
 class PaginatedResourceResponse extends ResourceCollectionResponse
 {

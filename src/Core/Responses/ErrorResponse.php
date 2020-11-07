@@ -17,15 +17,20 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document;
+namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Contracts\Serializable;
+use LaravelJsonApi\Contracts\Serializable as SerializableContract;
+use LaravelJsonApi\Core\Document\Concerns\Serializable;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
-class ErrorResponse implements Serializable, Responsable
+class ErrorResponse implements SerializableContract, Responsable
 {
 
-    use Concerns\Serializable;
+    use IsResponsable;
+    use Serializable;
 
     /**
      * @var ErrorList
@@ -38,16 +43,6 @@ class ErrorResponse implements Serializable, Responsable
     private ?int $status = null;
 
     /**
-     * @var array
-     */
-    private array $headers = [];
-
-    /**
-     * @var int
-     */
-    private int $encodeOptions = 0;
-
-    /**
      * ErrorResponse constructor.
      *
      * @param ErrorList|Error|Error[] $errors
@@ -55,32 +50,6 @@ class ErrorResponse implements Serializable, Responsable
     public function __construct($errors)
     {
         $this->errors = ErrorList::cast($errors);
-    }
-
-    /**
-     * Set JSON encode options.
-     *
-     * @param int $options
-     * @return $this
-     */
-    public function withEncodeOptions(int $options): self
-    {
-        $this->encodeOptions = $options;
-
-        return $this;
-    }
-
-    /**
-     * Set response headers.
-     *
-     * @param array $headers
-     * @return $this
-     */
-    public function withHeaders(array $headers): self
-    {
-        $this->headers = $headers;
-
-        return $this;
     }
 
     /**
@@ -116,9 +85,12 @@ class ErrorResponse implements Serializable, Responsable
      */
     public function toArray()
     {
-        return [
-            'errors' => $this->errors->toArray(),
-        ];
+        return array_filter([
+            'jsonapi' => $this->jsonApi()->toArray() ?: null,
+            'meta' => $this->meta()->toArray() ?: null,
+            'links' => $this->links->toArray() ?: null,
+            'errors' => $this->errors,
+        ]);
     }
 
     /**
@@ -126,9 +98,12 @@ class ErrorResponse implements Serializable, Responsable
      */
     public function jsonSerialize()
     {
-        return [
+        return array_filter([
+            'jsonapi' => $this->jsonApi()->jsonSerialize(),
+            'meta' => $this->meta()->jsonSerialize(),
+            'links' => $this->links()->jsonSerialize(),
             'errors' => $this->errors,
-        ];
+        ]);
     }
 
 }

@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Http\Controllers\Actions;
 use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Core\Resources\DataResponse;
+use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Http\Requests\ResourceRequest;
 
