@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Spec;
 
 use Illuminate\Pipeline\Pipeline;
+use LogicException;
 use function json_decode;
 
 class Builder
@@ -33,7 +34,12 @@ class Builder
     /**
      * @var string|null
      */
-    private ?string $expects = null;
+    private ?string $expectedType = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $expectedId = null;
 
     /**
      * Builder constructor.
@@ -46,14 +52,16 @@ class Builder
     }
 
     /**
-     * Expect the supplied resource type.
+     * Expect the supplied resource type and id.
      *
      * @param string $resourceType
+     * @param string|null $resourceId
      * @return $this
      */
-    public function expects(string $resourceType): self
+    public function expects(string $resourceType, ?string $resourceId): self
     {
-        $this->expects = $resourceType;
+        $this->expectedType = $resourceType;
+        $this->expectedId = $resourceId;
 
         return $this;
     }
@@ -72,20 +80,30 @@ class Builder
             throw new \InvalidArgumentException('Expecting a string or object.');
         }
 
-        $pipes = [
-            Validators\DataValidator::class,
-            Validators\TypeValidator::class,
-            Validators\ClientIdValidator::class,
-            Validators\FieldsValidator::class,
-            Validators\AttributesValidator::class,
-            Validators\RelationshipsValidator::class,
-            Validators\RelationshipValidator::class,
-        ];
-
         return $this->pipeline
-            ->send(new Document($json, $this->expects))
-            ->through($pipes)
+            ->send(new Document($json, $this->expectedType, $this->expectedId))
+            ->through($this->pipes())
             ->via('validate')
             ->thenReturn();
+    }
+
+    /**
+     * @return string[]
+     */
+    private function pipes(): array
+    {
+        if ($this->expectedType) {
+            return [
+                Validators\DataValidator::class,
+                Validators\TypeValidator::class,
+                Validators\ClientIdValidator::class,
+                Validators\IdValidator::class,
+                Validators\FieldsValidator::class,
+                Validators\AttributesValidator::class,
+                Validators\RelationshipsValidator::class,
+            ];
+        }
+
+        throw new LogicException('Cannot determine validation pipes.');
     }
 }

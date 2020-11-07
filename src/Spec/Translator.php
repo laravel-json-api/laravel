@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Spec;
 use Illuminate\Contracts\Translation\Translator as IlluminateTranslator;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Support\Str;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Document\Error as NeomerxError;
 
@@ -112,7 +113,6 @@ class Translator
             ->setSourcePointer($this->pointer($path, $member));
     }
 
-
     /**
      * Create an error for when a member has a field that is not allowed.
      *
@@ -128,6 +128,26 @@ class Translator
             ->setCode($this->trans('member_field_not_allowed', 'code'))
             ->setTitle($this->trans('member_field_not_allowed', 'title'))
             ->setDetail($this->trans('member_field_not_allowed', 'detail', compact('member', 'field')))
+            ->setSourcePointer($this->pointer($path, $member));
+    }
+
+    /**
+     * Create an error for when a member has a field that is not supported.
+     *
+     * @param string $path
+     * @param string $member
+     * @param string $field
+     * @return Error
+     */
+    public function memberFieldNotSupported(string $path, string $member, string $field): Error
+    {
+        $type = $this->translator->get(Str::singular($member));
+
+        return Error::make()
+            ->setStatus(Response::HTTP_BAD_REQUEST)
+            ->setCode($this->trans('member_field_not_supported', 'code'))
+            ->setTitle($this->trans('member_field_not_supported', 'title'))
+            ->setDetail($this->trans('member_field_not_supported', 'detail', compact('type', 'field')))
             ->setSourcePointer($this->pointer($path, $member));
     }
 

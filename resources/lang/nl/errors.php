@@ -94,6 +94,12 @@ return [
         'code' => '',
     ],
 
+    'member_field_not_supported' => [
+        'title' => 'Non-Compliant JSON API Document',
+        'detail' => 'Het veld :field is geen ondersteund :type.',
+        'code' => '',
+    ],
+
     'resource_type_not_supported' => [
         'title' => 'Niet Ondersteund',
         'detail' => 'Resource type :type wordt niet ondersteund door dit endpoint.',

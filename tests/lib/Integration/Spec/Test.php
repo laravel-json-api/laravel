@@ -22,10 +22,11 @@ namespace LaravelJsonApi\Tests\Integration\Spec;
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Spec\Builder;
+use LaravelJsonApi\Spec\Document;
 use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Tests\Integration\TestCase;
 
-class ResourceTest extends TestCase
+class Test extends TestCase
 {
 
     /**
@@ -48,8 +49,13 @@ class ResourceTest extends TestCase
         $spec->method('fields')->willReturnMap([
             ['posts', [
                 $this->createAttribute('title'),
+                $this->createAttribute('content'),
+                $this->createAttribute('slug'),
                 $this->createToOne('author'),
                 $this->createToMany('tags'),
+            ]],
+            ['users', [
+                $this->createAttribute('name'),
             ]],
         ]);
         $spec->method('types')->willReturn(['posts', 'users', 'comments', 'podcasts', 'tags']);
@@ -195,6 +201,24 @@ class ResourceTest extends TestCase
                     'source' => ['pointer' => '/data/attributes'],
                 ],
             ],
+            'data.attributes.*:unrecognised' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => 'Hello World',
+                            'content' => '...',
+                            'foo' => 'bar',
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => 'The field foo is not a supported attribute.',
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/attributes'],
+                ],
+            ],
             'data.relationships:not object' => [
                 [
                     'data' => [
@@ -269,6 +293,28 @@ class ResourceTest extends TestCase
                     'detail' => "The member author must be an object.",
                     'status' => '400',
                     'source' => ['pointer' => '/data/relationships/author'],
+                ],
+            ],
+            'data.relationships.*:unrecognised' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => 'Hello World',
+                            'content' => '...',
+                        ],
+                        'relationships' => [
+                            'foo' => [
+                                'data' => null,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => 'The field foo is not a supported relationship.',
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/relationships'],
                 ],
             ],
             'data.relationships.*.data:required' => [
@@ -506,25 +552,87 @@ class ResourceTest extends TestCase
                     'source' => ['pointer' => '/data/relationships/tags/data/0'],
                 ],
             ],
-            'fields:duplicate' => [
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function updateProvider(): array
+    {
+        return [
+            'data.id:required' => [
                 [
                     'data' => [
                         'type' => 'posts',
-                        'attributes' => [
-                            'author' => null,
-                        ],
-                        'relationships' => [
-                            'author' => [
-                                'data' => null,
-                            ],
-                        ],
+                        'attributes' => ['title' => 'Hello World'],
                     ],
                 ],
                 [
                     'title' => 'Non-Compliant JSON API Document',
-                    'detail' => 'The author field cannot exist as an attribute and a relationship.',
+                    'detail' => "The member id is required.",
                     'status' => '400',
                     'source' => ['pointer' => '/data'],
+                ],
+            ],
+            'data.id:not string' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'id' => null,
+                        'attributes' => ['title' => 'Hello World'],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member id must be a string.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/id'],
+                ],
+            ],
+            'data.id:integer' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'id' => 1,
+                        'attributes' => ['title' => 'Hello World'],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member id must be a string.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/id'],
+                ],
+            ],
+            'data.id:empty' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'id' => '',
+                        'attributes' => ['title' => 'Hello World'],
+                    ],
+                ],
+                [
+                    'title' => 'Non-Compliant JSON API Document',
+                    'detail' => "The member id cannot be empty.",
+                    'status' => '400',
+                    'source' => ['pointer' => '/data/id'],
+                ],
+            ],
+            'data.id:not supported' => [
+                [
+                    'data' => [
+                        'type' => 'posts',
+                        'id' => '10',
+                        'attributes' => ['title' => 'Hello World'],
+                    ],
+                ],
+                [
+                    'title' => 'Not Supported',
+                    'detail' => "Resource id 10 is not supported by this endpoint.",
+                    'status' => '409',
+                    'source' => ['pointer' => '/data/id'],
                 ],
             ],
         ];
@@ -540,12 +648,76 @@ class ResourceTest extends TestCase
         ksort($expected);
 
         $document = $this->builder
-            ->expects('posts')
+            ->expects('posts', null)
             ->build(json_encode($json));
 
+        $this->assertInvalid($document, [$expected]);
+    }
+
+    /**
+     * @param $json
+     * @param array $expected
+     * @dataProvider updateProvider
+     */
+    public function testUpdate($json, array $expected): void
+    {
+        ksort($expected);
+
+        $document = $this->builder
+            ->expects('posts', '1')
+            ->build(json_encode($json));
+
+        $this->assertInvalid($document, [$expected]);
+    }
+
+    public function testDuplicateFields(): void
+    {
+        $json = [
+            'data' => [
+                'type' => 'posts',
+                'id' => '1',
+                'attributes' => [
+                    'author' => null,
+                ],
+                'relationships' => [
+                    'author' => [
+                        'data' => null,
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                'detail' => 'The author field cannot exist as an attribute and a relationship.',
+                'source' => ['pointer' => '/data'],
+                'status' => '400',
+                'title' => 'Non-Compliant JSON API Document',
+            ],
+            [
+                'detail' => 'The field author is not a supported attribute.',
+                'source' => ['pointer' => '/data/attributes'],
+                'status' => '400',
+                'title' => 'Non-Compliant JSON API Document',
+            ],
+        ];
+
+        $document = $this->builder
+            ->expects('posts', '1')
+            ->build(json_encode($json));
+
+        $this->assertInvalid($document, $expected);
+    }
+
+    /**
+     * @param Document $document
+     * @param array $expected
+     */
+    private function assertInvalid(Document $document, array $expected): void
+    {
         $this->assertFalse($document->valid());
         $this->assertTrue($document->invalid());
-        $this->assertSame([$expected], $document->errors()->toArray());
+        $this->assertSame($expected, $document->errors()->toArray());
     }
 
     /**

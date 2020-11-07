@@ -58,6 +58,10 @@ class ClientIdValidator
      */
     public function validate(Document $document, \Closure $next): Document
     {
+        if ($document->id()) {
+            return $next($document);
+        }
+
         $data = $document->data;
 
         if (!property_exists($data, 'id')) {

@@ -21,10 +21,16 @@ namespace LaravelJsonApi\Spec\Validators;
 
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Spec\Translator;
 
-class TypeValidator
+class IdValidator
 {
+
+    /**
+     * @var Specification
+     */
+    private Specification $spec;
 
     /**
      * @var Translator
@@ -32,17 +38,19 @@ class TypeValidator
     private Translator $translator;
 
     /**
-     * TypeValidator constructor.
+     * ClientIdValidator constructor.
      *
+     * @param Specification $spec
      * @param Translator $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(Specification $spec, Translator $translator)
     {
+        $this->spec = $spec;
         $this->translator = $translator;
     }
 
     /**
-     * Validate the `/data/type` member of the document.
+     * Validate the `/data/id` member of the document.
      *
      * @param Document $document
      * @param \Closure $next
@@ -50,18 +58,18 @@ class TypeValidator
      */
     public function validate(Document $document, \Closure $next): Document
     {
-        $data = $document->data;
-
-        if (!property_exists($data, 'type')) {
-            $document->errors()->push(
-                $this->translator->memberRequired('/data', 'type')
-            );
-            return $document;
+        if (!$expected = $document->id()) {
+            return $next($document);
         }
 
-        if ($error = $this->accept($document->type(), $data->type)) {
+        $data = $document->data;
+
+        if (!property_exists($data, 'id')) {
+            $document->errors()->push(
+                $this->translator->memberRequired('/data', 'id')
+            );
+        } else if ($error = $this->accept($expected, $data->id)) {
             $document->errors()->push($error);
-            return $document;
         }
 
         return $next($document);
@@ -75,15 +83,15 @@ class TypeValidator
     private function accept(string $expected, $value): ?Error
     {
         if (!is_string($value)) {
-            return $this->translator->memberNotString('/data', 'type');
+            return $this->translator->memberNotString('/data', 'id');
         }
 
         if (empty($value)) {
-            return $this->translator->memberEmpty('/data', 'type');
+            return $this->translator->memberEmpty('/data', 'id');
         }
 
         if ($expected !== $value) {
-            return $this->translator->resourceTypeNotSupported($value);
+            return $this->translator->resourceIdNotSupported($value);
         }
 
         return null;

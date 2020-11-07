@@ -19,11 +19,19 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Spec\Validators;
 
+use LaravelJsonApi\Contracts\Schema\Attribute;
+use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Spec\Document;
+use LaravelJsonApi\Spec\Specification;
 use LaravelJsonApi\Spec\Translator;
 
 class AttributesValidator
 {
+
+    /**
+     * @var Specification
+     */
+    private Specification $spec;
 
     /**
      * @var Translator
@@ -33,10 +41,12 @@ class AttributesValidator
     /**
      * AttributesValidator constructor.
      *
+     * @param Specification $spec
      * @param Translator $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(Specification $spec, Translator $translator)
     {
+        $this->spec = $spec;
         $this->translator = $translator;
     }
 
@@ -49,28 +59,48 @@ class AttributesValidator
      */
     public function validate(Document $document, \Closure $next): Document
     {
-        $data = $document->data;
+        $data = $document->data ?? null;
 
-        if (property_exists($data, 'attributes') && $errors = $this->accept($data->attributes)) {
-            $document->errors()->push(...$errors);
+        if ($data && property_exists($data, 'attributes')) {
+            $document->errors()->merge(
+                $this->accept($document->type(), $data->attributes)
+            );
         }
 
         return $next($document);
     }
 
     /**
-     * @param $value
-     * @return array|null
+     * @param string $resourceType
+     * @param $attributes
+     * @return ErrorList
      */
-    private function accept($value): ?array
+    private function accept(string $resourceType, $attributes): ErrorList
     {
-        if (!is_object($value)) {
-            return [$this->translator->memberNotObject('/data', 'attributes')];
+        $errors = new ErrorList();
+
+        if (!is_object($attributes)) {
+            return $errors->push(
+                $this->translator->memberNotObject('/data', 'attributes')
+            );
         }
 
-        return collect(['type', 'id'])
-            ->filter(fn($field) => property_exists($value, $field))
-            ->map(fn($field) => $this->translator->memberFieldNotAllowed('/data', 'attributes', $field))
-            ->all();
+        /** Type and id are not allowed in attributes */
+        $errors->push(...collect(['type', 'id'])->filter(fn($name) => property_exists($attributes, $name))->map(
+            fn($name) => $this->translator->memberFieldNotAllowed('/data', 'attributes', $name)
+        ));
+
+        $fields = collect($this->spec->fields($resourceType))
+            ->whereInstanceOf(Attribute::class)
+            ->map(fn($field) => $field->name())
+            ->values();
+
+        $actual = collect(get_object_vars($attributes))
+            ->forget(['type', 'id'])
+            ->keys();
+
+        return $errors->push(...$actual->diff($fields)->map(
+            fn($name) => $this->translator->memberFieldNotSupported('/data', 'attributes', $name)
+        ));
     }
 }

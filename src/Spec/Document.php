@@ -37,6 +37,11 @@ class Document
     /**
      * @var string|null
      */
+    private ?string $resourceId;
+
+    /**
+     * @var string|null
+     */
     private ?string $relation;
 
     /**
@@ -49,12 +54,18 @@ class Document
      *
      * @param object $document
      * @param string $resourceType
+     * @param string|null $resourceId
      * @param string|null $relation
      */
-    public function __construct(object $document, string $resourceType, string $relation = null)
-    {
+    public function __construct(
+        object $document,
+        string $resourceType,
+        ?string $resourceId,
+        string $relation = null
+    ) {
         $this->document = $document;
         $this->resourceType = $resourceType;
+        $this->resourceId = $resourceId;
         $this->relation = $relation;
         $this->errors = new ErrorList();
     }
@@ -85,6 +96,14 @@ class Document
     public function type(): string
     {
         return $this->resourceType;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function id(): ?string
+    {
+        return $this->resourceId;
     }
 
     /**
@@ -154,7 +173,7 @@ class Document
      */
     public function toBase(): object
     {
-        return $this->document;
+        return clone $this->document;
     }
 
 }

@@ -84,6 +84,14 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     }
 
     /**
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->stack = array_map(fn($error) => clone $error, $this->stack);
+    }
+
+    /**
      * Add errors.
      *
      * @param Error ...$errors
