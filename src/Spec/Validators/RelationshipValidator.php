@@ -146,28 +146,51 @@ class RelationshipValidator
         $errors = [];
         $dataPath = sprintf('%s/%s', rtrim($path, '/'), $member);
 
-        if (!property_exists($value, 'type')) {
-            $errors[] = $this->translator->memberRequired($dataPath, 'type');
-        } else if ($error = $this->acceptType($dataPath, $value->type)) {
-            $errors[] = $error;
-        }
+        $errors[] = $this->acceptIdentifierType($dataPath, $value);
+        $errors[] = $this->acceptIdentifierId($dataPath, $value);
 
-        return $errors;
+        return array_filter($errors);
     }
 
     /**
-     * @param $path
-     * @param $value
+     * @param string $path
+     * @param object $identifier
      * @return Error|null
      */
-    private function acceptType($path, $value): ?Error
+    private function acceptIdentifierType(string $path, object $identifier): ?Error
     {
-        if (!is_string($value)) {
+        if (!property_exists($identifier, 'type')) {
+            return $this->translator->memberRequired($path, 'type');
+        }
+
+        if (!is_string($identifier->type)) {
             return $this->translator->memberNotString($path, 'type');
         }
 
-        if (empty($value)) {
+        if (empty($identifier->type)) {
             return $this->translator->memberEmpty($path, 'type');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $path
+     * @param object $identifier
+     * @return Error|null
+     */
+    private function acceptIdentifierId(string $path, object $identifier): ?Error
+    {
+        if (!property_exists($identifier, 'id')) {
+            return $this->translator->memberRequired($path, 'id');
+        }
+
+        if (!is_string($identifier->id)) {
+            return $this->translator->memberNotString($path, 'id');
+        }
+
+        if (empty($identifier->id) && '0' !== $identifier->id) {
+            return $this->translator->memberEmpty($path, 'id');
         }
 
         return null;

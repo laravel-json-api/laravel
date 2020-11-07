@@ -321,7 +321,7 @@ class ResourceTest extends TestCase
                 ],
                 [
                     'title' => 'Non-Compliant JSON API Document',
-                    'detail' => "The member data must be an object.",
+                    'detail' => "The member type is required.",
                     'status' => '400',
                     'source' => ['pointer' => '/data/relationships/author/data'],
                 ],
@@ -346,7 +346,7 @@ class ResourceTest extends TestCase
                 ],
                 [
                     'title' => 'Non-Compliant JSON API Document',
-                    'detail' => "The member data must be an object.",
+                    'detail' => "The member id is required.",
                     'status' => '400',
                     'source' => ['pointer' => '/data/relationships/author/data'],
                 ],
@@ -457,7 +457,7 @@ class ResourceTest extends TestCase
                 ],
                 [
                     'title' => 'Non-Compliant JSON API Document',
-                    'detail' => "The member type is required.",
+                    'detail' => "The member id is required.",
                     'status' => '400',
                     'source' => ['pointer' => '/data/relationships/tags/data/0'],
                 ],

@@ -20,16 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Spec;
 
 use LaravelJsonApi\Core\Document\ErrorList;
-use stdClass;
 use function json_decode;
 
 class Document
 {
 
     /**
-     * @var stdClass
+     * @var object
      */
-    private stdClass $document;
+    private object $document;
 
     /**
      * @var ErrorList
@@ -46,7 +45,7 @@ class Document
             return self::fromString($json);
         }
 
-        if ($json instanceof stdClass) {
+        if (is_object($json)) {
             return new self($json);
         }
 
@@ -67,9 +66,9 @@ class Document
     /**
      * Document constructor.
      *
-     * @param stdClass $document
+     * @param object $document
      */
-    public function __construct(stdClass $document)
+    public function __construct(object $document)
     {
         $this->document = $document;
         $this->errors = new ErrorList();
@@ -127,6 +126,14 @@ class Document
     public function invalid(): bool
     {
         return !$this->valid();
+    }
+
+    /**
+     * @return object
+     */
+    public function toBase(): object
+    {
+        return $this->document;
     }
 
 }
