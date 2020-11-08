@@ -23,9 +23,16 @@
             "email": "contact@gammie.co.uk"
         }
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../eloquent"
+        }
+    ],
     "require": {
         "php": "^7.4",
         "ext-json": "*",
+        "laravel-json-api/eloquent": "*",
         "laravel/framework": "^8.0",
         "neomerx/json-api": "^4.0"
     },
