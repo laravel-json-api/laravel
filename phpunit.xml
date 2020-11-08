@@ -2,7 +2,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          backupGlobals="false"
          backupStaticAttributes="false"
-         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutTestsThatDoNotTestAnything="true"
          bootstrap="vendor/autoload.php"
          colors="true"
          convertErrorsToExceptions="true"

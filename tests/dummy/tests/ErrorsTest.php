@@ -71,6 +71,47 @@ JSON;
         ]);
     }
 
+    public function testSpecificationError(): void
+    {
+        $json = <<<JSON
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "author": null
+        },
+        "relationships": {
+            "title": {
+                "data": null
+            }
+        }
+    }
+}
+JSON;
+
+        $response = $this->sendInvalid('POST', '/api/v1/posts', $json);
+
+        $response->assertStatus(400)->assertExactJson([
+            'errors' => [
+                [
+                    'detail' => 'The field author is not a supported attribute.',
+                    'source' => ['pointer' => '/data/attributes'],
+                    'status' => '400',
+                    'title' => 'Non-Compliant JSON API Document',
+                ],
+                [
+                    'detail' => 'The field title is not a supported relationship.',
+                    'source' => ['pointer' => '/data/relationships'],
+                    'status' => '400',
+                    'title' => 'Non-Compliant JSON API Document',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ]);
+    }
+
     /**
      * @param string $method
      * @param string $uri

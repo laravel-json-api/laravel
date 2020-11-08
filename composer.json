@@ -27,12 +27,17 @@
         {
             "type": "path",
             "url": "../eloquent"
+        },
+        {
+            "type": "path",
+            "url": "../spec"
         }
     ],
     "require": {
         "php": "^7.4",
         "ext-json": "*",
         "laravel-json-api/eloquent": "*",
+        "laravel-json-api/spec": "*",
         "laravel/framework": "^8.0",
         "neomerx/json-api": "^4.0"
     },

@@ -67,6 +67,7 @@ class ServiceProvider extends BaseServiceProvider
     protected function bootTranslations()
     {
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'jsonapi');
+        $this->loadTranslationsFrom(__DIR__ . '/../vendor/laravel-json-api/spec/resources/lang', 'jsonapi');
     }
 
     /**
