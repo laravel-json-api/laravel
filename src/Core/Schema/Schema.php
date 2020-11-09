@@ -166,9 +166,12 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
             return $this->fields;
         }
 
-        return $this->fields = collect($this->fields())
-            ->keyBy(fn(Field $field) => $field->name())
-            ->sortKeys()
-            ->all();
+        return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
+            if ($field instanceof SchemaAwareContract) {
+                $field->withSchemas($this->schemas());
+            }
+
+            return $field->name();
+        })->sortKeys()->all();
     }
 }

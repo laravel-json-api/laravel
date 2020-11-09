@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Posts;
+namespace App\JsonApi\V1\Posts;
 
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use function url;

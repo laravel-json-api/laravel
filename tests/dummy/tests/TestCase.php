@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests;
+namespace App\Tests;
 
-use DummyApp\Providers\AppServiceProvider;
-use DummyApp\Providers\AuthServiceProvider;
-use DummyApp\Providers\EventServiceProvider;
-use DummyApp\Providers\RouteServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\AuthServiceProvider;
+use App\Providers\EventServiceProvider;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use LaravelJsonApi\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;

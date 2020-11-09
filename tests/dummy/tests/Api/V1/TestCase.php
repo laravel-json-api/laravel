@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace App\Tests\Api\V1;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
+use App\Tests\TestCase as BaseTestCase;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class TestCase extends BaseTestCase

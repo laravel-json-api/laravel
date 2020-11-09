@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,20 +15,33 @@
  * limitations under the License.
  */
 
-declare(strict_types=1);
+namespace App\Models;
 
-namespace LaravelJsonApi\Contracts\Store;
-
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-interface QueriesOne
+class Post extends Model
 {
 
+    use HasFactory;
+
     /**
-     * Query a single resource.
-     *
-     * @param Model|object|string $modelOrResourceId
-     * @return QueryOneBuilder
+     * @var string[]
      */
-    public function queryOne($modelOrResourceId): QueryOneBuilder;
+    protected $fillable = [
+        'content',
+        'slug',
+        'synopsis',
+        'title',
+    ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

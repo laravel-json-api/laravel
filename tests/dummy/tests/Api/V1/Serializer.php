@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace App\Tests\Api\V1;
 
-use DummyApp\Post;
+use App\Models\Post;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
 

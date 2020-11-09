@@ -17,11 +17,11 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1;
+namespace App\JsonApi\V1;
 
-use DummyApp\JsonApi\V1\Posts\PostSchema;
-use DummyApp\JsonApi\V1\Users\UserSchema;
-use DummyApp\Post;
+use App\JsonApi\V1\Posts\PostSchema;
+use App\JsonApi\V1\Users\UserSchema;
+use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Http\Server as BaseServer;
 

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
-namespace DummyApp;
+declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+namespace LaravelJsonApi\Contracts\Store;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model
+interface ModifiesToOne
 {
 
-    use HasFactory;
-
     /**
-     * @return BelongsTo
+     * Modify a to-one relationship.
+     *
+     * @param Model|object|string $modelOrResourceId
+     * @param string $fieldName
+     * @return ToOneBuilder
      */
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    public function modifyToOne($modelOrResourceId, string $fieldName): ToOneBuilder;
 }

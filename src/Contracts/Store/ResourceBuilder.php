@@ -47,8 +47,8 @@ interface ResourceBuilder
      * Store the resource using the supplied validated data.
      *
      * @param array $validatedData
-     * @return Model|mixed
+     * @return Model|object
      *      the created or updated resource.
      */
-    public function store(array $validatedData);
+    public function store(array $validatedData): object;
 }

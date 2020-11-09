@@ -27,7 +27,7 @@ interface DeletesResources
     /**
      * Destroy a resource.
      *
-     * @param Model|mixed|string $modelOrResourceId
+     * @param Model|object|string $modelOrResourceId
      * @return void
      */
     public function delete($modelOrResourceId): void;

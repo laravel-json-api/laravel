@@ -19,16 +19,20 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Store;
 
+use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
+use LaravelJsonApi\Contracts\Store\ModifiesToOne;
 use LaravelJsonApi\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Contracts\Store\QueriesOne;
+use LaravelJsonApi\Contracts\Store\QueriesToOne;
 use LaravelJsonApi\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Contracts\Store\ResourceBuilder;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Contracts\Store\ToOneBuilder;
 use LaravelJsonApi\Contracts\Store\UpdatesResources;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
@@ -66,7 +70,7 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function find(string $resourceType, string $resourceId)
+    public function find(string $resourceType, string $resourceId): ?object
     {
         return $this
             ->resources($resourceType)
@@ -114,6 +118,20 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
+    public function queryToOne(string $resourceType, $modelOrResourceId, string $fieldName): QueryOneBuilder
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof QueriesToOne) {
+            return $repository->queryToOne($modelOrResourceId, $fieldName);
+        }
+
+        throw new LogicException("Querying to-one relationships on a {$resourceType} resource is not supported.");
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function create(string $resourceType): ResourceBuilder
     {
         $repository = $this->resources($resourceType);
@@ -152,6 +170,20 @@ class Store implements StoreContract
         }
 
         throw new LogicException("Deleting a {$resourceType} resource is not supported.");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function modifyToOne(string $resourceType, $modelOrResourceId, string $fieldName): ToOneBuilder
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof ModifiesToOne) {
+            return $repository->modifyToOne($modelOrResourceId, $fieldName);
+        }
+
+        throw new LogicException("Modifying to-one relationships on a {$resourceType} resource is not supported.");
     }
 
     /**

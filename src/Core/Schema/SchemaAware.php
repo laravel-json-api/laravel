@@ -36,7 +36,7 @@ trait SchemaAware
      * @param Container $container
      * @return void
      */
-    public function withContainer(Container $container): void
+    public function withSchemas(Container $container): void
     {
         if (!$this->schemas) {
             $this->schemas = $container;

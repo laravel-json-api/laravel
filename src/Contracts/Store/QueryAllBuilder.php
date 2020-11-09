@@ -68,7 +68,7 @@ interface QueryAllBuilder
      *
      * @return Model|mixed|null
      */
-    public function first();
+    public function first(): ?object;
 
     /**
      * Execute the query and return the result.

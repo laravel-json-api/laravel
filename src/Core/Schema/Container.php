@@ -129,7 +129,7 @@ class Container implements ContainerContract
 
         /** If the schema needs to lookup other schemas, we inject the container. */
         if ($schema instanceof SchemaAwareContract) {
-            $schema->withContainer($this);
+            $schema->withSchemas($this);
         }
 
         if ($schema instanceof Schema) {

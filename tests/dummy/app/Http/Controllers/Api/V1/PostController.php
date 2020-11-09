@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1;
 
 use LaravelJsonApi\Http\Controllers\Actions;
 

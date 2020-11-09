@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Users;
+namespace App\JsonApi\V1\Users;
 
-use DummyApp\User;
+use App\Models\User;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Str;

@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-namespace DummyApp\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts;
 
-use DummyApp\Post;
-use DummyApp\Tests\Api\V1\TestCase;
+use App\Models\Post;
+use App\Tests\Api\V1\TestCase;
 
 class ReadTest extends TestCase
 {

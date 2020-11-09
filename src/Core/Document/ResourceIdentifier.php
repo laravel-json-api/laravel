@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use LaravelJsonApi\Core\Document\Concerns;
+use InvalidArgumentException;
 
 class ResourceIdentifier
 {
@@ -35,6 +36,25 @@ class ResourceIdentifier
      * @var string
      */
     private string $id;
+
+    /**
+     * @param array $value
+     * @return static
+     */
+    public static function fromArray(array $value): self
+    {
+        if (!isset($value['type']) || !isset($value['id'])) {
+            throw new InvalidArgumentException('Expecting an array with a type and id.');
+        }
+
+        $identifier = new self($value['type'], $value['id']);
+
+        if (isset($value['meta'])) {
+            $identifier->setMeta($value['meta']);
+        }
+
+        return $identifier;
+    }
 
     /**
      * ResourceIdentifier constructor.

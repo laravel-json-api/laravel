@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace DummyApp\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

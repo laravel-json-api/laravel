@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Posts;
+namespace App\JsonApi\V1\Posts;
 
-use DummyApp\Post;
+use App\Models\Post;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;

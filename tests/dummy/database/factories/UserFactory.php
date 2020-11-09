@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use DummyApp\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

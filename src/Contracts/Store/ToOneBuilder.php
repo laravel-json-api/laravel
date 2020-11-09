@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,31 +20,35 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Store;
 
 use Illuminate\Database\Eloquent\Model;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Query\IncludePaths;
+use LaravelJsonApi\Core\Query\RelationshipPath;
 
-interface Repository
+interface ToOneBuilder
 {
 
     /**
-     * Get the model for the supplied resource id.
+     * Apply the provided query parameters.
      *
-     * @param string $resourceId
+     * @param QueryParameters $query
+     * @return $this
+     */
+    public function using(QueryParameters $query): self;
+
+    /**
+     * Eager load resources using the provided JSON API include paths.
+     *
+     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
+     * @return $this
+     */
+    public function with($includePaths): self;
+
+    /**
+     * Replace the value of the relationship.
+     *
+     * @param array|null $identifier
      * @return Model|object|null
+     *      the new related value.
      */
-    public function find(string $resourceId): ?object;
-
-    /**
-     * Find the supplied model or throw a runtime exception if it does not exist.
-     *
-     * @param string $resourceId
-     * @return Model|object
-     */
-    public function findOrFail(string $resourceId): object;
-
-    /**
-     * Does a model with the supplied resource id exist?
-     *
-     * @param string $resourceId
-     * @return bool
-     */
-    public function exists(string $resourceId): bool;
+    public function replace(?array $identifier): ?object;
 }

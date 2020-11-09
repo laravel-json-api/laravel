@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests;
+namespace App\Tests;
 
 use Illuminate\Testing\TestResponse;
 

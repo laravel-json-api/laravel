@@ -53,9 +53,9 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "App\\":  "tests/dummy/app",
+            "App\\Tests\\": "tests/dummy/tests",
             "Database\\Factories\\": "tests/dummy/database/factories",
-            "DummyApp\\":  "tests/dummy/app",
-            "DummyApp\\Tests\\": "tests/dummy/tests",
             "LaravelJsonApi\\Tests\\": "tests/lib"
         }
     },

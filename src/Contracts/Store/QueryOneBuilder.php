@@ -54,7 +54,7 @@ interface QueryOneBuilder
     /**
      * Execute the query and get the first result.
      *
-     * @return Model|mixed|null
+     * @return Model|object|null
      */
-    public function first();
+    public function first(): ?object;
 }

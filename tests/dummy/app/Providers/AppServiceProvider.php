@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace DummyApp\Providers;
+namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

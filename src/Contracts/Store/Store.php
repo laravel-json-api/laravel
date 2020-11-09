@@ -26,9 +26,9 @@ interface Store
      *
      * @param string $resourceType
      * @param string $resourceId
-     * @return Model|mixed|null
+     * @return Model|object|null
      */
-    public function find(string $resourceType, string $resourceId);
+    public function find(string $resourceType, string $resourceId): ?object;
 
     /**
      * Does a model exist for the supplied resource type and id?
@@ -51,10 +51,20 @@ interface Store
      * Query one resource by JSON API resource type.
      *
      * @param string $resourceType
-     * @param Model|string $modelOrResourceId
+     * @param Model|object|string $modelOrResourceId
      * @return QueryOneBuilder
      */
     public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder;
+
+    /**
+     * Query a to-one relationship.
+     *
+     * @param string $resourceType
+     * @param $modelOrResourceId
+     * @param string $fieldName
+     * @return QueryOneBuilder
+     */
+    public function queryToOne(string $resourceType, $modelOrResourceId, string $fieldName): QueryOneBuilder;
 
     /**
      * Create a new resource.
@@ -68,17 +78,29 @@ interface Store
      * Update an existing resource.
      *
      * @param string $resourceType
-     * @param Model|mixed|string $modelOrResourceId
+     * @param Model|object|string $modelOrResourceId
      * @return ResourceBuilder
      */
     public function update(string $resourceType, $modelOrResourceId): ResourceBuilder;
 
     /**
+     * Delete an existing resource.
+     *
      * @param string $resourceType
-     * @param $modelOrResourceId
+     * @param Model|object|string $modelOrResourceId
      * @return void
      */
     public function delete(string $resourceType, $modelOrResourceId): void;
+
+    /**
+     * Modify a to-one relation.
+     *
+     * @param string $resourceType
+     * @param Model|object|string $modelOrResourceId
+     * @param string $fieldName
+     * @return ToOneBuilder
+     */
+    public function modifyToOne(string $resourceType, $modelOrResourceId, string $fieldName): ToOneBuilder;
 
     /**
      * Access a resource repository by its JSON API resource type.

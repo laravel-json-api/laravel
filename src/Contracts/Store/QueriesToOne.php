@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,14 +21,15 @@ namespace LaravelJsonApi\Contracts\Store;
 
 use Illuminate\Database\Eloquent\Model;
 
-interface QueriesOne
+interface QueriesToOne
 {
 
     /**
-     * Query a single resource.
+     * Query a to-one relation.
      *
      * @param Model|object|string $modelOrResourceId
+     * @param string $fieldName
      * @return QueryOneBuilder
      */
-    public function queryOne($modelOrResourceId): QueryOneBuilder;
+    public function queryToOne($modelOrResourceId, string $fieldName): QueryOneBuilder;
 }
