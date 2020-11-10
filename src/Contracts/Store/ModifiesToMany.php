@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Store;
 
-interface Attribute extends Field, Sortable
+use Illuminate\Database\Eloquent\Model;
+
+interface ModifiesToMany
 {
+
+    /**
+     * Modify a to-one relationship.
+     *
+     * @param Model|object|string $modelOrResourceId
+     * @param string $fieldName
+     * @return ToManyBuilder
+     */
+    public function modifyToMany($modelOrResourceId, string $fieldName): ToManyBuilder;
 }

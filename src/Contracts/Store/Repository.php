@@ -33,6 +33,14 @@ interface Repository
     public function find(string $resourceId): ?object;
 
     /**
+     * Get the models for the supplied resource ids.
+     *
+     * @param string[] $resourceIds
+     * @return Model[]|object[]|iterable
+     */
+    public function findMany(array $resourceIds): iterable;
+
+    /**
      * Find the supplied model or throw a runtime exception if it does not exist.
      *
      * @param string $resourceId

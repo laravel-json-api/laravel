@@ -36,13 +36,17 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     private array $stack;
 
     /**
-     * @param FieldSets|array $value
+     * @param FieldSets|FieldSet|array|null $value
      * @return FieldSets
      */
     public static function cast($value): self
     {
         if ($value instanceof self) {
             return $value;
+        }
+
+        if ($value instanceof FieldSet) {
+            return new self($value);
         }
 
         if (is_array($value)) {
@@ -65,6 +69,19 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
         return new self(...collect($value)->map(function (array $fields, string $type) {
             return new FieldSet($type, ...$fields);
         })->values());
+    }
+
+    /**
+     * @param FieldSets|FieldSet|array|null $value
+     * @return FieldSets|null
+     */
+    public static function nullable($value): ?self
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return self::cast($value);
     }
 
     /**

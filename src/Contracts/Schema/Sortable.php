@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Schema;
 
-interface Attribute extends Field, Sortable
+interface Sortable
 {
+
+    /**
+     * Is the field sortable?
+     *
+     * @return bool
+     */
+    public function isSortable(): bool;
 }

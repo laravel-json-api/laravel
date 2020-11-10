@@ -17,8 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Core\Schema\Concerns;
 
-interface Attribute extends Field, Sortable
+trait SparseField
 {
+
+    /**
+     * @var bool
+     */
+    private bool $sparseField = true;
+
+    /**
+     * Mark the field as not allowed in sparse field sets.
+     *
+     * @return $this
+     */
+    public function notSparseField(): self
+    {
+        $this->sparseField = false;
+
+        return $this;
+    }
+
+    /**
+     * Can the field be listed in sparse field sets?
+     *
+     * @return bool
+     */
+    public function isSparseField(): bool
+    {
+        return true === $this->sparseField;
+    }
 }

@@ -57,8 +57,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Cast a value to query parameters.
      *
-     * @param $value
-     * @return static
+     * @param QueryParametersContract|array|null $value
+     * @return QueryParameters
      */
     public static function cast($value): self
     {
@@ -96,6 +96,19 @@ class QueryParameters implements QueryParametersContract, Arrayable
             array_key_exists('page', $value) ? $value['page'] : null,
             array_key_exists('filter', $value) ? $value['filter'] : null
         );
+    }
+
+    /**
+     * @param QueryParametersContract|array|null $value
+     * @return QueryParameters|null
+     */
+    public static function nullable($value): ?self
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return self::cast($value);
     }
 
     /**

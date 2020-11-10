@@ -126,4 +126,14 @@ class SortField
     {
         return false === $this->ascending;
     }
+
+    /**
+     * Get the sort direction as a string.
+     *
+     * @return string
+     */
+    public function getDirection(): string
+    {
+        return $this->isAscending() ? 'asc' : 'desc';
+    }
 }

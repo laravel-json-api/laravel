@@ -55,6 +55,13 @@ interface Schema extends Traversable
     public function repository(): Repository;
 
     /**
+     * Get the "id" field.
+     *
+     * @return ID
+     */
+    public function id(): ID;
+
+    /**
      * Get the resource attributes.
      *
      * @return Attribute[]|iterable

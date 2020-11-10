@@ -40,7 +40,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     private array $stack;
 
     /**
-     * @param SortFields|SortField|array|string $value
+     * @param SortFields|SortField|array|string|null $value
      * @return SortFields
      */
     public static function cast($value): self
@@ -61,6 +61,10 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
             return self::fromString($value);
         }
 
+        if (is_null($value)) {
+            return new self();
+        }
+
         throw new UnexpectedValueException('Unexpected sort fields value.');
     }
 
@@ -70,9 +74,9 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public static function fromArray(array $values): self
     {
-        return new self(...collect($values)->map(function ($field) {
-            return SortField::cast($field);
-        }));
+        return new self(...collect($values)
+            ->map(fn($field) => SortField::cast($field))
+        );
     }
 
     /**
@@ -81,9 +85,22 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public static function fromString(string $value): self
     {
-        return new self(...collect(explode(',', $value))->map(function ($field) {
-            return SortField::fromString($field);
-        }));
+        return new self(...collect(explode(',', $value))
+            ->map(fn($field) => SortField::fromString($field))
+        );
+    }
+
+    /**
+     * @param SortFields|SortField|array|string|null $value
+     * @return SortFields|null
+     */
+    public static function nullable($value): ?self
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return self::cast($value);
     }
 
     /**

@@ -22,51 +22,14 @@ namespace LaravelJsonApi\Contracts\Store;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Contracts\Pagination\Page;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Query\IncludePaths;
-use LaravelJsonApi\Core\Query\RelationshipPath;
-use LaravelJsonApi\Core\Query\SortField;
-use LaravelJsonApi\Core\Query\SortFields;
 
-interface QueryAllBuilder
+interface QueryAllBuilder extends QueryManyBuilder
 {
-
-    /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParameters $query
-     * @return $this
-     */
-    public function using(QueryParameters $query): self;
-
-    /**
-     * Filter models using JSON API filter parameters.
-     *
-     * @param array|null $filters
-     * @return $this
-     */
-    public function filter(?array $filters): self;
-
-    /**
-     * Sort models using JSON API sort fields.
-     *
-     * @param SortFields|SortField|array|string|null $fields
-     * @return $this
-     */
-    public function sort($fields): self;
-
-    /**
-     * Eager load resources using the provided JSON API include paths.
-     *
-     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
-     * @return $this
-     */
-    public function with($includePaths): self;
 
     /**
      * Execute the query and get the first result.
      *
-     * @return Model|mixed|null
+     * @return Model|object|null
      */
     public function first(): ?object;
 
@@ -78,32 +41,9 @@ interface QueryAllBuilder
      *
      * Otherwise, this method MUST return a cursor of all matching models.
      *
-     * @return Model|LazyCollection|null
+     * @return LazyCollection|Model|object|null
      */
     public function firstOrMany();
-
-    /**
-     * Get a lazy collection for the query.
-     *
-     * @return LazyCollection
-     */
-    public function cursor(): LazyCollection;
-
-    /**
-     * Return a page of models using JSON API page parameters.
-     *
-     * @param array $page
-     * @return Page
-     */
-    public function paginate(array $page): Page;
-
-    /**
-     * Execute the query, paginating results only if page parameters are provided.
-     *
-     * @param array|null $page
-     * @return Page|LazyCollection|iterable
-     */
-    public function getOrPaginate(?array $page): iterable;
 
     /**
      * Execute the query.
@@ -116,7 +56,7 @@ interface QueryAllBuilder
      * a page of matching models.
      *
      * @param array|null $page
-     * @return Model|Page|iterable|null
+     * @return Model|object|Page|LazyCollection|iterable|null
      */
     public function firstOrPaginate(?array $page);
 }

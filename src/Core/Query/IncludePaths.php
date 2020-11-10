@@ -38,7 +38,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     private array $stack;
 
     /**
-     * @param IncludePaths|RelationshipPath|array|string $value
+     * @param IncludePaths|RelationshipPath|array|string|null $value
      * @return IncludePaths
      */
     public static function cast($value): self
@@ -86,6 +86,19 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
         return new self(...collect(explode(',', $paths))->map(function (string $path) {
             return RelationshipPath::fromString($path);
         }));
+    }
+
+    /**
+     * @param IncludePaths|RelationshipPath|array|string|null $value
+     * @return IncludePaths|null
+     */
+    public static function nullable($value): ?self
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return self::cast($value);
     }
 
     /**

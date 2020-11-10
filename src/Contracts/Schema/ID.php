@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,21 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Schema;
 
-interface Attribute extends Field, Sortable
+interface ID extends Field, Sortable
 {
+
+    /**
+     * Get the regex pattern for the ID field.
+     *
+     * @return string
+     */
+    public function pattern(): string;
+
+    /**
+     * Does the value match the pattern?
+     *
+     * @param string $value
+     * @return bool
+     */
+    public function match(string $value): bool;
 }

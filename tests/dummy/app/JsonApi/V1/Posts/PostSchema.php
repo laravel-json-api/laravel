@@ -22,11 +22,12 @@ namespace App\JsonApi\V1\Posts;
 use App\Models\Post;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Filters\ID;
 use LaravelJsonApi\Eloquent\Filters\Where;
+use LaravelJsonApi\Eloquent\Filters\WhereIn;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
@@ -46,6 +47,7 @@ class PostSchema extends Schema
     public function fields(): array
     {
         return [
+            ID::make(),
             BelongsTo::make('author')->inverseType('users')->readOnly(),
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
@@ -63,7 +65,7 @@ class PostSchema extends Schema
     public function filters(): array
     {
         return [
-            ID::make($this->idName()),
+            WhereIn::make('id', $this->idColumn())->delimiter(','),
             Where::make('slug')->singular(),
         ];
     }

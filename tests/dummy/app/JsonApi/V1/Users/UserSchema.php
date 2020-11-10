@@ -22,6 +22,7 @@ namespace App\JsonApi\V1\Users;
 use App\Models\User;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
@@ -42,6 +43,7 @@ class UserSchema extends Schema
     public function fields(): array
     {
         return [
+            ID::make(),
             DateTime::make('createdAt')->readOnly(),
             Str::make('name'),
             DateTime::make('updatedAt')->readOnly(),

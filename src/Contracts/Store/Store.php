@@ -67,6 +67,16 @@ interface Store
     public function queryToOne(string $resourceType, $modelOrResourceId, string $fieldName): QueryOneBuilder;
 
     /**
+     * Query a to-many relationship.
+     *
+     * @param string $resourceType
+     * @param $modelOrResourceId
+     * @param string $fieldName
+     * @return QueryManyBuilder
+     */
+    public function queryToMany(string $resourceType, $modelOrResourceId, string $fieldName): QueryManyBuilder;
+
+    /**
      * Create a new resource.
      *
      * @param string $resourceType
@@ -101,6 +111,16 @@ interface Store
      * @return ToOneBuilder
      */
     public function modifyToOne(string $resourceType, $modelOrResourceId, string $fieldName): ToOneBuilder;
+
+    /**
+     * Modify a to-many relation.
+     *
+     * @param string $resourceType
+     * @param Model|object|string $modelOrResourceId
+     * @param string $fieldName
+     * @return ToManyBuilder
+     */
+    public function modifyToMany(string $resourceType, $modelOrResourceId, string $fieldName): ToManyBuilder;
 
     /**
      * Access a resource repository by its JSON API resource type.

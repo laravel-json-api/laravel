@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Schema;
 
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Field;
+use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
@@ -57,6 +58,20 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     public function getIterator()
     {
         yield from $this->allFields();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function id(): ID
+    {
+        $field = $this->allFields()['id'] ?? null;
+
+        if ($field instanceof ID) {
+            return $field;
+        }
+
+        throw new LogicException('Expecting an id field to exist.');
     }
 
     /**
@@ -149,6 +164,10 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function sortable(): iterable
     {
+        if ($this->id()->isSortable()) {
+            yield $this->id()->name();
+        }
+
         /** @var Attribute $attr */
         foreach ($this->attributes() as $attr) {
             if ($attr->isSortable()) {

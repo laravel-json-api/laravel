@@ -18,6 +18,7 @@
 namespace LaravelJsonApi\Core\Resources;
 
 use ArrayAccess;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -38,16 +39,16 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     use DelegatesToResource;
 
     /**
-     * @var Model|mixed
+     * @var Model|object
      */
-    public $resource;
+    public object $resource;
 
     /**
      * JsonApiResource constructor.
      *
-     * @param $resource
+     * @param Model|object $resource
      */
-    public function __construct($resource)
+    public function __construct(object $resource)
     {
         $this->resource = $resource;
     }
@@ -77,7 +78,11 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function id(): string
     {
-        return (string) $this->resource->getRouteKey();
+        if ($this->resource instanceof UrlRoutable) {
+            return $this->resource->getRouteKey();
+        }
+
+        throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
     }
 
     /**

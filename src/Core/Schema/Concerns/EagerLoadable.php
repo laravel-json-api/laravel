@@ -17,8 +17,33 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Core\Schema\Concerns;
 
-interface Attribute extends Field, Sortable
+trait EagerLoadable
 {
+
+    /**
+     * @var bool
+     */
+    private bool $includePath = true;
+
+    /**
+     * @return $this
+     */
+    public function cannotEagerLoad(): self
+    {
+        $this->includePath = false;
+
+        return $this;
+    }
+
+    /**
+     * Is the relation allowed as an include path?
+     *
+     * @return bool
+     */
+    public function isIncludePath(): bool
+    {
+        return $this->includePath;
+    }
 }
