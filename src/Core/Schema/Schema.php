@@ -77,6 +77,14 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     /**
      * @inheritDoc
      */
+    public function isField(string $name): bool
+    {
+        return isset($this->allFields()[$name]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function attributes(): iterable
     {
         foreach ($this as $field) {
@@ -107,6 +115,16 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     /**
      * @inheritDoc
      */
+    public function isAttribute(string $name): bool
+    {
+        $field = $this->allFields()[$name] ?? null;
+
+        return $field instanceof Attribute;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function relationships(): iterable
     {
         foreach ($this as $field) {
@@ -132,6 +150,16 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
             $name,
             $this->type()
         ));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRelationship(string $name): bool
+    {
+        $field = $this->allFields()[$name] ?? null;
+
+        return $field instanceof Relation;
     }
 
     /**

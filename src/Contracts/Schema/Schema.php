@@ -62,6 +62,14 @@ interface Schema extends Traversable
     public function id(): ID;
 
     /**
+     * Does the named field exist?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isField(string $name): bool;
+
+    /**
      * Get the resource attributes.
      *
      * @return Attribute[]|iterable
@@ -77,6 +85,14 @@ interface Schema extends Traversable
     public function attribute(string $name): Attribute;
 
     /**
+     * Does the named attribute exist?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isAttribute(string $name): bool;
+
+    /**
      * Get the resource relationships.
      *
      * @return Relation[]|iterable
@@ -90,6 +106,14 @@ interface Schema extends Traversable
      * @return Relation
      */
     public function relationship(string $name): Relation;
+
+    /**
+     * Does the named relationship exist?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isRelationship(string $name): bool;
 
     /**
      * Get the filters for the resource.
