@@ -49,4 +49,14 @@ interface Relation extends Field
      * @return bool
      */
     public function isIncludePath(): bool;
+
+    /**
+     * Get additional filters for the relation.
+     *
+     * Filters returned by this method are additional to the filters
+     * that exist on the inverse resource type.
+     *
+     * @return Filter[]|iterable
+     */
+    public function filters(): iterable;
 }
