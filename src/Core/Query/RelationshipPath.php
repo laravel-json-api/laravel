@@ -123,12 +123,37 @@ class RelationshipPath implements IteratorAggregate, Countable
     }
 
     /**
+     * Get the first name.
+     *
+     * @return string
+     */
+    public function first(): string
+    {
+        return $this->names[0];
+    }
+
+    /**
      * @param int $num
      * @return $this
      */
     public function take(int $num): self
     {
         return new self(...collect($this->names)->take($num));
+    }
+
+    /**
+     * @param int $num
+     * @return $this|null
+     */
+    public function skip(int $num): ?self
+    {
+        $names = collect($this->names)->skip($num);
+
+        if ($names->isNotEmpty()) {
+            return new self(...$names);
+        }
+
+        return null;
     }
 
 }

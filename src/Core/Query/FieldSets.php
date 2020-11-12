@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
 use function collect;
@@ -36,7 +37,7 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     private array $stack;
 
     /**
-     * @param FieldSets|FieldSet|array|null $value
+     * @param FieldSets|FieldSet|Enumerable|array|null $value
      * @return FieldSets
      */
     public static function cast($value): self
@@ -49,7 +50,7 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
             return new self($value);
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
         }
 
@@ -61,11 +62,15 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     }
 
     /**
-     * @param array $value
+     * @param array|Enumerable $value
      * @return FieldSets
      */
-    public static function fromArray(array $value): self
+    public static function fromArray($value): self
     {
+        if (!is_array($value) && !$value instanceof Enumerable) {
+            throw new \InvalidArgumentException('Expecting an array or enumerable object.');
+        }
+
         return new self(...collect($value)->map(function (array $fields, string $type) {
             return new FieldSet($type, ...$fields);
         })->values());

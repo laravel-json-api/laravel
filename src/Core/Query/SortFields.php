@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
 use function array_map;
@@ -40,7 +41,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     private array $stack;
 
     /**
-     * @param SortFields|SortField|array|string|null $value
+     * @param SortFields|SortField|Enumerable|array|string|null $value
      * @return SortFields
      */
     public static function cast($value): self
@@ -53,7 +54,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
             return new self($value);
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
         }
 
@@ -69,11 +70,15 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
-     * @param array $values
+     * @param array|Enumerable $values
      * @return SortFields
      */
-    public static function fromArray(array $values): self
+    public static function fromArray($values): self
     {
+        if (!is_array($values) && !$values instanceof Enumerable) {
+            throw new \InvalidArgumentException('Expecting an array or enumerable object.');
+        }
+
         return new self(...collect($values)
             ->map(fn($field) => SortField::cast($field))
         );

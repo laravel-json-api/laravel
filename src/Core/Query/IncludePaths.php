@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
 use function collect;
@@ -38,7 +39,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     private array $stack;
 
     /**
-     * @param IncludePaths|RelationshipPath|array|string|null $value
+     * @param IncludePaths|RelationshipPath|Enumerable|array|string|null $value
      * @return IncludePaths
      */
     public static function cast($value): self
@@ -51,7 +52,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
             return new self($value);
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
         }
 
@@ -67,11 +68,15 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
-     * @param array $paths
+     * @param array|Enumerable $paths
      * @return IncludePaths
      */
-    public static function fromArray(array $paths): self
+    public static function fromArray($paths): self
     {
+        if (!is_array($paths) && !$paths instanceof Enumerable) {
+            throw new \InvalidArgumentException('Expecting an array or enumerable object.');
+        }
+
         return new self(...collect($paths)->map(function ($path) {
             return RelationshipPath::cast($path);
         }));
@@ -157,6 +162,28 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     public function count()
     {
         return count($this->stack);
+    }
+
+    /**
+     * @return RelationshipPath[]
+     */
+    public function all(): array
+    {
+        return $this->stack;
+    }
+
+    /**
+     * @param int $num
+     * @return $this
+     */
+    public function skip(int $num): self
+    {
+        $items = collect($this->stack)
+            ->map(fn(RelationshipPath $path) => $path->skip($num))
+            ->filter()
+            ->values();
+
+        return new self(...$items);
     }
 
     /**

@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Enumerable;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Support\Arr;
 use UnexpectedValueException;
@@ -57,7 +58,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Cast a value to query parameters.
      *
-     * @param QueryParametersContract|array|null $value
+     * @param QueryParametersContract|Enumerable|array|null $value
      * @return QueryParameters
      */
     public static function cast($value): self
@@ -76,7 +77,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
             );
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
         }
 
@@ -84,11 +85,19 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @param array $value
+     * @param array|Enumerable $value
      * @return static
      */
-    public static function fromArray(array $value): self
+    public static function fromArray($value): self
     {
+        if ($value instanceof Enumerable) {
+            $value = $value->all();
+        }
+
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException('Expecting an array or enumerable value.');
+        }
+
         return new self(
             array_key_exists('include', $value) ? IncludePaths::fromArray($value['include']) : null,
             array_key_exists('fields', $value) ? FieldSets::fromArray($value['fields']) : null,
