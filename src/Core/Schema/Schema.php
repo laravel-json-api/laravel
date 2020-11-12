@@ -26,6 +26,7 @@ use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LogicException;
+use function array_keys;
 use function sprintf;
 
 abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorAggregate
@@ -72,6 +73,14 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
         }
 
         throw new LogicException('Expecting an id field to exist.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fieldNames(): array
+    {
+        return array_keys($this->allFields());
     }
 
     /**

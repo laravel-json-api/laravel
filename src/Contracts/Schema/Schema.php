@@ -62,6 +62,13 @@ interface Schema extends Traversable
     public function id(): ID;
 
     /**
+     * Get all the field names.
+     *
+     * @return array
+     */
+    public function fieldNames(): array;
+
+    /**
      * Does the named field exist?
      *
      * @param string $name
