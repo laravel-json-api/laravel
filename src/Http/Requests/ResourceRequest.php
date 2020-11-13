@@ -24,7 +24,6 @@ use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Facades\JsonApi;
-use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
 use LaravelJsonApi\Http\Exceptions\JsonApiException;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LaravelJsonApi\Spec\UnexpectedDocumentException;
@@ -59,7 +58,7 @@ class ResourceRequest extends FormRequest
      */
     public static function forResource(string $resourceType): ResourceRequest
     {
-        $resolver = self::$requestResolver ?: new ResourceRequestResolver('Request');
+        $resolver = self::$requestResolver ?: new RequestResolver('Request');
 
         return $resolver($resourceType);
     }

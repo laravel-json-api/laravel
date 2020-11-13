@@ -17,11 +17,11 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resolver;
+namespace LaravelJsonApi\Core\Resources;
 
 use LaravelJsonApi\Core\Support\Str;
 
-final class ResourceClass
+final class ResourceResolver
 {
 
     /**

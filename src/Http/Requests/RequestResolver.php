@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resolver;
+namespace LaravelJsonApi\Http\Requests;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,7 +27,7 @@ use LogicException;
 use function app;
 use function sprintf;
 
-class ResourceRequest
+class RequestResolver
 {
 
     /**

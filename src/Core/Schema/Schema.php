@@ -25,6 +25,7 @@ use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LogicException;
 use function array_keys;
 use function sprintf;
@@ -33,6 +34,16 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
 {
 
     use SchemaAware;
+
+    /**
+     * @var callable|null
+     */
+    public static $resourceTypeResolver;
+
+    /**
+     * @var callable|null
+     */
+    protected static $resourceResolver;
 
     /**
      * The maximum depth of include paths.
@@ -52,6 +63,48 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      * @return iterable
      */
     abstract public function fields(): iterable;
+
+    /**
+     * Specify the callback to use to guess the resource type from the schema class.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessTypeUsing(callable $resolver): void
+    {
+        static::$resourceTypeResolver = $resolver;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function type(): string
+    {
+        $resolver = static::$resourceResolver ?: new TypeResolver();
+
+        return $resolver(static::class);
+    }
+
+    /**
+     * Specify the callback to use to guess the resource class from the schema class.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessResourceUsing(callable $resolver): void
+    {
+        static::$resourceResolver = $resolver;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function resource(): string
+    {
+        $resolver = static::$resourceResolver ?: new ResourceResolver();
+
+        return $resolver(static::class);
+    }
 
     /**
      * @inheritDoc

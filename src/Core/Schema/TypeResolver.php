@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Resolver;
+namespace LaravelJsonApi\Core\Schema;
 
 use LaravelJsonApi\Core\Support\Str;
 use function class_basename;
 
-final class ResourceType
+final class TypeResolver
 {
 
     /**
