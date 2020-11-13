@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Tests\Unit\Core\Schema;
 
 use LaravelJsonApi\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Schema\IncludePathIterator;
@@ -43,19 +44,27 @@ class IncludePathIteratorTest extends TestCase
 
         $this->schemas = $this->createMock(Container::class);
         $this->schemas->method('schemaFor')->willReturnMap([
+            ['images', $image = $this->createMock(Schema::class)],
             ['posts', $post = $this->createMock(Schema::class)],
             ['users', $user = $this->createMock(Schema::class)],
             ['comments', $comment = $this->createMock(Schema::class)],
             ['user-profiles', $profile = $this->createMock(Schema::class)],
         ]);
 
+        $image->method('relationships')->willReturn([
+            $this->createPolymorph('imageable', 'imageables', ['posts', 'users']),
+            $this->createIgnoredRelation(),
+        ]);
+
         $post->method('relationships')->willReturn([
             $this->createRelation('author', 'users'),
             $this->createRelation('comments', 'comments'),
+            $this->createRelation('image', 'images'),
             $this->createIgnoredRelation(),
         ]);
 
         $user->method('relationships')->willReturn([
+            $this->createRelation('image', 'images'),
             $this->createRelation('posts', 'posts'),
             $this->createRelation('profile', 'user-profiles'),
             $this->createIgnoredRelation(),
@@ -75,24 +84,59 @@ class IncludePathIteratorTest extends TestCase
     public function depthProvider(): array
     {
         return [
-            [1, ['author', 'comments']],
-            [2, [
+            'one' => [1, ['author', 'comments', 'image']],
+            'two' => [2, [
                 'author',
+                'author.image',
                 'author.posts',
                 'author.profile',
                 'comments',
                 'comments.user',
+                'image',
+                'image.imageable',
             ]],
-            [3, [
+            'three' => [3, [
                 'author',
+                'author.image',
+                'author.image.imageable',
                 'author.posts',
                 'author.posts.author',
                 'author.posts.comments',
+                'author.posts.image',
                 'author.profile',
                 'comments',
                 'comments.user',
+                'comments.user.image',
                 'comments.user.posts',
                 'comments.user.profile',
+                'image',
+                'image.imageable', // polymorph at depth, terminate.
+            ]],
+            'four' => [4, [
+                'author',
+                'author.image',
+                'author.image.imageable', // polymorph at depth, terminate
+                'author.posts',
+                'author.posts.author',
+                'author.posts.author.image',
+                'author.posts.author.posts',
+                'author.posts.author.profile',
+                'author.posts.comments',
+                'author.posts.comments.user',
+                'author.posts.image',
+                'author.posts.image.imageable',
+                'author.profile',
+                'comments',
+                'comments.user',
+                'comments.user.image',
+                'comments.user.image.imageable',
+                'comments.user.posts',
+                'comments.user.posts.author',
+                'comments.user.posts.comments',
+                'comments.user.posts.image',
+                'comments.user.profile',
+                'image',
+                'image.imageable', // polymorph at depth, terminate.
             ]],
         ];
     }
@@ -114,6 +158,61 @@ class IncludePathIteratorTest extends TestCase
     }
 
     /**
+     * @return array[]
+     */
+    public function polymorphProvider(): array
+    {
+        return [
+            'one' => [1, ['imageable']],
+            'two' => [2, [
+                'imageable',
+                'imageable.author', // post
+                'imageable.comments', // post
+                'imageable.image', // post + user
+                'imageable.posts', // user
+                'imageable.profile', // user
+            ]],
+            'three' => [3, [
+                'imageable',
+                'imageable.author', // post
+                'imageable.author.image',
+                'imageable.author.posts',
+                'imageable.author.profile',
+                'imageable.comments', // post
+                'imageable.comments.user',
+                'imageable.image', // post + user
+                'imageable.image.imageable',
+                'imageable.posts', // user
+                'imageable.posts.author',
+                'imageable.posts.comments',
+                'imageable.posts.image',
+                'imageable.profile', // user
+            ]],
+        ];
+    }
+
+    /**
+     * Test polymorphs.
+     *
+     * The polymorph is at the start, then we can iterate through the
+     * different schemas supported by that relation.
+     *
+     * @param int $depth
+     * @param array $expected
+     * @dataProvider polymorphProvider
+     */
+    public function testPolymorph(int $depth, array $expected): void
+    {
+        $iterator = new IncludePathIterator(
+            $this->schemas,
+            $this->schemas->schemaFor('images'),
+            $depth
+        );
+
+        $this->assertSame($expected, $iterator->toArray());
+    }
+
+    /**
      * @param string $name
      * @param string $inverse
      * @return Relation|MockObject
@@ -124,6 +223,23 @@ class IncludePathIteratorTest extends TestCase
         $relation->method('isIncludePath')->willReturn(true);
         $relation->method('name')->willReturn($name);
         $relation->method('inverse')->willReturn($inverse);
+
+        return $relation;
+    }
+
+    /**
+     * @param string $name
+     * @param string $psuedoType
+     * @param array $inverse
+     * @return Relation
+     */
+    private function createPolymorph(string $name, string $psuedoType, array $inverse): Relation
+    {
+        $relation = $this->createMock(PolymorphicRelation::class);
+        $relation->method('isIncludePath')->willReturn(true);
+        $relation->method('name')->willReturn($name);
+        $relation->method('inverse')->willReturn($psuedoType);
+        $relation->method('inverseTypes')->willReturn($inverse);
 
         return $relation;
     }

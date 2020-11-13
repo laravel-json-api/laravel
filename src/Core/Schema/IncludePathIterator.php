@@ -19,9 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
+use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 
@@ -44,6 +46,11 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
     private int $depth;
 
     /**
+     * @var bool
+     */
+    private bool $start;
+
+    /**
      * IncludePathIterator constructor.
      *
      * @param SchemaContainer $schemas
@@ -59,6 +66,7 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
         $this->schemas = $schemas;
         $this->schema = $schema;
         $this->depth = $depth;
+        $this->start = true;
     }
 
     /**
@@ -66,7 +74,9 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
      */
     public function all(): array
     {
-        return iterator_to_array($this);
+        return array_values(array_unique(
+            iterator_to_array($this)
+        ));
     }
 
     /**
@@ -78,6 +88,13 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
         foreach ($this->schema->relationships() as $relation) {
             if ($relation->isIncludePath()) {
                 yield $name = $relation->name();
+
+                if ($relation instanceof PolymorphicRelation) {
+                    foreach ($this->polymorph($relation) as $path) {
+                        yield "{$name}.{$path}";
+                    }
+                    continue;
+                }
 
                 if ($next = $this->next($relation)) {
                     foreach ($next as $path) {
@@ -103,14 +120,50 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
     private function next(Relation $relation): ?self
     {
         if (1 < $this->depth) {
-            return new self(
-                $this->schemas,
-                $this->schemas->schemaFor($relation->inverse()),
-                $this->depth - 1
+            return $this->make(
+                $this->schemas->schemaFor($relation->inverse())
             );
         }
 
         return null;
+    }
+
+    /**
+     * Iterator over paths from a polymorphic relation.
+     *
+     * Iteration from polymorphs is only supported if the relation is
+     * one the first level schema, i.e. is at the start of the path.
+     *
+     * If a polymorphic relation is later in the path, it effectively
+     * terminates the iteration for that path.
+     *
+     * This is because in Eloquent, we only support loading polymorphic
+     * relations via a morph-to map at the top-level of the include path.
+     *
+     * @param PolymorphicRelation $relation
+     * @return Generator
+     */
+    private function polymorph(PolymorphicRelation $relation): Generator
+    {
+        if (1 < $this->depth && true === $this->start) {
+            foreach ($relation->inverseTypes() as $type) {
+                yield from $this->make(
+                    $this->schemas->schemaFor($type)
+                );
+            }
+        }
+    }
+
+    /**
+     * @param Schema $schema
+     * @return $this
+     */
+    private function make(Schema $schema): self
+    {
+        $iterator = new self($this->schemas, $schema, $this->depth - 1);
+        $iterator->start = false;
+
+        return $iterator;
     }
 
 }

@@ -39,6 +39,16 @@ interface Relation extends Field
     /**
      * Get the inverse resource type.
      *
+     * If the relation is polymorphic, it MUST implement
+     * the `PolymorphicRelation` interface and return a
+     * psuedo-type from this method.
+     *
+     * For example, if an `images` resource has an `imageable`
+     * relation to which either a `posts` or `users` resource
+     * could be related. The `inverse()` method would return
+     * `imageables` and the `inverseTypes()` method would
+     * return: `['posts', 'users']`.
+     *
      * @return string
      */
     public function inverse(): string;
