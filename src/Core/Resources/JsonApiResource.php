@@ -56,11 +56,6 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     private static array $types = [];
 
     /**
-     * @var array|null
-     */
-    private ?array $relationships = null;
-
-    /**
      * @var string|null
      */
     private ?string $selfUri = null;
@@ -177,8 +172,11 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function relationship(string $name): Relation
     {
-        if ($relation = $this->allRelations()[$name] ?? null) {
-            return $relation;
+        /** @var Relation $relation */
+        foreach ($this->relationships() as $relation) {
+            if ($relation->fieldName() === $name) {
+                return $relation;
+            }
         }
 
         throw new LogicException(sprintf(
@@ -237,20 +235,5 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
         return static::$types[$fqn] = Str::dasherize(Str::plural(
             Str::before(class_basename($fqn), 'Resource')
         ));
-    }
-
-    /**
-     * @return array
-     */
-    private function allRelations(): array
-    {
-        if (is_array($this->relationships)) {
-            return $this->relationships;
-        }
-
-        return $this->relationships = collect($this->relationships())
-            ->keyBy(fn(Relation $relation) => $relation->fieldName())
-            ->sortKeys()
-            ->all();
     }
 }
