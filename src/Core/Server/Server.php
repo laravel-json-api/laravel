@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http;
+namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
-use LaravelJsonApi\Contracts\Http\Server as ServerContract;
+use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
@@ -36,6 +36,13 @@ use LaravelJsonApi\Core\Store\Store;
 
 abstract class Server implements ServerContract
 {
+
+    /**
+     * The base URI for the server.
+     *
+     * @var string
+     */
+    protected string $baseUri = '';
 
     /**
      * @var IlluminateContainer
@@ -142,6 +149,26 @@ abstract class Server implements ServerContract
         $factory = $this->container->make(EncoderFactory::class);
 
         return $factory->build($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function url($parameters, bool $secure = null): string
+    {
+        return url($this->baseUri(), $parameters, $secure);
+    }
+
+    /**
+     * @return string
+     */
+    protected function baseUri(): string
+    {
+        if (!empty($this->baseUri)) {
+            return $this->baseUri;
+        }
+
+        throw new \LogicException('No base URI set on server.');
     }
 
     /**

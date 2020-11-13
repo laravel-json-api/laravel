@@ -17,7 +17,7 @@
 
 namespace LaravelJsonApi\Contracts\Encoder;
 
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Server;
 
 interface Factory
 {

@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use LaravelJsonApi\Contracts\Http\Repository;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Repository;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LogicException;
 

@@ -20,26 +20,9 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Comments;
 
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use function url;
 
 class CommentResource extends JsonApiResource
 {
-
-    /**
-     * @return string
-     */
-    public function type(): string
-    {
-        return 'comments';
-    }
-
-    /**
-     * @return string
-     */
-    public function selfUrl(): string
-    {
-        return url('api/v1', [$this->type(), $this->id()]);
-    }
 
     /**
      * @return iterable
@@ -59,8 +42,8 @@ class CommentResource extends JsonApiResource
     public function relationships(): iterable
     {
         return [
-            $this->relation('post'),
-            $this->relation('user'),
+            $this->relation('post')->showDataIfLoaded(),
+            $this->relation('user')->showDataIfLoaded(),
         ];
     }
 

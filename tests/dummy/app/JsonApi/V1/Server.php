@@ -21,10 +21,15 @@ namespace App\JsonApi\V1;
 
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
-use LaravelJsonApi\Http\Server as BaseServer;
+use LaravelJsonApi\Core\Server\Server as BaseServer;
 
 class Server extends BaseServer
 {
+
+    /**
+     * @var string
+     */
+    protected string $baseUri = '/api/v1';
 
     /**
      * Bootstrap the server when it is handling an HTTP request.

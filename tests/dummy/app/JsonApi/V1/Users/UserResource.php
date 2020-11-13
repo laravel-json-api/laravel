@@ -25,22 +25,6 @@ class UserResource extends JsonApiResource
 {
 
     /**
-     * @return string
-     */
-    public function type(): string
-    {
-        return 'users';
-    }
-
-    /**
-     * @return string
-     */
-    public function selfUrl(): string
-    {
-        return url('api/v1', [$this->type(), $this->id()]);
-    }
-
-    /**
      * @return iterable
      */
     public function attributes(): iterable
@@ -59,6 +43,5 @@ class UserResource extends JsonApiResource
     {
         return [];
     }
-
 
 }

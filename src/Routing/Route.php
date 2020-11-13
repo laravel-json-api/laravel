@@ -23,7 +23,7 @@ use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
 
 class Route implements RouteContract

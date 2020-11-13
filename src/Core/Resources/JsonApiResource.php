@@ -27,8 +27,10 @@ use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
+use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
+use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function sprintf;
 
@@ -44,9 +46,24 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     public object $resource;
 
     /**
+     * @var string
+     */
+    protected string $type = '';
+
+    /**
+     * @var array
+     */
+    private static array $types = [];
+
+    /**
      * @var array|null
      */
     private ?array $relationships = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $selfUri = null;
 
     /**
      * JsonApiResource constructor.
@@ -59,16 +76,6 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
-     * @return string
-     */
-    abstract public function type(): string;
-
-    /**
-     * @return string
-     */
-    abstract public function selfUrl(): string;
-
-    /**
      * @return iterable
      */
     abstract public function attributes(): iterable;
@@ -77,6 +84,33 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * @return iterable
      */
     abstract public function relationships(): iterable;
+
+    /**
+     * @return string
+     */
+    public function selfUrl(): string
+    {
+        if ($this->selfUri) {
+            return $this->selfUri;
+        }
+
+        return $this->selfUri = JsonApi::server()->url([
+            $this->type(),
+            $this->id(),
+        ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function type(): string
+    {
+        if (!empty($this->type)) {
+            return $this->type;
+        }
+
+        return $this->type = $this->guessType();
+    }
 
     /**
      * @return string
@@ -187,6 +221,22 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     protected function relation(string $fieldName, string $keyName = null): Relation
     {
         return new Relation($this, $fieldName, $keyName);
+    }
+
+    /**
+     * @return string
+     */
+    protected static function guessType(): string
+    {
+        $fqn = static::class;
+
+        if (isset(static::$types[$fqn])) {
+            return static::$types[$fqn];
+        }
+
+        return static::$types[$fqn] = Str::dasherize(Str::plural(
+            Str::before(class_basename($fqn), 'Resource')
+        ));
     }
 
     /**

@@ -17,15 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http;
+namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
-use LaravelJsonApi\Contracts\Http\Repository as RepositoryContract;
+use LaravelJsonApi\Contracts\Server\Repository as RepositoryContract;
 use RuntimeException;
 use Throwable;
-use LaravelJsonApi\Contracts\Http\Server as ServerContract;
+use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 
 class ServerRepository implements RepositoryContract
 {

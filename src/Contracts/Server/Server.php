@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace LaravelJsonApi\Contracts\Http;
+namespace LaravelJsonApi\Contracts\Server;
 
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
@@ -73,4 +73,11 @@ interface Server
      * @return Encoder
      */
     public function encoder(): Encoder;
+
+    /**
+     * @param $parameters
+     * @param bool|null $secure
+     * @return string
+     */
+    public function url($parameters, bool $secure = null): string;
 }

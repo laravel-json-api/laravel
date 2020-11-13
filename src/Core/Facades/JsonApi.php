@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Routing\Route;
 
 /**

@@ -26,8 +26,8 @@ use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
-use LaravelJsonApi\Http\Server;
-use LaravelJsonApi\Http\ServerRepository;
+use LaravelJsonApi\Core\Server\Server;
+use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Routing\Route;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
@@ -88,19 +88,19 @@ class ServiceProvider extends BaseServiceProvider
      */
     private function bindHttp(): void
     {
-        $this->app->bind(Contracts\Http\Repository::class, ServerRepository::class);
-        $this->app->bind(Contracts\Http\Server::class, Server::class);
+        $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
+        $this->app->bind(Contracts\Server\Server::class, Server::class);
 
         $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->store();
+            return $app->make(Contracts\Server\Server::class)->store();
         });
 
         $this->app->bind(Contracts\Schema\Container::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->schemas();
+            return $app->make(Contracts\Server\Server::class)->schemas();
         });
 
         $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->resources();
+            return $app->make(Contracts\Server\Server::class)->resources();
         });
     }
 

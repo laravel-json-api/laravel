@@ -42,7 +42,6 @@ class CreateTest extends TestCase
             ->jsonApi()
             ->expects('posts')
             ->withData($data)
-            ->includePaths('author')
             ->post('/api/v1/posts');
 
         $id = $response

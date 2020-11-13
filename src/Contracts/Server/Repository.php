@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http;
+namespace LaravelJsonApi\Contracts\Server;
 
 interface Repository
 {

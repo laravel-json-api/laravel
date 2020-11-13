@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Encoder\Neomerx;
 
 use LaravelJsonApi\Contracts\Encoder\Encoder as EncoderContract;
 use LaravelJsonApi\Contracts\Encoder\Factory as FactoryContract;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Encoder\Neomerx\Mapper;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
