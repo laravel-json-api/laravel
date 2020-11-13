@@ -108,7 +108,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @param QueryParametersContract|array|null $value
+     * @param QueryParametersContract|Enumerable|array|null $value
      * @return QueryParameters|null
      */
     public static function nullable($value): ?self
@@ -193,7 +193,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param IncludePaths|array|string $paths
      * @return $this
      */
-    public function withIncludePaths($paths): self
+    public function setIncludePaths($paths): self
     {
         $this->includePaths = IncludePaths::cast($paths);
 
@@ -224,7 +224,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param FieldSets|array $fieldSets
      * @return $this
      */
-    public function withSparseFieldSets($fieldSets): self
+    public function setSparseFieldSets($fieldSets): self
     {
         $this->fieldSets = FieldSets::cast($fieldSets);
 
@@ -250,7 +250,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param array $fields
      * @return $this
      */
-    public function withFieldSet(string $type, array $fields): self
+    public function setFieldSet(string $type, array $fields): self
     {
         if (!$this->fieldSets) {
             $this->fieldSets = new FieldSets();
@@ -288,7 +288,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param SortFields|array|string $fields
      * @return $this
      */
-    public function withSortFields($fields): self
+    public function setSortFields($fields): self
     {
         $this->sort = SortFields::cast($fields);
 
@@ -319,7 +319,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param Arrayable|array $pagination
      * @return $this
      */
-    public function withPagination($pagination): self
+    public function setPagination($pagination): self
     {
         $this->pagination = collect($pagination)->toArray();
 
@@ -352,7 +352,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param Arrayable|array $filters
      * @return $this
      */
-    public function withFilters($filters): self
+    public function setFilters($filters): self
     {
         $this->filters = collect($filters)->toArray();
 
