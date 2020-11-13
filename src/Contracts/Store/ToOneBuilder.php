@@ -50,5 +50,5 @@ interface ToOneBuilder
      * @return Model|object|null
      *      the new related value.
      */
-    public function replace(?array $identifier): ?object;
+    public function associate(?array $identifier): ?object;
 }

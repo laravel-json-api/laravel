@@ -50,7 +50,7 @@ interface ToManyBuilder
      * @return EloquentCollection|iterable
      *      the related models that were used to replace the relationship.
      */
-    public function replace(array $identifiers): iterable;
+    public function sync(array $identifiers): iterable;
 
     /**
      * Add the specified members to the relationship unless they are already present.
@@ -59,7 +59,7 @@ interface ToManyBuilder
      * @return EloquentCollection|iterable
      *      the related models that were added to the relationship.
      */
-    public function add(array $identifiers): iterable;
+    public function attach(array $identifiers): iterable;
 
     /**
      * Delete the specified members from the relationship.
@@ -68,5 +68,5 @@ interface ToManyBuilder
      * @return EloquentCollection|iterable
      *      the related models that were removed from the relationship.
      */
-    public function remove(array $identifiers): iterable;
+    public function detach(array $identifiers): iterable;
 }
