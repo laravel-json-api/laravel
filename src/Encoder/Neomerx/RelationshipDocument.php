@@ -19,11 +19,20 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Encoder\Neomerx;
 
-use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Encoder\Neomerx\Encoder\Encoder as ExtendedEncoder;
 
-class CompoundDocument extends Document
+class RelationshipDocument extends Document
 {
+
+    /**
+     * @var object
+     */
+    private object $resource;
+
+    /**
+     * @var string
+     */
+    private string $fieldName;
 
     /**
      * @var mixed
@@ -31,15 +40,24 @@ class CompoundDocument extends Document
     private $data;
 
     /**
-     * CompoundDocument constructor.
+     * RelationshipDocument constructor.
      *
      * @param ExtendedEncoder $encoder
      * @param Mapper $mapper
-     * @param mixed $data
+     * @param object $resource
+     * @param string $fieldName
+     * @param object|iterable|null $data
      */
-    public function __construct(ExtendedEncoder $encoder, Mapper $mapper, $data)
-    {
+    public function __construct(
+        ExtendedEncoder $encoder,
+        Mapper $mapper,
+        object $resource,
+        string $fieldName,
+        $data
+    ) {
         parent::__construct($encoder, $mapper);
+        $this->resource = $resource;
+        $this->fieldName = $fieldName;
         $this->data = $data;
     }
 
@@ -48,9 +66,11 @@ class CompoundDocument extends Document
      */
     protected function serialize(): array
     {
-        return $this->encoder()->serializeData(
-            $this->data
-        );
+        return $this
+            ->encoder()
+            ->withRelationshipSelfLink($this->resource, $this->fieldName)
+            ->withRelationshipRelatedLink($this->resource, $this->fieldName)
+            ->serializeIdentifiers($this->data);
     }
 
     /**
@@ -58,9 +78,11 @@ class CompoundDocument extends Document
      */
     protected function encode(): string
     {
-        return $this->encoder()->encodeData(
-            $this->data
-        );
+        return $this
+            ->encoder()
+            ->withRelationshipSelfLink($this->resource, $this->fieldName)
+            ->withRelationshipRelatedLink($this->resource, $this->fieldName)
+            ->encodeIdentifiers($this->data);
     }
 
 }

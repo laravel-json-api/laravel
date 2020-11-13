@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,27 +25,40 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Core\Resources\ResourceCollection;
 use function is_null;
 
-class DataResponse implements Responsable
+class RelationshipResponse implements Responsable
 {
 
     use Concerns\IsResponsable;
 
     /**
-     * @var Page|Model|iterable|null
+     * @var object
      */
-    private $value;
+    private object $resource;
 
     /**
-     * DataResponse constructor.
-     *
-     * @param Page|Model|iterable|null $value
+     * @var string
      */
-    public function __construct($value)
+    private string $fieldName;
+
+    /**
+     * @var Page|Model|iterable|null
+     */
+    private $related;
+
+    /**
+     * RelationshipResponse constructor.
+     *
+     * @param object $resource
+     * @param string $fieldName
+     * @param Page|Model|iterable|null $related
+     */
+    public function __construct(object $resource, string $fieldName, $related)
     {
-        $this->value = $value;
+        $this->resource = $resource;
+        $this->fieldName = $fieldName;
+        $this->related = $related;
     }
 
     /**
@@ -77,27 +90,36 @@ class DataResponse implements Responsable
      * Convert the data member to a response class.
      *
      * @param $request
-     * @return PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
+     * @return ResourceIdentifierResponse|ResourceIdentifierCollectionResponse
      */
     private function prepareDataResponse($request)
     {
-        if ($this->value instanceof Page) {
-            return new PaginatedResourceResponse($this->value);
+        $resolver = JsonApi::server()->resources();
+        $resource = $resolver->resolve($this->resource);
+
+        if (is_null($this->related)) {
+            return new ResourceIdentifierResponse(
+                $resource,
+                $this->fieldName,
+                null
+            );
         }
 
-        if (is_null($this->value)) {
-            return new ResourceResponse(null);
-        }
-
-        $parsed = JsonApi::server()
-            ->resources()
-            ->resolve($this->value);
+        $parsed = $resolver->resolve($this->related);
 
         if ($parsed instanceof JsonApiResource) {
-            return $parsed->prepareResponse($request);
+            return new ResourceIdentifierResponse(
+                $resource,
+                $this->fieldName,
+                $parsed
+            );
         }
 
-        return (new ResourceCollection($parsed))->prepareResponse($request);
+        return new ResourceIdentifierCollectionResponse(
+            $resource,
+            $this->fieldName,
+            $parsed
+        );
     }
 
 }

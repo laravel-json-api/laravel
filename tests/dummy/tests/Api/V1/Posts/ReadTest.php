@@ -26,7 +26,7 @@ class ReadTest extends TestCase
     public function test(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->toArray();
+        $expected = $this->serializer->post($post)->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -40,7 +40,7 @@ class ReadTest extends TestCase
     public function testSlugFilter(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->toArray();
+        $expected = $this->serializer->post($post)->jsonSerialize();
 
         $response = $this
             ->jsonApi()

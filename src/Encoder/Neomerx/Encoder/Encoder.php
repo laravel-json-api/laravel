@@ -36,6 +36,19 @@ class Encoder extends BaseEncoder
     }
 
     /**
+     * Serialize resource identifiers to an array.
+     *
+     * @param $data
+     * @return array
+     */
+    public function serializeIdentifiers($data): array
+    {
+        return $this->encodeIdentifiersToArray($data);
+    }
+
+    /**
+     * Serialize a meta document to an array.
+     *
      * @param $meta
      * @return array
      */

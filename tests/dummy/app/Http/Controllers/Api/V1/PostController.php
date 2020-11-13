@@ -29,5 +29,7 @@ class PostController
     use Actions\Store;
     use Actions\Update;
     use Actions\Destroy;
+    use Actions\FetchRelated;
+    use Actions\FetchRelationship;
 
 }

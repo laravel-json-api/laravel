@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1;
 
 use App\Models\Post;
+use App\Models\User;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
 
@@ -60,6 +61,30 @@ class Serializer
                         'related' => "{$self}/comments",
                     ],
                 ],
+            ],
+            'links' => [
+                'self' => $self,
+            ],
+        ]);
+    }
+
+    /**
+     * Get the expected user resource.
+     *
+     * @param User $user
+     * @return ResourceObject
+     */
+    public function user(User $user): ResourceObject
+    {
+        $self = url('/api/v1/users', $user);
+
+        return ResourceObject::fromArray([
+            'type' => 'users',
+            'id' => (string) $user->getRouteKey(),
+            'attributes' => [
+                'createdAt' => $user->created_at->toJSON(),
+                'name' => $user->name,
+                'updatedAt' => $user->updated_at->toJSON(),
             ],
             'links' => [
                 'self' => $self,

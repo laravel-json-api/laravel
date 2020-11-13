@@ -17,38 +17,33 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1;
+namespace Database\Factories;
 
+use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
-use LaravelJsonApi\Http\Server as BaseServer;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class Server extends BaseServer
+class CommentFactory extends Factory
 {
-
     /**
-     * Bootstrap the server when it is handling an HTTP request.
+     * The name of the factory's corresponding model.
      *
-     * @return void
+     * @var string
      */
-    public function serving(): void
-    {
-        Post::creating(static function (Post $post) {
-            $post->author()->associate(Auth::user());
-        });
-    }
+    protected $model = Comment::class;
 
     /**
-     * Get the server's list of schemas.
+     * Define the model's default state.
      *
      * @return array
      */
-    protected function allSchemas(): array
+    public function definition()
     {
         return [
-            Comments\CommentSchema::class,
-            Posts\PostSchema::class,
-            Users\UserSchema::class,
+            'content' => $this->faker->text,
+            'post_id' => Post::factory(),
+            'user_id' => User::factory(),
         ];
     }
 }

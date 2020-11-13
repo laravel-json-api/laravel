@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Document;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -81,13 +82,17 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     /**
      * Create a resource object from the data member of a JSON document.
      *
-     * @param array $data
+     * @param array|Enumerable $data
      * @return ResourceObject
      */
-    public static function fromArray(array $data): self
+    public static function fromArray($data): self
     {
-        if (!isset($data['type'])) {
-            throw new InvalidArgumentException('Expecting a resource type.');
+        if ($data instanceof Enumerable) {
+            $data = $data->all();
+        }
+
+        if (!is_array($data) || !isset($data['type'])) {
+            throw new InvalidArgumentException('Expecting an array resource with a type field.');
         }
 
         return new self(

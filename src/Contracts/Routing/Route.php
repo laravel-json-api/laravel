@@ -45,6 +45,20 @@ interface Route
     public function resourceId(): string;
 
     /**
+     * Get the resource model.
+     *
+     * @return Model|object
+     */
+    public function model(): object;
+
+    /**
+     * Get the relationship name.
+     *
+     * @return string
+     */
+    public function relationship(): string;
+
+    /**
      * Get the schema for the current route.
      *
      * @return Schema

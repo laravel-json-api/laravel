@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,35 +15,37 @@
  * limitations under the License.
  */
 
-namespace LaravelJsonApi\Contracts\Encoder;
+declare(strict_types=1);
 
-use LaravelJsonApi\Contracts\Serializable;
+namespace App\Models;
 
-interface CompoundDocument extends Serializable
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Comment extends Model
 {
 
-    /**
-     * Set the top-level JSON API member.
-     *
-     * @param $jsonApi
-     * @return $this
-     */
-    public function withJsonApi($jsonApi): self;
+    use HasFactory;
 
     /**
-     * Set the top-level links member.
-     *
-     * @param $links
-     * @return $this
+     * @var string[]
      */
-    public function withLinks($links): self;
+    protected $fillable = ['content'];
 
     /**
-     * Set the top-level meta member.
-     *
-     * @param $meta
-     * @return $this
+     * @return BelongsTo
      */
-    public function withMeta($meta): self;
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(Post::class);
+    }
 
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

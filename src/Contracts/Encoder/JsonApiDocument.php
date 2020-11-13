@@ -15,27 +15,35 @@
  * limitations under the License.
  */
 
-namespace LaravelJsonApi\Testing;
+namespace LaravelJsonApi\Contracts\Encoder;
 
-trait MakesJsonApiRequests
+use LaravelJsonApi\Contracts\Serializable;
+
+interface JsonApiDocument extends Serializable
 {
 
     /**
-     * Test a JSON API URI.
+     * Set the top-level JSON API member.
      *
-     * @param string|null $expects
-     *      the expected resource type.
-     * @return TestBuilder
+     * @param $jsonApi
+     * @return $this
      */
-    protected function jsonApi(string $expects = null): TestBuilder
-    {
-        $tester = new TestBuilder($this);
+    public function withJsonApi($jsonApi): self;
 
-        if ($expects) {
-            $tester->expects($expects);
-        }
+    /**
+     * Set the top-level links member.
+     *
+     * @param $links
+     * @return $this
+     */
+    public function withLinks($links): self;
 
-        return $tester;
-    }
+    /**
+     * Set the top-level meta member.
+     *
+     * @param $meta
+     * @return $this
+     */
+    public function withMeta($meta): self;
 
 }

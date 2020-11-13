@@ -44,6 +44,11 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     public object $resource;
 
     /**
+     * @var array|null
+     */
+    private ?array $relationships = null;
+
+    /**
      * JsonApiResource constructor.
      *
      * @param Model|object $resource
@@ -138,7 +143,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function relationship(string $name): Relation
     {
-        if ($relation = $this->relationships()[$name] ?? null) {
+        if ($relation = $this->allRelations()[$name] ?? null) {
             return $relation;
         }
 
@@ -182,5 +187,20 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     protected function relation(string $fieldName, string $keyName = null): Relation
     {
         return new Relation($this, $fieldName, $keyName);
+    }
+
+    /**
+     * @return array
+     */
+    private function allRelations(): array
+    {
+        if (is_array($this->relationships)) {
+            return $this->relationships;
+        }
+
+        return $this->relationships = collect($this->relationships())
+            ->keyBy(fn(Relation $relation) => $relation->fieldName())
+            ->sortKeys()
+            ->all();
     }
 }

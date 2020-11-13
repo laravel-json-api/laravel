@@ -43,7 +43,7 @@ class UpdateTest extends TestCase
     public function test(): void
     {
         $data = $this->serialize();
-        $expected = $data->forget('updatedAt')->toArray();
+        $expected = $data->forget('updatedAt')->jsonSerialize();
 
         $response = $this
             ->actingAs($this->post->author)

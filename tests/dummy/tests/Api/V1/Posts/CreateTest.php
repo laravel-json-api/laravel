@@ -34,7 +34,7 @@ class CreateTest extends TestCase
         $expected = $data
             ->forget('createdAt', 'updatedAt')
             ->replace('author', ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
-            ->toArray();
+            ->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()

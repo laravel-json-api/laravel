@@ -30,7 +30,7 @@ class CreatePostTables extends Migration
     public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('author_id');
             $table->string('title');
@@ -44,6 +44,26 @@ class CreatePostTables extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->unsignedBigInteger('post_id');
+            $table->unsignedBigInteger('user_id');
+            $table->text('content');
+
+            $table->foreign('post_id')
+                ->references('id')
+                ->on('posts')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+        });
     }
 
     /**
@@ -53,6 +73,7 @@ class CreatePostTables extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('comments');
         Schema::dropIfExists('posts');
     }
 }

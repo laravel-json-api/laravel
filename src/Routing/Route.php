@@ -31,6 +31,7 @@ class Route implements RouteContract
 
     public const RESOURCE_TYPE = 'resource_type';
     public const RESOURCE_ID_NAME = 'resource_id_name';
+    public const RESOURCE_RELATIONSHIP = 'resource_relationship';
 
     use ForwardsCalls;
 
@@ -109,6 +110,35 @@ class Route implements RouteContract
         }
 
         return $modelOrResourceId;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function model(): object
+    {
+        $modelOrResourceId = $this->modelOrResourceId();
+
+        if (is_string($modelOrResourceId)) {
+            return $this
+                ->schema()
+                ->repository()
+                ->findOrFail($modelOrResourceId);
+        }
+
+        return $modelOrResourceId;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function relationship(): string
+    {
+        if ($name = $this->route->parameter(self::RESOURCE_RELATIONSHIP)) {
+            return $name;
+        }
+
+        throw new LogicException('No JSON API relationship name set on route.');
     }
 
     /**
