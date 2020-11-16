@@ -58,6 +58,41 @@ class ReadCommentsTest extends TestCase
         $response->assertFetchedMany($expected);
     }
 
+    public function testFilter(): void
+    {
+        $comments = Comment::factory()
+            ->count(4)
+            ->create(['post_id' => $this->post]);
+
+        $expected = $comments->take(2);
+        $ids = $expected->map(fn(Comment $comment) => $comment->getRouteKey())->all();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('comments')
+            ->filter(['id' => $ids])
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
+
+        $response->assertFetchedMany($expected);
+    }
+
+    public function testIncludePath(): void
+    {
+        $comments = Comment::factory()
+            ->count(2)
+            ->create(['post_id' => $this->post]);
+
+        $response = $this
+            ->jsonApi()
+            ->includePaths('user')
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
+
+        $response->willSeeType('comments')->assertFetchedMany($comments);
+        $response->willSeeType('users')->assertIncluded(
+            $comments->pluck('user')->all()
+        );
+    }
+
     public function testInvalidMediaType(): void
     {
         $this->jsonApi()

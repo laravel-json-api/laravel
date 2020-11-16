@@ -24,6 +24,8 @@ use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Filters\Where;
+use LaravelJsonApi\Eloquent\Filters\WhereIn;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
@@ -55,7 +57,10 @@ class UserSchema extends Schema
      */
     public function filters(): array
     {
-        return [];
+        return [
+            WhereIn::make('id', $this->idColumn())->delimiter(','),
+            Where::make('email')->singular(),
+        ];
     }
 
     /**

@@ -18,6 +18,7 @@
 namespace LaravelJsonApi\Contracts\Routing;
 
 use Illuminate\Database\Eloquent\Model;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 
 interface Route
@@ -52,11 +53,11 @@ interface Route
     public function model(): object;
 
     /**
-     * Get the relationship name.
+     * Get the field name for a relationship URL.
      *
      * @return string
      */
-    public function relationship(): string;
+    public function fieldName(): string;
 
     /**
      * Get the schema for the current route.
@@ -64,4 +65,28 @@ interface Route
      * @return Schema
      */
     public function schema(): Schema;
+
+    /**
+     * Does the URL have a relation?
+     *
+     * @return bool
+     */
+    public function hasRelation(): bool;
+
+    /**
+     * Get the inverse schema for a relationship route.
+     *
+     * For example, the URL `/api/posts/123/comments` would
+     * return the comments schema as the inverse schema.
+     *
+     * @return Schema
+     */
+    public function inverse(): Schema;
+
+    /**
+     * Get the relation for a relationship URL.
+     *
+     * @return Relation
+     */
+    public function relation(): Relation;
 }

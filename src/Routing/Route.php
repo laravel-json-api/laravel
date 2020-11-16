@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Routing;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
@@ -132,7 +133,7 @@ class Route implements RouteContract
     /**
      * @inheritDoc
      */
-    public function relationship(): string
+    public function fieldName(): string
     {
         if ($name = $this->route->parameter(self::RESOURCE_RELATIONSHIP)) {
             return $name;
@@ -150,4 +151,34 @@ class Route implements RouteContract
             $this->resourceType()
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasRelation(): bool
+    {
+        return !!$this->route->parameter(self::RESOURCE_RELATIONSHIP);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inverse(): Schema
+    {
+        return $this->server->schemas()->schemaFor(
+            $this->relation()->inverse()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function relation(): Relation
+    {
+        return $this->schema()->relationship(
+            $this->fieldName()
+        );
+    }
+
+
 }

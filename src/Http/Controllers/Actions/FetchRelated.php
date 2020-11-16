@@ -39,7 +39,7 @@ trait FetchRelated
     {
         $relation = $route
             ->schema()
-            ->relationship($route->relationship());
+            ->relationship($route->fieldName());
 
         if ($relation->toOne()) {
             $request = ResourceQuery::queryOne($relation->inverse());

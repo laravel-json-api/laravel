@@ -70,13 +70,24 @@ class Rule
      */
     public static function filter($allowed = null): AllowedFilterParameters
     {
-        if (is_null($allowed)) {
-            return AllowedFilterParameters::make(
-                JsonApi::route()->schema()
+        if (!is_null($allowed)) {
+            return new AllowedFilterParameters(
+                Arr::wrap($allowed)
             );
         }
 
-        return new AllowedFilterParameters(Arr::wrap($allowed));
+        $route = JsonApi::route();
+
+        if ($route->hasRelation()) {
+            return AllowedFilterParameters::forFilters(
+                ...$route->inverse()->filters(),
+                ...$route->relation()->filters()
+            );
+        }
+
+        return AllowedFilterParameters::make(
+            $route->schema()
+        );
     }
 
     /**
@@ -87,13 +98,17 @@ class Rule
      */
     public static function includePaths($allowed = null): AllowedIncludePaths
     {
-        if (is_null($allowed)) {
-            return AllowedIncludePaths::make(
-                JsonApi::route()->schema()
+        if (!is_null($allowed)) {
+            return new AllowedIncludePaths(
+                Arr::wrap($allowed)
             );
         }
 
-        return new AllowedIncludePaths(Arr::wrap($allowed));
+        $route = JsonApi::route();
+
+        return AllowedIncludePaths::make(
+            $route->hasRelation() ? $route->inverse() : $route->schema()
+        );
     }
 
     /**
@@ -115,13 +130,17 @@ class Rule
      */
     public static function page($allowed = null): AllowedPageParameters
     {
-        if (is_null($allowed)) {
-            return AllowedPageParameters::make(
-                JsonApi::route()->schema()
+        if (!is_null($allowed)) {
+            return new AllowedPageParameters(
+                Arr::wrap($allowed)
             );
         }
 
-        return new AllowedPageParameters(Arr::wrap($allowed));
+        $route = JsonApi::route();
+
+        return AllowedPageParameters::make(
+            $route->hasRelation() ? $route->inverse() : $route->schema()
+        );
     }
 
     /**
@@ -132,13 +151,17 @@ class Rule
      */
     public static function sort($allowed = null): AllowedSortParameters
     {
-        if (is_null($allowed)) {
-            return AllowedSortParameters::make(
-                JsonApi::route()->schema()
+        if (!is_null($allowed)) {
+            return new AllowedSortParameters(
+                Arr::wrap($allowed)
             );
         }
 
-        return new AllowedSortParameters(Arr::wrap($allowed));
+        $route = JsonApi::route();
+
+        return AllowedSortParameters::make(
+            $route->hasRelation() ? $route->inverse() : $route->schema()
+        );
     }
 
     /**

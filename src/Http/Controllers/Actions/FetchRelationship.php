@@ -39,7 +39,7 @@ trait FetchRelationship
     {
         $model = $route->model();
         $relation = $route->schema()->relationship(
-            $route->relationship()
+            $route->fieldName()
         );
 
         if ($relation->toOne()) {

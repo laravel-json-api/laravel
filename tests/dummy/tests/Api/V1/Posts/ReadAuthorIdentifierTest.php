@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 
 class ReadAuthorIdentifierTest extends TestCase
@@ -36,7 +37,9 @@ class ReadAuthorIdentifierTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->post = Post::factory()->create();
+        $this->post = Post::factory()
+            ->for(User::factory(['email' => 'john.doe@example.com']), 'author')
+            ->create();
     }
 
     public function test(): void
@@ -59,6 +62,26 @@ class ReadAuthorIdentifierTest extends TestCase
                 'version' => '1.0',
             ],
         ]);
+    }
+
+    public function testFilterMatches(): void
+    {
+        $response = $this
+            ->jsonApi('users')
+            ->filter(['email' => $this->post->author->email])
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
+
+        $response->assertFetchedToOne($this->post->author);
+    }
+
+    public function testFilterDoesntMatch(): void
+    {
+        $response = $this
+            ->jsonApi('users')
+            ->filter(['email' => 'foo@bar.com'])
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
+
+        $response->assertFetchedNull();
     }
 
     public function testInvalidMediaType(): void

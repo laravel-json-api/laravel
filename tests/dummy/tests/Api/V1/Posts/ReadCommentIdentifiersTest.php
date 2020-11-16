@@ -70,6 +70,24 @@ class ReadCommentIdentifiersTest extends TestCase
         ]);
     }
 
+    public function testFiltered(): void
+    {
+        $comments = Comment::factory()
+            ->count(4)
+            ->create(['post_id' => $this->post]);
+
+        $expected = $comments->take(2);
+        $ids = $expected->map(fn(Comment $comment) => $comment->getRouteKey())->all();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('comments')
+            ->filter(['id' => $ids])
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+
+        $response->assertFetchedToMany($expected);
+    }
+
     public function testInvalidMediaType(): void
     {
         $this->jsonApi()

@@ -35,7 +35,16 @@ class AllowedFilterParameters extends AbstractAllowedRule
      */
     public static function make(Schema $schema): self
     {
-        return new self(collect($schema->filters())->map(
+        return static::forFilters(...$schema->filters());
+    }
+
+    /**
+     * @param Filter ...$filters
+     * @return static
+     */
+    public static function forFilters(Filter ...$filters): self
+    {
+        return new self(collect($filters)->map(
             fn(Filter $filter) => $filter->key()
         ));
     }
