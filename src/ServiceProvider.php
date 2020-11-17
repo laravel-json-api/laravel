@@ -26,12 +26,9 @@ use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\Server;
 use LaravelJsonApi\Core\Server\ServerRepository;
-use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
 use LaravelJsonApi\Http\Middleware\SubstituteBindings;
 use LaravelJsonApi\Routing\Route;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -53,21 +50,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->bindEncoder();
         $this->bindRoute();
         $this->bindService();
         $this->bindServer();
-    }
-
-    /**
-     * Bind the encoder into the service container.
-     *
-     * @return void
-     */
-    private function bindEncoder(): void
-    {
-        $this->app->bind(Contracts\Encoder\Factory::class, EncoderFactory::class);
-        $this->app->bind(FactoryInterface::class, NeomerxFactory::class);
     }
 
     /**

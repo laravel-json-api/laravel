@@ -39,6 +39,10 @@
         {
             "type": "path",
             "url": "../core"
+        },
+        {
+            "type": "path",
+            "url": "../encoder-neomerx"
         }
     ],
     "require": {
@@ -46,6 +50,7 @@
         "ext-json": "*",
         "laravel-json-api/core": "*",
         "laravel-json-api/eloquent": "*",
+        "laravel-json-api/encoder-neomerx": "*",
         "laravel-json-api/spec": "*",
         "laravel-json-api/validation": "*",
         "laravel/framework": "^8.0",

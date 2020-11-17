@@ -53,6 +53,7 @@ abstract class TestCase extends BaseTestCase
         return [
             \LaravelJsonApi\Spec\ServiceProvider::class,
             \LaravelJsonApi\Validation\ServiceProvider::class,
+            \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
             ServiceProvider::class,
             AppServiceProvider::class,
             AuthServiceProvider::class,
