@@ -19,9 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
+use LaravelJsonApi\Core\JsonApiService;
+use LaravelJsonApi\Core\Server\Server;
+use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
 use LaravelJsonApi\Http\Middleware\BootJsonApi;
 use LaravelJsonApi\Http\Middleware\SubstituteBindings;
@@ -49,10 +53,10 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->app->registerDeferredProvider(Core\ServiceProvider::class);
         $this->bindEncoder();
         $this->bindRoute();
-        $this->bindSpecification();
+        $this->bindService();
+        $this->bindServer();
     }
 
     /**
@@ -77,13 +81,35 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Bind the JSON API specification into the service container.
+     * Bind the JSON API service into the service container.
      *
      * @return void
      */
-    private function bindSpecification(): void
+    private function bindService(): void
     {
-        $this->app->bind(Spec\Specification::class, Spec\ServerSpecification::class);
-        $this->app->singleton(Spec\Translator::class);
+        $this->app->singleton(JsonApiService::class);
+    }
+
+    /**
+     * Bind server services into the service container.
+     *
+     * @return void
+     */
+    private function bindServer(): void
+    {
+        $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
+        $this->app->bind(Contracts\Server\Server::class, Server::class);
+
+        $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->store();
+        });
+
+        $this->app->bind(Contracts\Schema\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->schemas();
+        });
+
+        $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->resources();
+        });
     }
 }

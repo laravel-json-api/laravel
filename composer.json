@@ -35,11 +35,16 @@
         {
             "type": "path",
             "url": "../validation"
+        },
+        {
+            "type": "path",
+            "url": "../core"
         }
     ],
     "require": {
         "php": "^7.4",
         "ext-json": "*",
+        "laravel-json-api/core": "*",
         "laravel-json-api/eloquent": "*",
         "laravel-json-api/spec": "*",
         "laravel-json-api/validation": "*",
