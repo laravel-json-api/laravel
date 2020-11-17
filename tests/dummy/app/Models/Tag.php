@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,34 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace App\Models;
 
-use Illuminate\Support\Collection;
-use LaravelJsonApi\Contracts\Schema\Schema;
-use function collect;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class AllowedIncludePaths extends AbstractAllowedRule
+class Tag extends Model
 {
 
+    use HasFactory;
+
     /**
-     * Create an allowed include path rule for the supplied schema.
-     *
-     * @param Schema $schema
-     * @return AllowedIncludePaths
+     * @var string[]
      */
-    public static function make(Schema $schema): self
+    protected $fillable = ['name'];
+
+    /**
+     * @return MorphToMany
+     */
+    public function posts(): MorphToMany
     {
-        return new self($schema->includePaths());
+        return $this->morphedByMany(Post::class, 'taggable');
     }
 
     /**
-     * @inheritDoc
+     * @return MorphToMany
      */
-    protected function extract($value): Collection
+    public function videos(): MorphToMany
     {
-        $paths = is_string($value) ? explode(',', $value) : [];
-
-        return collect($paths);
+        return $this->morphedByMany(Video::class, 'taggable');
     }
-
 }

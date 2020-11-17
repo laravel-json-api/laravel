@@ -47,8 +47,7 @@ class UpdateTest extends TestCase
 
         $response = $this
             ->actingAs($this->post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->withData($data)
             ->includePaths('author')
             ->patch(url('/api/v1/posts', $this->post));
@@ -66,6 +65,71 @@ class UpdateTest extends TestCase
         ]);
     }
 
+    /**
+     * @return array
+     */
+    public function fieldProvider(): array
+    {
+        return [
+            ['content'],
+            ['slug'],
+            ['synopsis'],
+            ['title'],
+        ];
+    }
+
+    /**
+     * @param string $fieldName
+     * @dataProvider fieldProvider
+     */
+    public function testIndividualField(string $fieldName): void
+    {
+        $data = $this->serialize()->only($fieldName);
+
+        $expected = $this->serializer
+            ->post($this->post)
+            ->forget('updatedAt')
+            ->replace($fieldName, $data[$fieldName]);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertUpdated($expected->jsonSerialize());
+
+        $this->assertDatabaseHas('posts', [
+            'author_id' => $this->post->author->getKey(),
+            'content' => $expected['content'],
+            'created_at' => $this->post->created_at,
+            'id' => $this->post->getKey(),
+            'slug' => $expected['slug'],
+            'synopsis' => $expected['synopsis'],
+            'title' => $expected['title'],
+        ]);
+    }
+
+    public function testInvalid(): void
+    {
+        $other = Post::factory()->create();
+
+        $data = $this->serialize()->replace('slug', $other->slug);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertExactErrorStatus([
+            'detail' => 'The slug has already been taken.',
+            'source' => ['pointer' => '/data/attributes/slug'],
+            'status' => '422',
+            'title' => 'Unprocessable Entity',
+        ]);
+    }
 
     public function testNotAcceptableMediaType(): void
     {

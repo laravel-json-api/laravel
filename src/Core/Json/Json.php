@@ -65,7 +65,7 @@ final class Json
             $value = $value->jsonSerialize();
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || is_null($value)) {
             return new Hash($value);
         }
 

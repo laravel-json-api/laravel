@@ -26,6 +26,7 @@ use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route implements RouteContract
 {
@@ -85,7 +86,7 @@ class Route implements RouteContract
      */
     public function modelOrResourceId()
     {
-        if (!$name = $this->route->parameter(self::RESOURCE_ID_NAME)) {
+        if (!$name = $this->resourceIdName()) {
             throw new LogicException('No JSON API resource id name set on route.');
         }
 
@@ -116,18 +117,23 @@ class Route implements RouteContract
     /**
      * @inheritDoc
      */
+    public function hasResourceId(): bool
+    {
+        return !empty($this->resourceIdName());
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function model(): object
     {
         $modelOrResourceId = $this->modelOrResourceId();
 
-        if (is_string($modelOrResourceId)) {
-            return $this
-                ->schema()
-                ->repository()
-                ->findOrFail($modelOrResourceId);
+        if (is_object($modelOrResourceId)) {
+            return $modelOrResourceId;
         }
 
-        return $modelOrResourceId;
+        throw new LogicException('Expecting bindings to be substituted.');
     }
 
     /**
@@ -180,5 +186,42 @@ class Route implements RouteContract
         );
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function substituteBindings(): void
+    {
+        if ($this->hasResourceId()) {
+            $this->setModel($this->schema()->repository()->find(
+                $this->resourceId()
+            ));
+        }
+    }
+
+    /**
+     * @param object|null $model
+     * @return void
+     * @throws NotFoundHttpException
+     */
+    private function setModel(?object $model): void
+    {
+        if ($model) {
+            $this->route->setParameter(
+                $this->resourceIdName(),
+                $model
+            );
+            return;
+        }
+
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function resourceIdName(): ?string
+    {
+        return $this->route->parameter(self::RESOURCE_ID_NAME) ?: null;
+    }
 
 }

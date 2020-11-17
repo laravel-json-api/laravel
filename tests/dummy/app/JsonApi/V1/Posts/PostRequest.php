@@ -21,6 +21,7 @@ namespace App\JsonApi\V1\Posts;
 
 use Illuminate\Validation\Rule;
 use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class PostRequest extends ResourceRequest
 {
@@ -30,10 +31,17 @@ class PostRequest extends ResourceRequest
      */
     public function rules(): array
     {
+        $unique = Rule::unique('posts');
+
+        if ($post = $this->model()) {
+            $unique->ignore($post);
+        }
+
         return [
             'content' => ['required', 'string'],
-            'slug' => ['required', 'string', Rule::unique('posts')],
+            'slug' => ['required', 'string', $unique],
             'synopsis' => ['required', 'string'],
+            'tags' => JsonApiRule::toMany(),
             'title' => ['required', 'string'],
         ];
     }

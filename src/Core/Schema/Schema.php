@@ -147,6 +147,22 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     /**
      * @inheritDoc
      */
+    public function field(string $name): Field
+    {
+        if ($field = $this->allFields()[$name] ?? null) {
+            return $field;
+        }
+
+        throw new LogicException(sprintf(
+            'Field %s does not exist on resource schema %s.',
+            $name,
+            $this->type()
+        ));
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function attributes(): iterable
     {
         foreach ($this as $field) {

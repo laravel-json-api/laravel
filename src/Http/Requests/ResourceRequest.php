@@ -19,17 +19,24 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http\Requests;
 
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
-use LaravelJsonApi\Core\Facades\JsonApi;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Http\Exceptions\JsonApiException;
+use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LaravelJsonApi\Spec\UnexpectedDocumentException;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use function array_key_exists;
 
 class ResourceRequest extends FormRequest
 {
@@ -64,19 +71,89 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * Is this a request to create a resource?
+     *
      * @return bool
      */
     public function isCreating(): bool
     {
-        return $this->isMethod('POST');
+        return $this->isMethod('POST') && $this->isNotRelationship();
     }
 
     /**
+     * Is this a request to update a resource?
+     *
      * @return bool
      */
     public function isUpdating(): bool
     {
-        return $this->isMethod('PATCH');
+        return $this->isMethod('PATCH') && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to replace a resource relationship?
+     *
+     * @return bool
+     */
+    public function isUpdatingRelation(): bool
+    {
+        return $this->isMethod('PATCH') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to attach records to a resource relationship?
+     *
+     * @return bool
+     */
+    public function isAttachingRelation(): bool
+    {
+        return $this->isMethod('POST') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to detach records from a resource relationship?
+     *
+     * @return bool
+     */
+    public function isDetachingRelation(): bool
+    {
+        return $this->isMethod('DELETE') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to modify a resource relationship?
+     *
+     * @return bool
+     */
+    public function isModifyingRelationship(): bool
+    {
+        return $this->isUpdatingRelation() || $this->isAttachingRelation() || $this->isDetachingRelation();
+    }
+
+    /**
+     * Get the decoded JSON API document.
+     *
+     * @return array
+     */
+    public function document(): array
+    {
+        $document = $this->json()->all();
+
+        if (!is_array($document) || !isset($document['data']) || !is_array($document['data'])) {
+            throw new LogicException('Expecting JSON API specification compliance to have been run.');
+        }
+
+        return $document;
+    }
+
+    /**
+     * Get the field name for a relationship request.
+     *
+     * @return string
+     */
+    public function fieldName(): string
+    {
+        return $this->jsonApi()->route()->fieldName();
     }
 
     /**
@@ -84,13 +161,56 @@ class ResourceRequest extends FormRequest
      */
     public function validationData()
     {
-        $data = $this->json('data');
+        $document = $this->document();
 
-        if (is_array($data)) {
-            return ResourceObject::fromArray($data)->all();
+        if ($this->isCreating()) {
+            $data = $this->dataForCreate($document);
+        } else if ($this->isUpdating()) {
+            $data = $this->dataForUpdate(
+                $this->model(),
+                $document
+            );
+        } else {
+            $data = $document['data'];
         }
 
-        throw new LogicException('Expecting data to be an array.');
+        return ResourceObject::fromArray($data)->all();
+    }
+
+    /**
+     * Get the validation data for a modify relationship request.
+     *
+     * @return array
+     */
+    public function validationDataForRelationship(): array
+    {
+        $document = $this->dataForRelationship(
+            $this->model(),
+            $this->jsonApi()->route()->fieldName(),
+            $this->document()
+        );
+
+        return ResourceObject::fromArray($document)->all();
+    }
+
+    /**
+     * Get the relationship value that has been validated.
+     *
+     * @return mixed
+     */
+    public function validatedForRelation()
+    {
+        $data = $this->validated();
+        $fieldName = $this->fieldName();
+
+        if (array_key_exists($fieldName, $data)) {
+            return $data[$fieldName];
+        }
+
+        throw new LogicException(sprintf(
+            'Expecting relation %s to have a rule so that it is validated.',
+            $fieldName
+        ));
     }
 
     /**
@@ -104,7 +224,22 @@ class ResourceRequest extends FormRequest
         }
 
         /** JSON API spec compliance. */
-        $this->validateDocument();
+        if ($this->isCreating() || $this->isUpdating()) {
+            $this->validateResourceDocument();
+        } else if ($this->isModifyingRelationship()) {
+            $this->validateRelationshipDocument();
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new JsonApiException($this->validationErrors()->createErrorsForResource(
+            $this->schema(),
+            $validator
+        ));
     }
 
     /**
@@ -175,18 +310,263 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Validate the JSON API document.
+     * @inheritDoc
+     */
+    protected function createDefaultValidator(ValidationFactory $factory)
+    {
+        if ($this->isRelationship()) {
+            return $this->createRelationshipValidator($factory);
+        }
+
+        return parent::createDefaultValidator($factory);
+    }
+
+    /**
+     * @param ValidationFactory $factory
+     * @return Validator
+     */
+    protected function createRelationshipValidator(ValidationFactory $factory): Validator
+    {
+        return $factory->make(
+            $this->validationDataForRelationship(),
+            $this->relationshipRules(),
+            $this->messages(),
+            $this->attributes()
+        );
+    }
+
+    /**
+     * Get validation data for creating a domain record.
+     *
+     * @param array $document
+     * @return array
+     */
+    protected function dataForCreate(array $document): array
+    {
+        return $document['data'] ?? [];
+    }
+
+    /**
+     * Get validation data for updating a domain record.
+     *
+     * The JSON API spec says:
+     *
+     * > If a request does not include all of the attributes for a resource,
+     * > the server MUST interpret the missing attributes as if they were included
+     * > with their current values. The server MUST NOT interpret missing
+     * > attributes as null values.
+     *
+     * So that the validator has access to the current values of attributes, we
+     * merge attributes provided by the client over the top of the existing attribute
+     * values.
+     *
+     * @param Model|object $record
+     *      the record being updated.
+     * @param array $document
+     *      the JSON API document to validate.
+     * @return array
+     */
+    protected function dataForUpdate(object $record, array $document): array
+    {
+        $data = $document['data'] ?? [];
+
+        if ($this->mustValidateExisting($record, $data)) {
+            $data['attributes'] = $this->extractAttributes(
+                $record,
+                $data['attributes'] ?? []
+            );
+
+            $data['relationships'] = $this->extractRelationships(
+                $record,
+                $data['relationships'] ?? []
+            );
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get validation data for modifying a relationship.
+     *
+     * @param mixed $record
+     * @param string $fieldName
+     * @param array $document
+     * @return array
+     */
+    protected function dataForRelationship(object $record, string $fieldName, array $document): array
+    {
+        $resource = $this->resources()->create($record);
+
+        return [
+            'type' => $resource->type(),
+            'id' => $resource->id(),
+            'relationships' => [
+                $fieldName => [
+                    'data' => $document['data'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Should existing resource values be provided to the validator for an update request?
+     *
+     * Child classes can overload this method if they need to programmatically work out
+     * if existing values must be provided to the validator instance for an update request.
+     *
+     * @param Model|object $model
+     *      the model being updated
+     * @param array $document
+     *      the JSON API document provided by the client.
+     * @return bool
+     */
+    protected function mustValidateExisting(object $model, array $document): bool
+    {
+        return false !== $this->validateExisting;
+    }
+
+    /**
+     * Extract attributes for a resource update.
+     *
+     * @param Model|object $model
+     * @param array $new
+     * @return array
+     */
+    protected function extractAttributes(object $model, array $new): array
+    {
+        return collect($this->existingAttributes($model))
+            ->merge($new)
+            ->all();
+    }
+
+    /**
+     * Get any existing attributes for the provided model.
+     *
+     * @param Model|object $model
+     * @return iterable
+     */
+    protected function existingAttributes(object $model): iterable
+    {
+        $resource = $this->resources()->create($model);
+
+        return $resource->attributes();
+    }
+
+    /**
+     * Extract relationships for a resource update.
+     *
+     * @param Model|object $model
+     * @param array $new
+     * @return array
+     */
+    protected function extractRelationships(object $model, array $new): array
+    {
+        return collect($this->existingRelationships($model))
+            ->map(fn($value) => $this->convertExistingRelationships($value))
+            ->merge($new)
+            ->all();
+    }
+
+    /**
+     * Get any existing relationships for the provided record.
+     *
+     * As there is no reliable way for us to work this out (as we do not
+     * know the relationship keys), child classes should overload this method
+     * to add existing relationship data.
+     *
+     * @param Model|object $model
+     * @return iterable
+     */
+    protected function existingRelationships(object $model): iterable
+    {
+        return [];
+    }
+
+    /**
+     * Get validation rules for a specified relationship field.
+     *
+     * @return array
+     */
+    private function relationshipRules(): array
+    {
+        $rules = $this->container->call([$this, 'rules']);
+        $fieldName = $this->fieldName();
+
+        return collect($rules)
+            ->filter(fn($v, $key) => Str::startsWith($key, $fieldName))
+            ->all();
+    }
+
+    /**
+     * Convert relationships returned by the `existingRelationships()` method.
+     *
+     * We support the method returning JSON API formatted relationships, e.g.:
+     *
+     * ```
+     * return [
+     *          'author' => [
+     *            'data' => [
+     *              'type' => 'users',
+     *              'id' => (string) $record->author->getRouteKey(),
+     *          ],
+     *      ],
+     * ];
+     * ```
+     *
+     * Or this shorthand:
+     *
+     * ```php
+     * return [
+     *      'author' => $record->author,
+     * ];
+     * ```
+     *
+     * This method converts the shorthand into the JSON API formatted relationships.
+     *
+     * @param $value
+     * @return array
+     */
+    private function convertExistingRelationships($value)
+    {
+        if (is_array($value) && array_key_exists('data', $value)) {
+            return $value;
+        }
+
+        if (is_null($value)) {
+            return ['data' => null];
+        }
+
+        $value = $this->resources()->resolve($value);
+
+        if ($value instanceof JsonApiResource) {
+            return [
+                'data' => [
+                    'type' => $value->type(),
+                    'id' => $value->id(),
+                ],
+            ];
+        }
+
+        $data = collect($value)
+            ->map(fn(JsonApiResource $resource) => ['type' => $resource->type(), 'id' => $resource->id()])
+            ->all();
+
+        return compact('data');
+    }
+
+    /**
+     * Validate the JSON API document for a resource request.
      *
      * @return void
      * @throws HttpExceptionInterface
      */
-    private function validateDocument(): void
+    private function validateResourceDocument(): void
     {
-        $route = JsonApi::route();
-        $id = $this->isUpdating() ? $route->resourceId() : null;
+        $route = $this->jsonApi()->route();
+        $id = $route->hasResourceId() ? $route->resourceId() : null;
 
         /** @var ResourceBuilder $builder */
-        $builder = app(ResourceBuilder::class);
+        $builder = $this->container->make(ResourceBuilder::class);
 
         try {
             $document = $builder
@@ -201,6 +581,60 @@ class ResourceRequest extends FormRequest
         if ($document->invalid()) {
             throw $this->invalidDocument($document->errors());
         }
+    }
+
+    /**
+     * Validate the JSON API document for a modify relationship request.
+     *
+     * @return void
+     * @throws HttpExceptionInterface
+     */
+    private function validateRelationshipDocument(): void
+    {
+        $route = $this->jsonApi()->route();
+
+        /** @var RelationBuilder $builder */
+        $builder = $this->container->make(RelationBuilder::class);
+
+        try {
+            $document = $builder
+                ->expects($route->resourceType(), $route->fieldName())
+                ->build($this->getContent());
+        } catch (\JsonException $ex) {
+            throw $this->invalidJson($ex);
+        } catch (UnexpectedDocumentException $ex) {
+            throw $this->unexpectedDocument($ex);
+        }
+
+        if ($document->invalid()) {
+            throw $this->invalidDocument($document->errors());
+        }
+    }
+
+    /**
+     * Is this a request to modify a relationship?
+     *
+     * @return bool
+     */
+    private function isRelationship(): bool
+    {
+        return $this->jsonApi()->route()->hasRelation();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isNotRelationship(): bool
+    {
+        return !$this->isRelationship();
+    }
+
+    /**
+     * @return ResourceContainer
+     */
+    private function resources(): ResourceContainer
+    {
+        return $this->jsonApi()->server()->resources();
     }
 
 }

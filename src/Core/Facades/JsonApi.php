@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Routing\Route;
 
 /**
@@ -37,6 +38,6 @@ class JsonApi extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'json-api';
+        return JsonApiService::class;
     }
 }

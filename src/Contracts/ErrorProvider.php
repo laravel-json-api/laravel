@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,32 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace LaravelJsonApi\Contracts;
 
-use Illuminate\Support\Arr;
+use LaravelJsonApi\Core\Document\ErrorList;
 
-class HasMany extends HasOne
+interface ErrorProvider
 {
 
     /**
-     * @inheritDoc
+     * @return ErrorList
      */
-    protected function accept(?array $data): bool
-    {
-        if (is_null($data)) {
-            return false;
-        }
-
-        if (empty($data)) {
-            return true;
-        }
-
-        if (Arr::isAssoc($data)) {
-            return false;
-        }
-
-        return collect($data)->every(function ($value) {
-            return $this->acceptType($value);
-        });
-    }
+    public function toErrors(): ErrorList;
 }

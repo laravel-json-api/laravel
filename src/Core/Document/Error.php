@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
 use LogicException;
@@ -83,7 +84,7 @@ class Error implements Serializable
             return $value;
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return Error::fromArray($value);
         }
 
@@ -93,11 +94,19 @@ class Error implements Serializable
     /**
      * Create an error from an array.
      *
-     * @param array $values
+     * @param array|Enumerable $values
      * @return static
      */
-    public static function fromArray(array $values): Error
+    public static function fromArray($values): Error
     {
+        if ($values instanceof Enumerable) {
+            $values = $values->all();
+        }
+
+        if (!is_array($values)) {
+            throw new InvalidArgumentException('Expecting an array or enumerable object.');
+        }
+
         return static::make()
             ->setId($values['id'] ?? null)
             ->setLinks($values['links'] ?? null)

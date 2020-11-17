@@ -17,22 +17,34 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\JsonApi\V1\Videos;
 
-use LaravelJsonApi\Http\Controllers\Actions;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
-class PostController
+class VideoResource extends JsonApiResource
 {
 
-    use Actions\FetchMany;
-    use Actions\FetchOne;
-    use Actions\Store;
-    use Actions\Update;
-    use Actions\Destroy;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
-    use Actions\AttachRelationship;
-    use Actions\DetachRelationship;
+    /**
+     * @return iterable
+     */
+    public function attributes(): iterable
+    {
+        return [
+            'createdAt' => $this->created_at,
+            'title' => $this->title,
+            'updatedAt' => $this->updated_at,
+            'url' => $this->url,
+        ];
+    }
+
+    /**
+     * @return iterable
+     */
+    public function relationships(): iterable
+    {
+        return [
+            $this->relation('tags'),
+        ];
+    }
 
 }

@@ -17,22 +17,19 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Posts;
+namespace App\JsonApi\V1\Tags;
 
-use App\Models\Post;
+use App\Models\Tag;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
-use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
-use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
 use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
 use LaravelJsonApi\Eloquent\Schema;
 
-class PostSchema extends Schema
+class TagSchema extends Schema
 {
 
     /**
@@ -40,7 +37,7 @@ class PostSchema extends Schema
      *
      * @var string
      */
-    public static string $model = Post::class;
+    public static string $model = Tag::class;
 
     /**
      * @inheritDoc
@@ -49,15 +46,15 @@ class PostSchema extends Schema
     {
         return [
             ID::make(),
-            BelongsTo::make('author')->inverseType('users')->readOnly(),
-            HasMany::make('comments')->readOnly(),
-            Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
-            Str::make('slug'),
-            Str::make('synopsis'),
-            BelongsToMany::make('tags'),
-            Str::make('title')->sortable(),
+            Str::make('name')->sortable(),
+            BelongsToMany::make('posts')
+                ->cannotEagerLoad()
+                ->readOnly(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
+            BelongsToMany::make('videos')
+                ->cannotEagerLoad()
+                ->readOnly(),
         ];
     }
 
@@ -68,7 +65,6 @@ class PostSchema extends Schema
     {
         return [
             WhereIn::make('id', $this->idColumn())->delimiter(','),
-            Where::make('slug')->singular(),
         ];
     }
 

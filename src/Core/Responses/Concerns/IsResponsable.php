@@ -158,6 +158,16 @@ trait IsResponsable
     }
 
     /**
+     * @return array
+     */
+    protected function headers(): array
+    {
+        return \collect(['Content-Type' => 'application/vnd.api+json'])
+            ->merge($this->headers ?: [])
+            ->all();
+    }
+
+    /**
      * @param Request $request
      * @return IncludePaths|null
      */

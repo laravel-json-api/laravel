@@ -17,35 +17,34 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace App\JsonApi\V1\Tags;
 
-use Illuminate\Support\Collection;
-use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
-class AllowedPageParameters extends AbstractAllowedRule
+class TagResource extends JsonApiResource
 {
 
     /**
-     * Create an allowed page parameters rule for the supplied schema.
-     *
-     * @param Schema $schema
-     * @return AllowedPageParameters
+     * @return iterable
      */
-    public static function make(Schema $schema): self
+    public function attributes(): iterable
     {
-        if ($paginator = $schema->pagination()) {
-            return new self($paginator->keys());
-        }
-
-        return new self([]);
+        return [
+            'createdAt' => $this->created_at,
+            'name' => $this->name,
+            'updatedAt' => $this->updated_at,
+        ];
     }
 
     /**
-     * @inheritDoc
+     * @return iterable
      */
-    protected function extract($value): Collection
+    public function relationships(): iterable
     {
-        return collect($value)->keys();
+        return [
+            $this->relation('posts'),
+            $this->relation('videos'),
+        ];
     }
 
 }

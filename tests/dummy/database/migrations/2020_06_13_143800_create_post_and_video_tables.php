@@ -19,7 +19,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostTables extends Migration
+class CreatePostAndVideoTables extends Migration
 {
 
     /**
@@ -45,6 +45,13 @@ class CreatePostTables extends Migration
                 ->onUpdate('cascade');
         });
 
+        Schema::create('videos', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('title');
+            $table->string('url');
+        });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
@@ -64,6 +71,28 @@ class CreatePostTables extends Migration
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
         });
+
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('name');
+        });
+
+        Schema::create('taggables', function (Blueprint $table) {
+            $table->unsignedBigInteger('tag_id');
+            $table->morphs('taggable');
+            $table->primary([
+                'tag_id',
+                'taggable_type',
+                'taggable_id',
+            ]);
+
+            $table->foreign('tag_id')
+                ->references('id')
+                ->on('tags')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+        });
     }
 
     /**
@@ -73,7 +102,10 @@ class CreatePostTables extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('taggables');
+        Schema::dropIfExists('tags');
         Schema::dropIfExists('comments');
+        Schema::dropIfExists('videos');
         Schema::dropIfExists('posts');
     }
 }

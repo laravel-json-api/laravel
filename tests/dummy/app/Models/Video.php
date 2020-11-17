@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class Post extends Model
+class Video extends Model
 {
 
     use HasFactory;
@@ -32,28 +31,7 @@ class Post extends Model
     /**
      * @var string[]
      */
-    protected $fillable = [
-        'content',
-        'slug',
-        'synopsis',
-        'title',
-    ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
+    protected $fillable = ['title', 'url'];
 
     /**
      * @return MorphToMany

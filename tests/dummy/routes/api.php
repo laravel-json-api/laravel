@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('json-api:v1')->prefix('v1')->namespace('Api\V1')->group(function () {
+Route::middleware(['json-api:v1', 'json-api.bindings'])->prefix('v1')->namespace('Api\V1')->group(function () {
     Route::get('posts', 'PostController@index')->defaults('resource_type', 'posts');
     Route::post('posts', 'PostController@store')->defaults('resource_type', 'posts');
     Route::get('posts/{post}', 'PostController@read')
@@ -14,6 +14,7 @@ Route::middleware('json-api:v1')->prefix('v1')->namespace('Api\V1')->group(funct
     Route::delete('posts/{post}', 'PostController@destroy')
         ->defaults('resource_type', 'posts')
         ->defaults('resource_id_name', 'post');
+
     Route::get('posts/{post}/author', 'PostController@readRelated')
         ->defaults('resource_type', 'posts')
         ->defaults('resource_id_name', 'post')
@@ -22,6 +23,7 @@ Route::middleware('json-api:v1')->prefix('v1')->namespace('Api\V1')->group(funct
         ->defaults('resource_type', 'posts')
         ->defaults('resource_id_name', 'post')
         ->defaults('resource_relationship', 'author');
+
     Route::get('posts/{post}/comments', 'PostController@readRelated')
         ->defaults('resource_type', 'posts')
         ->defaults('resource_id_name', 'post')
@@ -30,4 +32,25 @@ Route::middleware('json-api:v1')->prefix('v1')->namespace('Api\V1')->group(funct
         ->defaults('resource_type', 'posts')
         ->defaults('resource_id_name', 'post')
         ->defaults('resource_relationship', 'comments');
+
+    Route::get('posts/{post}/tags', 'PostController@readRelated')
+        ->defaults('resource_type', 'posts')
+        ->defaults('resource_id_name', 'post')
+        ->defaults('resource_relationship', 'tags');
+    Route::get('posts/{post}/relationships/tags', 'PostController@readRelationship')
+        ->defaults('resource_type', 'posts')
+        ->defaults('resource_id_name', 'post')
+        ->defaults('resource_relationship', 'tags');
+    Route::patch('posts/{post}/relationships/tags', 'PostController@updateRelationship')
+        ->defaults('resource_type', 'posts')
+        ->defaults('resource_id_name', 'post')
+        ->defaults('resource_relationship', 'tags');
+    Route::post('posts/{post}/relationships/tags', 'PostController@attachRelationship')
+        ->defaults('resource_type', 'posts')
+        ->defaults('resource_id_name', 'post')
+        ->defaults('resource_relationship', 'tags');
+    Route::delete('posts/{post}/relationships/tags', 'PostController@detachRelationship')
+        ->defaults('resource_type', 'posts')
+        ->defaults('resource_id_name', 'post')
+        ->defaults('resource_relationship', 'tags');
 });

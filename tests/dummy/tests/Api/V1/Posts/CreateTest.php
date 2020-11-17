@@ -20,11 +20,27 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Tests\Api\V1\TestCase;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
 class CreateTest extends TestCase
 {
+
+    /**
+     * @var EloquentCollection
+     */
+    private EloquentCollection $tags;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->tags = Tag::factory()->count(3)->create();
+    }
 
     public function test(): void
     {
@@ -37,10 +53,8 @@ class CreateTest extends TestCase
             ->jsonSerialize();
 
         $response = $this
-            ->withoutExceptionHandling()
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->withData($data)
             ->post('/api/v1/posts');
 
@@ -56,6 +70,43 @@ class CreateTest extends TestCase
             'synopsis' => $data['synopsis'],
             'title' => $data['title'],
         ]);
+
+        $this->assertDatabaseCount('taggables', 2);
+
+        /** @var Tag $tag */
+        foreach ($this->tags->take(2) as $tag) {
+            $this->assertDatabaseHas('taggables', [
+                'tag_id' => $tag->getKey(),
+                'taggable_id' => $id,
+                'taggable_type' => Post::class,
+            ]);
+        }
+    }
+
+    public function testInvalid(): void
+    {
+        $exists = Post::factory()->create();
+        $post = Post::factory()->make();
+
+        $data = $this
+            ->serialize($post)
+            ->replace('slug', $exists->slug)
+            ->jsonSerialize();
+
+        $expected = [
+            'detail' => 'The slug has already been taken.',
+            'source' => ['pointer' => '/data/attributes/slug'],
+            'status' => '422',
+            'title' => 'Unprocessable Entity',
+        ];
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertExactErrorStatus($expected);
     }
 
     public function testNotAcceptableMediaType(): void
@@ -65,8 +116,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
             ->post('/api/v1/posts');
@@ -82,8 +132,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->contentType('application/json')
             ->withData($data)
             ->post('/api/v1/posts');
@@ -113,6 +162,12 @@ class CreateTest extends TestCase
             'relationships' => [
                 'author' => [
                     'data' => null,
+                ],
+                'tags' => [
+                    'data' => $this->tags->take(2)->map(fn(Tag $tag) => [
+                        'type' => 'tags',
+                        'id' => (string) $tag->getRouteKey(),
+                    ])->all(),
                 ],
             ],
         ]);

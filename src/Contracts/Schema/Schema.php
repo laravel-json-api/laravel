@@ -77,6 +77,14 @@ interface Schema extends Traversable
     public function isField(string $name): bool;
 
     /**
+     * Get a field by name.
+     *
+     * @param string $name
+     * @return Field
+     */
+    public function field(string $name): Field;
+
+    /**
      * Get the resource attributes.
      *
      * @return Attribute[]|iterable

@@ -51,6 +51,8 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
+            \LaravelJsonApi\Spec\ServiceProvider::class,
+            \LaravelJsonApi\Validation\ServiceProvider::class,
             ServiceProvider::class,
             AppServiceProvider::class,
             AuthServiceProvider::class,

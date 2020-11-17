@@ -17,35 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace Database\Factories;
 
-use Illuminate\Support\Collection;
-use LaravelJsonApi\Contracts\Schema\Schema;
+use App\Models\Video;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class AllowedSortParameters extends AbstractAllowedRule
+class VideoFactory extends Factory
 {
-
     /**
-     * Create an allowed sort parameter rule for the supplied schema.
+     * The name of the factory's corresponding model.
      *
-     * @param Schema $schema
-     * @return static
+     * @var string
      */
-    public static function make(Schema $schema): self
-    {
-        return new self($schema->sortable());
-    }
+    protected $model = Video::class;
 
     /**
-     * @inheritDoc
+     * Define the model's default state.
+     *
+     * @return array
      */
-    protected function extract($value): Collection
+    public function definition()
     {
-        $params = is_string($value) ? explode(',', $value) : [];
-
-        return collect($params)->map(function ($param) {
-            return ltrim($param, '+-');
-        })->unique()->values();
+        return [
+            'title' => $this->faker->words(3, true),
+            'url' => $this->faker->url,
+        ];
     }
-
 }

@@ -76,7 +76,7 @@ class ErrorResponse implements SerializableContract, Responsable
         return response(
             $this->toJson($this->encodeOptions),
             $this->status ?: $this->errors->status(),
-            $this->headers
+            $this->headers()
         );
     }
 

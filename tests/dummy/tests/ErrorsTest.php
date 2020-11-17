@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
+use App\Models\Post;
 use Illuminate\Testing\TestResponse;
 
 class ErrorsTest extends TestCase
@@ -102,6 +103,37 @@ JSON;
                 [
                     'detail' => 'The field title is not a supported relationship.',
                     'source' => ['pointer' => '/data/relationships'],
+                    'status' => '400',
+                    'title' => 'Non-Compliant JSON API Document',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ]);
+    }
+
+    public function testSpecificationErrorOnRelationship(): void
+    {
+        $post = Post::factory()->create();
+        $uri = url('/api/v1/posts', [$post, 'relationships', 'tags']);
+
+        $json = <<<JSON
+{
+    "data": {
+        "type": "tags",
+        "id": "123"
+    }
+}
+JSON;
+
+        $response = $this->sendInvalid('POST', $uri, $json);
+
+        $response->assertStatus(400)->assertExactJson([
+            'errors' => [
+                [
+                    'detail' => 'The member data must be an array.',
+                    'source' => ['pointer' => '/data'],
                     'status' => '400',
                     'title' => 'Non-Compliant JSON API Document',
                 ],

@@ -60,7 +60,7 @@ class DataResponse implements Responsable
             ->withMeta($this->meta)
             ->withLinks($this->links)
             ->withEncodeOptions($this->encodeOptions)
-            ->withHeaders($this->headers);
+            ->withHeaders($this->headers());
     }
 
     /**

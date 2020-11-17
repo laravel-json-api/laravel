@@ -17,22 +17,29 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace Database\Factories;
 
-use LaravelJsonApi\Http\Controllers\Actions;
+use App\Models\Tag;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PostController
+class TagFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Tag::class;
 
-    use Actions\FetchMany;
-    use Actions\FetchOne;
-    use Actions\Store;
-    use Actions\Update;
-    use Actions\Destroy;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
-    use Actions\AttachRelationship;
-    use Actions\DetachRelationship;
-
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->colorName,
+        ];
+    }
 }

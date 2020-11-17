@@ -31,6 +31,14 @@ interface Container
     public function schemaFor(string $resourceType): Schema;
 
     /**
+     * Does a schema exist for the supplied resource type?
+     *
+     * @param string $resourceType
+     * @return bool
+     */
+    public function exists(string $resourceType): bool;
+
+    /**
      * Get a list of all the supported resource types.
      *
      * @return array

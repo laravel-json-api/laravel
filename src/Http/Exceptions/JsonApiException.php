@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Http\Exceptions;
 
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
+use LaravelJsonApi\Contracts\ErrorProvider;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
@@ -53,7 +54,7 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     /**
      * JsonApiException constructor.
      *
-     * @param ErrorList|Error|Error[] $errors
+     * @param ErrorList|ErrorProvider|Error|Error[] $errors
      * @param Throwable|null $previous
      * @param array $headers
      */

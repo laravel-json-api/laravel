@@ -22,7 +22,10 @@ namespace LaravelJsonApi\Core\Document;
 use Countable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
+use Illuminate\Support\Enumerable;
+use InvalidArgumentException;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\ErrorProvider;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LogicException;
@@ -42,7 +45,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     /**
      * Create a list of JSON API error objects.
      *
-     * @param ErrorList|Error|array $value
+     * @param ErrorList|ErrorProvider|Error|array $value
      * @return ErrorList
      */
     public static function cast($value): ErrorList
@@ -51,11 +54,15 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
             return $value;
         }
 
+        if ($value instanceof ErrorProvider) {
+            return $value->toErrors();
+        }
+
         if ($value instanceof Error) {
             return new ErrorList($value);
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return ErrorList::fromArray($value);
         }
 
@@ -63,13 +70,17 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     }
 
     /**
-     * @param array $array
+     * @param array|Enumerable $value
      * @return ErrorList
      */
-    public static function fromArray(array $array): self
+    public static function fromArray($value): self
     {
+        if (!is_array($value) && !$value instanceof Enumerable) {
+            throw new InvalidArgumentException('Expecting an array or enumerable object.');
+        }
+
         $errors = new self();
-        $errors->stack = collect($array)->map(function ($error) {
+        $errors->stack = collect($value)->map(function ($error) {
             return Error::cast($error);
         })->values()->all();
 

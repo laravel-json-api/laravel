@@ -64,6 +64,23 @@ class ReadTest extends TestCase
         $response->assertFetchedNull();
     }
 
+    public function testInvalidQueryParameter(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this
+            ->jsonApi('posts')
+            ->includePaths('foo')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertExactErrorStatus([
+            'detail' => 'Include path foo is not allowed.',
+            'source' => ['parameter' => 'include'],
+            'status' => '400',
+            'title' => 'Invalid Query Parameter',
+        ]);
+    }
+
     public function testInvalidMediaType(): void
     {
         $post = Post::factory()->create();

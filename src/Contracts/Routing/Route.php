@@ -20,6 +20,7 @@ namespace LaravelJsonApi\Contracts\Routing;
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 interface Route
 {
@@ -37,6 +38,13 @@ interface Route
      * @return Model|mixed|string|null
      */
     public function modelOrResourceId();
+
+    /**
+     * Does the URL have a resource id?
+     *
+     * @return bool
+     */
+    public function hasResourceId(): bool;
 
     /**
      * Get the resource id.
@@ -89,4 +97,12 @@ interface Route
      * @return Relation
      */
     public function relation(): Relation;
+
+    /**
+     * Substitute the route bindings onto the Laravel route.
+     *
+     * @return void
+     * @throws HttpExceptionInterface
+     */
+    public function substituteBindings(): void;
 }

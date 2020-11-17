@@ -64,7 +64,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
             return new self();
         }
 
-        throw new UnexpectedValueException('Unexpected include path value.');
+        throw new UnexpectedValueException('Unexpected include paths value.');
     }
 
     /**

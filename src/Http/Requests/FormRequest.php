@@ -19,7 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http\Requests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
+use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Core\JsonApiService;
+use LaravelJsonApi\Validation\Factory as ValidationFactory;
 
 class FormRequest extends BaseFormRequest
 {
@@ -55,5 +59,47 @@ class FormRequest extends BaseFormRequest
     public function isJsonApi(): bool
     {
         return $this->matchesType(self::JSON_API_MEDIA_TYPE, $this->header('CONTENT_TYPE'));
+    }
+
+    /**
+     * Get the JSON API schema for the request.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return $this->jsonApi()->route()->schema();
+    }
+
+    /**
+     * Get the model that the request relates to, if the URL has a resource id.
+     *
+     * @return Model|object|null
+     */
+    public function model(): ?object
+    {
+        $route = $this->jsonApi()->route();
+
+        if ($route->hasResourceId()) {
+            return $route->model();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return ValidationFactory
+     */
+    protected function validationErrors(): ValidationFactory
+    {
+        return $this->container->make(ValidationFactory::class);
+    }
+
+    /**
+     * @return JsonApiService
+     */
+    protected function jsonApi(): JsonApiService
+    {
+        return $this->container->make(JsonApiService::class);
     }
 }

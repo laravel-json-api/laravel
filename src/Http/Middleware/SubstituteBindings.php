@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,48 +17,43 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Rules;
+namespace LaravelJsonApi\Http\Middleware;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Routing\Route;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-class ParameterNotSupported implements Rule
+class SubstituteBindings
 {
 
     /**
-     * @var string|null
+     * @var Route
      */
-    private ?string $name;
+    private Route $route;
 
     /**
-     * DisallowedParameter constructor.
+     * SubstituteBindings constructor.
      *
-     * @param string $name
+     * @param Route $route
      */
-    public function __construct(string $name = null)
+    public function __construct(Route $route)
     {
-        $this->name = $name;
+        $this->route = $route;
     }
 
     /**
-     * @inheritDoc
+     * Handle the request.
+     *
+     * @param Request $request
+     * @param Closure $next
+     * @return mixed
+     * @throws HttpExceptionInterface
      */
-    public function passes($attribute, $value)
+    public function handle($request, Closure $next)
     {
-        if (!$this->name) {
-            $this->name = $attribute;
-        }
+        $this->route->substituteBindings();
 
-        return false;
+        return $next($request);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function message()
-    {
-        return trans('jsonapi::validation.parameter_not_supported', [
-            'name' => $this->name,
-        ]);
-    }
-
 }

@@ -1,0 +1,73 @@
+<?php
+/*
+ * Copyright 2020 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+declare(strict_types=1);
+
+namespace LaravelJsonApi\Http\Controllers\Actions;
+
+use Illuminate\Contracts\Support\Responsable;
+use LaravelJsonApi\Contracts\Routing\Route;
+use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Http\Requests\ResourceRequest;
+
+trait UpdateRelationship
+{
+
+    /**
+     * Update a resource relationship.
+     *
+     * @param Route $route
+     * @param StoreContract $store
+     * @return Responsable
+     */
+    public function updateRelationship(Route $route, StoreContract $store): Responsable
+    {
+        $model = $route->model();
+
+        $relation = $route
+            ->schema()
+            ->relationship($fieldName = $route->fieldName());
+
+        $request = ResourceRequest::forResource(
+            $resourceType = $route->resourceType()
+        );
+
+        $query = ResourceQuery::queryOne($resourceType);
+
+        $data = $request->validatedForRelation();
+
+        if ($relation->toOne()) {
+            $result = $store
+                ->modifyToOne($resourceType, $model, $fieldName)
+                ->using($query)
+                ->associate($data);
+        } else {
+            $result = $store
+                ->modifyToMany($resourceType, $model, $fieldName)
+                ->using($query)
+                ->sync($data);
+        }
+
+        return new RelationshipResponse(
+            $model,
+            $fieldName,
+            $result
+        );
+    }
+}

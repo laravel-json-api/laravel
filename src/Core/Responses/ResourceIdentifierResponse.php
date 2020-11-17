@@ -86,14 +86,4 @@ class ResourceIdentifierResponse implements Responsable
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function headers(): array
-    {
-        return \collect(['Content-Type' => 'application/vnd.api+json'])
-            ->merge($this->headers ?: [])
-            ->all();
-    }
-
 }

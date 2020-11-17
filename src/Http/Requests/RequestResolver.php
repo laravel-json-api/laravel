@@ -51,12 +51,22 @@ class RequestResolver
      */
     public function __invoke(string $resourceType): FormRequest
     {
+        $app = app();
+
         try {
             $fqn = Str::replaceLast('Schema', $this->type, get_class(
-                app(SchemaContainer::class)->schemaFor($resourceType)
+                $app->make(SchemaContainer::class)->schemaFor($resourceType)
             ));
 
-            return app($fqn);
+            if (!class_exists($fqn) && !$app->bound($fqn)) {
+                if ('CollectionQuery' === $this->type) {
+                    $fqn = AnonymousCollectionQuery::class;
+                } else if ('Query' === $this->type) {
+                    $fqn = AnonymousQuery::class;
+                }
+            }
+
+            return $app->make($fqn);
         } catch (BindingResolutionException $ex) {
            throw new LogicException(sprintf(
                'Unable to create request class of type [%s] for resource type %s.',

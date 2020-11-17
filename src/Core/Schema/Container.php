@@ -87,6 +87,14 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
+    public function exists(string $resourceType): bool
+    {
+        return isset($this->types[$resourceType]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function types(): array
     {
         return array_keys($this->types);

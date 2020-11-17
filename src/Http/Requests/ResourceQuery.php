@@ -19,11 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
+use LaravelJsonApi\Http\Exceptions\JsonApiException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
@@ -63,7 +65,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Resolve the request instance when querying many resources.
      *
      * @param string $resourceType
-     * @return QueryParameters
+     * @return QueryParameters|ResourceQuery
      */
     public static function queryMany(string $resourceType): QueryParameters
     {
@@ -87,7 +89,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Resolve the request instance when querying one resource.
      *
      * @param string $resourceType
-     * @return QueryParameters
+     * @return QueryParameters|ResourceQuery
      */
     public static function queryOne(string $resourceType): QueryParameters
     {
@@ -182,6 +184,16 @@ class ResourceQuery extends FormRequest implements QueryParameters
         if (!$this->isAcceptableMediaType()) {
             throw $this->notAcceptable();
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new JsonApiException($this->validationErrors()->createErrorsForQuery(
+            $validator
+        ));
     }
 
     /**
