@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,38 @@
 
 declare(strict_types=1);
 
-namespace App\Tests;
+namespace LaravelJsonApi\Laravel\Tests\Integration;
 
 use App\Models\Post;
 use Illuminate\Testing\TestResponse;
+use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 class ErrorsTest extends TestCase
 {
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadLaravelMigrations();
+        $this->loadMigrationsFrom(__DIR__ . '/../../dummy/database/migrations');
+
+        config()->set('json-api', [
+            'servers' => [
+                'v1' => \App\JsonApi\V1\Server::class,
+            ],
+        ]);
+
+        $this->defaultApiRoutes(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(function ($server) {
+                $server->resource('posts')->relationships(function ($relations) {
+                    $relations->hasMany('tags');
+                });
+            });
+        });
+    }
 
     public function testInvalidJson(): void
     {

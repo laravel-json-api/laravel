@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration;
 
+use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -31,7 +32,25 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
+            \LaravelJsonApi\Spec\ServiceProvider::class,
+            \LaravelJsonApi\Validation\ServiceProvider::class,
+            \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
             ServiceProvider::class,
         ];
+    }
+
+    /**
+     * Call the closure within the default Laravel API route setup.
+     *
+     * @param \Closure $callback
+     * @return void
+     * @see https://github.com/laravel/laravel/blob/8.x/app/Providers/RouteServiceProvider.php
+     */
+    protected function defaultApiRoutes(\Closure $callback): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace('App\\Http\\Controllers')
+            ->group($callback);
     }
 }
