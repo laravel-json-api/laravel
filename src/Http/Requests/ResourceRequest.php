@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Requests;
+namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
@@ -28,8 +28,8 @@ use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Http\Exceptions\JsonApiException;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LaravelJsonApi\Spec\UnexpectedDocumentException;

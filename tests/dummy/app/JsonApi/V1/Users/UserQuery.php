@@ -2,7 +2,7 @@
 
 namespace App\JsonApi\V1\Users;
 
-use LaravelJsonApi\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class UserQuery extends ResourceQuery

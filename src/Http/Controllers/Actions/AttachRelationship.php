@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Http\Requests\ResourceQuery;
-use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LogicException;
 
 trait AttachRelationship

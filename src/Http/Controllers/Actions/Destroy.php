@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;

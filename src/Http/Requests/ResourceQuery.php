@@ -17,15 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Requests;
+namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
-use LaravelJsonApi\Http\Exceptions\JsonApiException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;

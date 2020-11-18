@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Posts;
 
 use Illuminate\Validation\Rule;
-use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class PostRequest extends ResourceRequest

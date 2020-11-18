@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Middleware;
+namespace LaravelJsonApi\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;

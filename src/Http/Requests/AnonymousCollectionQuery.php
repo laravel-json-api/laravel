@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelJsonApi\Http\Requests;
+namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
 

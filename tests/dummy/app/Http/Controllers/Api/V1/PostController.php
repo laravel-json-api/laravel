@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use LaravelJsonApi\Http\Controllers\Actions;
+use LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 class PostController
 {

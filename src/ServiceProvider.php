@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi;
+namespace LaravelJsonApi\Laravel;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
@@ -26,9 +26,9 @@ use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\Server;
 use LaravelJsonApi\Core\Server\ServerRepository;
-use LaravelJsonApi\Http\Middleware\BootJsonApi;
-use LaravelJsonApi\Http\Middleware\SubstituteBindings;
-use LaravelJsonApi\Routing\Route;
+use LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi;
+use LaravelJsonApi\Laravel\Http\Middleware\SubstituteBindings;
+use LaravelJsonApi\Laravel\Routing\Route;
 
 class ServiceProvider extends BaseServiceProvider
 {

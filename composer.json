@@ -43,6 +43,10 @@
         {
             "type": "path",
             "url": "../encoder-neomerx"
+        },
+        {
+            "type": "path",
+            "url": "../testing"
         }
     ],
     "require": {
@@ -57,13 +61,13 @@
         "neomerx/json-api": "^4.0"
     },
     "require-dev": {
-        "cloudcreativity/json-api-testing": "^3.1",
+        "laravel-json-api/testing": "*",
         "orchestra/testbench": "^6.3",
         "phpunit/phpunit": "^9.4"
     },
     "autoload": {
         "psr-4": {
-            "LaravelJsonApi\\": "src/"
+            "LaravelJsonApi\\Laravel\\": "src/"
         }
     },
     "autoload-dev": {
@@ -71,7 +75,7 @@
             "App\\":  "tests/dummy/app",
             "App\\Tests\\": "tests/dummy/tests",
             "Database\\Factories\\": "tests/dummy/database/factories",
-            "LaravelJsonApi\\Tests\\": "tests/lib"
+            "LaravelJsonApi\\Laravel\\Tests\\": "tests/lib"
         }
     },
     "extra": {

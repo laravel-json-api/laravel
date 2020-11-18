@@ -17,14 +17,14 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
-use LaravelJsonApi\Http\Requests\ResourceQuery;
-use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait UpdateRelationship
 {

@@ -3,7 +3,7 @@
 namespace App\JsonApi\V1\Comments;
 
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
-use LaravelJsonApi\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 
 class CommentCollectionQuery extends ResourceQuery
 {
