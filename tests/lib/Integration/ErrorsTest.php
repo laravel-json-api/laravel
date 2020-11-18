@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Laravel\Tests\Integration;
 use App\Models\Post;
 use Illuminate\Testing\TestResponse;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
+use phpDocumentor\Reflection\Types\Parent_;
 
 class ErrorsTest extends TestCase
 {
@@ -48,6 +49,34 @@ class ErrorsTest extends TestCase
                 });
             });
         });
+    }
+
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \LaravelJsonApi\Testing\TestExceptionHandler::class
+        );
+    }
+
+    public function testNotFound(): void
+    {
+        $response = $this->get('/api/v1/posts/9999', ['Accept' => 'application/vnd.api+json']);
+
+        $response->assertExactJson([
+            'errors' => [
+                [
+                    'status' => '404',
+                    'title' => 'Not Found',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ]);
     }
 
     public function testInvalidJson(): void

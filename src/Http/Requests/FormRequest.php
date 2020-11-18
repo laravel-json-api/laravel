@@ -40,7 +40,7 @@ class FormRequest extends BaseFormRequest
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && self::JSON_API_MEDIA_TYPE === $acceptable;
+        return isset($acceptable[0]) && self::JSON_API_MEDIA_TYPE === $acceptable[0];
     }
 
     /**
