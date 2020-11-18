@@ -53,6 +53,7 @@ class CreateTest extends TestCase
             ->jsonSerialize();
 
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($post->author)
             ->jsonApi('posts')
             ->withData($data)

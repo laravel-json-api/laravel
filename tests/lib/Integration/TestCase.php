@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,23 @@
  * limitations under the License.
  */
 
-namespace App\Providers;
+declare(strict_types=1);
 
-use Illuminate\Support\ServiceProvider;
+namespace LaravelJsonApi\Laravel\Tests\Integration;
 
-class AppServiceProvider extends ServiceProvider
+use LaravelJsonApi\Laravel\ServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
+
+class TestCase extends BaseTestCase
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
 
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
+     * @inheritDoc
      */
-    public function boot()
+    protected function getPackageProviders($app)
     {
-        config()->set('json-api', require __DIR__ . '/../../config/json-api.php');
+        return [
+            ServiceProvider::class,
+        ];
     }
 }

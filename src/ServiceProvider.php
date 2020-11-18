@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +27,6 @@ use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\Server;
 use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi;
-use LaravelJsonApi\Laravel\Http\Middleware\SubstituteBindings;
-use LaravelJsonApi\Laravel\Routing\Route;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -42,7 +40,6 @@ class ServiceProvider extends BaseServiceProvider
     public function boot(Router $router): void
     {
         $router->aliasMiddleware('json-api', BootJsonApi::class);
-        $router->aliasMiddleware('json-api.bindings', SubstituteBindings::class);
     }
 
     /**
@@ -50,19 +47,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->bindRoute();
         $this->bindService();
         $this->bindServer();
-    }
-
-    /**
-     * Bind the route instance into the container.
-     *
-     * @return void
-     */
-    private function bindRoute(): void
-    {
-        $this->app->bind(Contracts\Routing\Route::class, Route::class);
     }
 
     /**

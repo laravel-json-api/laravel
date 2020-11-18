@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2020 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,27 @@
  * limitations under the License.
  */
 
-namespace App\Providers;
+declare(strict_types=1);
 
-use Illuminate\Support\ServiceProvider;
+namespace LaravelJsonApi\Laravel\Facades;
 
-class AppServiceProvider extends ServiceProvider
+use Illuminate\Support\Facades\Facade;
+use LaravelJsonApi\Laravel\Routing\PendingServerRegistration;
+use LaravelJsonApi\Laravel\Routing\Registrar;
+
+/**
+ * Class JsonApiRoute
+ *
+ * @method static PendingServerRegistration server(string $name)
+ */
+class JsonApiRoute extends Facade
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
 
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
+     * @return string
      */
-    public function boot()
+    protected static function getFacadeAccessor()
     {
-        config()->set('json-api', require __DIR__ . '/../../config/json-api.php');
+        return Registrar::class;
     }
 }
