@@ -24,7 +24,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
-use LaravelJsonApi\Core\Server\Server;
 use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi;
 
@@ -69,7 +68,6 @@ class ServiceProvider extends BaseServiceProvider
     private function bindServer(): void
     {
         $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
-        $this->app->bind(Contracts\Server\Server::class, Server::class);
 
         $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
             return $app->make(Contracts\Server\Server::class)->store();

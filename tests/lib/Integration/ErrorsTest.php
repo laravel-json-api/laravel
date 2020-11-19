@@ -20,12 +20,24 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Tests\Integration;
 
 use App\Models\Post;
-use Illuminate\Testing\TestResponse;
+use Carbon\Carbon;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
-use phpDocumentor\Reflection\Types\Parent_;
+use LaravelJsonApi\Testing\MakesJsonApiRequests;
+use LaravelJsonApi\Testing\TestResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ErrorsTest extends TestCase
 {
+
+    use MakesJsonApiRequests;
 
     /**
      * @return void
@@ -64,18 +76,13 @@ class ErrorsTest extends TestCase
 
     public function testNotFound(): void
     {
-        $response = $this->get('/api/v1/posts/9999', ['Accept' => 'application/vnd.api+json']);
+        $response = $this
+            ->jsonApi()
+            ->get('/api/v1/posts/9999');
 
-        $response->assertExactJson([
-            'errors' => [
-                [
-                    'status' => '404',
-                    'title' => 'Not Found',
-                ],
-            ],
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
+        $response->assertExactErrorStatus([
+            'status' => '404',
+            'title' => 'Not Found',
         ]);
     }
 
@@ -90,18 +97,11 @@ JSON;
 
         $response = $this->sendInvalid('POST', '/api/v1/posts', $json);
 
-        $response->assertStatus(400)->assertExactJson([
-            'errors' => [
-                [
-                    'code' => '4',
-                    'detail' => 'Syntax error',
-                    'status' => '400',
-                    'title' => 'Invalid JSON',
-                ],
-            ],
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
+        $response->assertExactErrorStatus([
+            'code' => '4',
+            'detail' => 'Syntax error',
+            'status' => '400',
+            'title' => 'Invalid JSON',
         ]);
     }
 
@@ -112,17 +112,10 @@ JSON;
     {
         $response = $this->sendInvalid('POST', '/api/v1/posts', '[]');
 
-        $response->assertStatus(400)->assertExactJson([
-            'errors' => [
-                [
-                    'detail' => 'Expecting JSON to decode to an object.',
-                    'status' => '400',
-                    'title' => 'Invalid JSON',
-                ],
-            ],
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
+        $response->assertExactErrorStatus([
+            'detail' => 'Expecting JSON to decode to an object.',
+            'status' => '400',
+            'title' => 'Invalid JSON',
         ]);
     }
 
@@ -146,23 +139,17 @@ JSON;
 
         $response = $this->sendInvalid('POST', '/api/v1/posts', $json);
 
-        $response->assertStatus(400)->assertExactJson([
-            'errors' => [
-                [
-                    'detail' => 'The field author is not a supported attribute.',
-                    'source' => ['pointer' => '/data/attributes'],
-                    'status' => '400',
-                    'title' => 'Non-Compliant JSON API Document',
-                ],
-                [
-                    'detail' => 'The field title is not a supported relationship.',
-                    'source' => ['pointer' => '/data/relationships'],
-                    'status' => '400',
-                    'title' => 'Non-Compliant JSON API Document',
-                ],
+        $response->assertExactErrors(400, [
+            ['detail' => 'The field author is not a supported attribute.',
+                'source' => ['pointer' => '/data/attributes'],
+                'status' => '400',
+                'title' => 'Non-Compliant JSON API Document',
             ],
-            'jsonapi' => [
-                'version' => '1.0',
+            [
+                'detail' => 'The field title is not a supported relationship.',
+                'source' => ['pointer' => '/data/relationships'],
+                'status' => '400',
+                'title' => 'Non-Compliant JSON API Document',
             ],
         ]);
     }
@@ -183,19 +170,199 @@ JSON;
 
         $response = $this->sendInvalid('POST', $uri, $json);
 
-        $response->assertStatus(400)->assertExactJson([
+        $response->assertExactErrorStatus([
+            'detail' => 'The member data must be an array.',
+            'source' => ['pointer' => '/data'],
+            'status' => '400',
+            'title' => 'Non-Compliant JSON API Document',
+        ]);
+    }
+
+    /**
+     * A JSON API exception thrown from a non-standard route renders as
+     * JSON API.
+     */
+    public function testJsonApiException(): void
+    {
+        Route::get('/test', function () {
+            throw JsonApiException::error([
+                'status' => '418',
+                'detail' => "Hello, I'm a teapot.",
+            ])->withHeaders(['X-Foo' => 'Bar']);
+        });
+
+        $expected = [
             'errors' => [
                 [
-                    'detail' => 'The member data must be an array.',
-                    'source' => ['pointer' => '/data'],
-                    'status' => '400',
-                    'title' => 'Non-Compliant JSON API Document',
+                    'status' => '418',
+                    'detail' => "Hello, I'm a teapot.",
                 ],
             ],
             'jsonapi' => [
                 'version' => '1.0',
             ],
+        ];
+
+        $this->get('/test')
+            ->assertStatus(418)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertHeader('X-Foo', 'Bar')
+            ->assertExactJson($expected);
+    }
+
+    public function testMaintenanceMode(): void
+    {
+        Route::get('/test', function () {
+            throw new MaintenanceModeException(Carbon::now()->getTimestamp(), 60, "We'll be back soon.");
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'title' => 'Service Unavailable',
+                    'detail' => "We'll be back soon.",
+                    'status' => '503',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(503)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
+
+
+    /**
+     * By default Laravel sends a 419 response for a TokenMismatchException.
+     *
+     * @see https://github.com/cloudcreativity/laravel-json-api/issues/181
+     */
+    public function testTokenMismatch(): void
+    {
+        Route::get('/test', function () {
+            throw new TokenMismatchException("The token is not valid.");
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'detail' => 'The token is not valid.',
+                    'status' => '419',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(419)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
+
+    public function testHttpException(): void
+    {
+        Route::get('/test', function () {
+            throw new HttpException(
+                418,
+                "I think I might be a teapot.",
+                null,
+                ['X-Teapot' => 'True']
+            );
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'title' => "I'm a teapot",
+                    'detail' => 'I think I might be a teapot.',
+                    'status' => '418',
+                ]
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(418)
+            ->assertHeader('X-Teapot', 'True')
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
+
+
+    /**
+     * If we get a Laravel validation exception we need to convert this to
+     * JSON API errors.
+     */
+    public function testValidationException(): void
+    {
+        $messages = new MessageBag([
+            'email' => 'These credentials do not match our records.',
+            'foo.bar' => 'Foo bar is not baz.',
         ]);
+
+        $validator = $this->createMock(Validator::class);
+        $validator->method('errors')->willReturn($messages);
+
+        Route::get('/test', function () use ($validator) {
+            throw new ValidationException($validator);
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'detail' => 'These credentials do not match our records.',
+                    'source' => ['pointer' => '/email'],
+                    'status' => '422',
+                    'title' => 'Unprocessable Entity',
+                ],
+                [
+                    'detail' => 'Foo bar is not baz.',
+                    'source' => ['pointer' => '/foo/bar'],
+                    'status' => '422',
+                    'title' => 'Unprocessable Entity',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(422)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
+
+    public function testGenericException(): void
+    {
+        Route::get('/test', function () {
+            throw new \Exception('Boom.');
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'title' => 'Internal Server Error',
+                    'status' => '500',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(500)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
     }
 
     /**
@@ -211,6 +378,8 @@ JSON;
             'CONTENT_TYPE' => 'application/vnd.api+json',
         ]);
 
-        return $this->call($method, $uri, [], [], [], $headers, $content);
+        $response = $this->call($method, $uri, [], [], [], $headers, $content);
+
+        return TestResponse::cast($response);
     }
 }
