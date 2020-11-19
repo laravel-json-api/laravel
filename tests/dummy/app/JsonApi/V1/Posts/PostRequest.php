@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Posts;
 
+use App\Models\Post;
 use Illuminate\Validation\Rule;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
@@ -43,6 +44,37 @@ class PostRequest extends ResourceRequest
             'synopsis' => ['required', 'string'],
             'tags' => JsonApiRule::toMany(),
             'title' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function deleteRules(): array
+    {
+        return [
+            'meta.no_comments' => 'accepted',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function deleteMessages(): array
+    {
+        return [
+            'meta.no_comments.accepted' => 'Cannot delete a post with comments.',
+        ];
+    }
+
+    /**
+     * @param Post $post
+     * @return array
+     */
+    public function metaForDelete(Post $post): array
+    {
+        return [
+            'no_comments' => $post->comments()->doesntExist(),
         ];
     }
 }

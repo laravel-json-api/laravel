@@ -19,13 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait Destroy
 {
@@ -39,19 +36,14 @@ trait Destroy
      */
     public function destroy(Route $route, StoreContract $store): Response
     {
-        $model = $route->model();
+        ResourceRequest::forResource(
+            $resourceType = $route->resourceType()
+        );
 
-        if (method_exists($this, 'authorizeDestroy')) {
-            $this->authorizeDestroy(Auth::user(), $model);
-        } else if (true !== Gate::check('delete', $model)) {
-            if (Auth::guest()) {
-                throw new AuthenticationException();
-            }
-
-            throw new AuthorizationException();
-        }
-
-        $store->delete($route->resourceType(), $model);
+        $store->delete(
+            $resourceType,
+            $route->modelOrResourceId()
+        );
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

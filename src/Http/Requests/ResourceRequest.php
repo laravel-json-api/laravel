@@ -132,6 +132,14 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * @return bool
+     */
+    public function isDeleting(): bool
+    {
+        return $this->isMethod('DELETE') && $this->isNotRelationship();
+    }
+
+    /**
      * Perform resource authorization.
      *
      * @param Gate $gate
@@ -166,6 +174,10 @@ class ResourceRequest extends FormRequest
                 $ability . Str::classify($relation->name()),
                 [$this->modelOrFail(), $related]
             );
+        }
+
+        if ($this->isDeleting()) {
+            return $gate->check('delete', $this->modelOrFail());
         }
 
         return true;
@@ -226,12 +238,25 @@ class ResourceRequest extends FormRequest
     public function validationDataForRelationship(): array
     {
         $document = $this->dataForRelationship(
-            $this->model(),
+            $this->modelOrFail(),
             $this->jsonApi()->route()->fieldName(),
             $this->document()
         );
 
         return ResourceObject::fromArray($document)->all();
+    }
+
+    /**
+     * @return array
+     */
+    public function validationDataForDelete(): array
+    {
+        $document = $this->dataForDelete($this->modelOrFail());
+
+        $fields = ResourceObject::fromArray($document)->all();
+        $fields['meta'] = array_merge($fields['meta'] ?? [], $document['meta'] ?? []);
+
+        return $fields;
     }
 
     /**
@@ -277,10 +302,18 @@ class ResourceRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new JsonApiException($this->validationErrors()->createErrorsForResource(
-            $this->schema(),
-            $validator
-        ));
+        $factory = $this->validationErrors();
+
+        if ($this->isDeleting()) {
+            $errors = $factory->createErrorsForDeleteResource($validator);
+        } else {
+            $errors = $factory->createErrorsForResource(
+                $this->schema(),
+                $validator
+            );
+        }
+
+        throw new JsonApiException($errors);
     }
 
     /**
@@ -351,6 +384,10 @@ class ResourceRequest extends FormRequest
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
+        if ($this->isDeleting()) {
+            return $this->createDeleteValidator($factory);
+        }
+
         if ($this->isRelationship()) {
             return $this->createRelationshipValidator($factory);
         }
@@ -359,6 +396,8 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * Create a validator to validate a relationship document.
+     *
      * @param ValidationFactory $factory
      * @return Validator
      */
@@ -369,6 +408,22 @@ class ResourceRequest extends FormRequest
             $this->relationshipRules(),
             $this->messages(),
             $this->attributes()
+        );
+    }
+
+    /**
+     * Create a validator to validate a delete request.
+     *
+     * @param ValidationFactory $factory
+     * @return Validator
+     */
+    protected function createDeleteValidator(ValidationFactory $factory): Validator
+    {
+        return $factory->make(
+            $this->validationDataForDelete(),
+            method_exists($this, 'deleteRules') ? $this->container->call([$this, 'deleteRules']) : [],
+            method_exists($this, 'deleteMessages') ? $this->deleteMessages() : $this->messages(),
+            method_exists($this, 'deleteAttributes') ? $this->deleteAttributes() : $this->attributes()
         );
     }
 
@@ -425,7 +480,7 @@ class ResourceRequest extends FormRequest
     /**
      * Get validation data for modifying a relationship.
      *
-     * @param mixed $record
+     * @param Model|object $record
      * @param string $fieldName
      * @param array $document
      * @return array
@@ -443,6 +498,30 @@ class ResourceRequest extends FormRequest
                 ],
             ],
         ];
+    }
+
+    /**
+     * Get validation data for deleting a resource.
+     *
+     * @param Model|object $record
+     * @return array
+     */
+    protected function dataForDelete(object $record): array
+    {
+        $route = $this->jsonApi()->route();
+
+        $data = $this->dataForUpdate($record, [
+            'data' => [
+                'type' => $route->resourceType(),
+                'id' => $route->resourceId(),
+            ],
+        ]);
+
+        if (method_exists($this, 'metaForDelete')) {
+            $data['meta'] = (array) $this->metaForDelete($record);
+        }
+
+        return $data;
     }
 
     /**
