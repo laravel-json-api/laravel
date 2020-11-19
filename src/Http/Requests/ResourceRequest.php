@@ -295,13 +295,12 @@ class ResourceRequest extends FormRequest
      * Get an exception if the media type is not supported.
      *
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function unsupportedMediaType(): HttpExceptionInterface
     {
         return new HttpException(
             Response::HTTP_UNSUPPORTED_MEDIA_TYPE,
-            'The request entity has a media type which the server or resource does not support.'
+            __('The request entity has a media type which the server or resource does not support.')
         );
     }
 
@@ -310,15 +309,14 @@ class ResourceRequest extends FormRequest
      *
      * @param \JsonException $ex
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function invalidJson(\JsonException $ex): HttpExceptionInterface
     {
         return new JsonApiException(Error::make()
             ->setStatus(Response::HTTP_BAD_REQUEST)
             ->setCode($ex->getCode())
-            ->setTitle('Invalid JSON')
-            ->setDetail($ex->getMessage())
+            ->setTitle(__('Invalid JSON'))
+            ->setDetail(__($ex->getMessage()))
         );
     }
 
@@ -327,14 +325,13 @@ class ResourceRequest extends FormRequest
      *
      * @param UnexpectedDocumentException $ex
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function unexpectedDocument(UnexpectedDocumentException $ex): HttpExceptionInterface
     {
         return new JsonApiException(Error::make()
             ->setStatus(Response::HTTP_BAD_REQUEST)
-            ->setTitle('Invalid JSON')
-            ->setDetail($ex->getMessage())
+            ->setTitle(__('Invalid JSON'))
+            ->setDetail(__($ex->getMessage()))
         );
     }
 
@@ -343,7 +340,6 @@ class ResourceRequest extends FormRequest
      *
      * @param ErrorList $errors
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function invalidDocument(ErrorList $errors): HttpExceptionInterface
     {

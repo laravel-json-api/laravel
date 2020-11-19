@@ -276,14 +276,13 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Get an exception if the media type is not acceptable.
      *
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function notAcceptable(): HttpExceptionInterface
     {
         return new HttpException(
             Response::HTTP_NOT_ACCEPTABLE,
-            "The requested resource is capable of generating only content not acceptable "
-            . "according to the Accept headers sent in the request."
+            __("The requested resource is capable of generating only content not acceptable "
+            . "according to the Accept headers sent in the request.")
         );
     }
 }
