@@ -42,6 +42,7 @@ class PostFactory extends Factory
         return [
             'author_id' => User::factory(),
             'content' => $this->faker->text,
+            'published_at' => $this->faker->dateTimeThisMonth,
             'slug' => $this->faker->unique()->slug,
             'synopsis' => $this->faker->sentence,
             'title' => $this->faker->words(3, true),

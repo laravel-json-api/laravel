@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Exceptions;
 
 use Closure;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -115,6 +116,10 @@ class ExceptionParser
             return new ErrorResponse($this->getValidationErrors($ex));
         }
 
+        if ($ex instanceof AuthenticationException) {
+            return new ErrorResponse($this->getAuthenticationError($ex));
+        }
+
         return new ErrorResponse($this->getDefaultError());
     }
 
@@ -130,17 +135,29 @@ class ExceptionParser
     }
 
     /**
-     * Convert a HTTP exception to a JSON API error.
-     *
-     * @param HttpExceptionInterface $e
+     * @param AuthenticationException $ex
      * @return Error
      */
-    protected function getHttpError(HttpExceptionInterface $e): Error
+    protected function getAuthenticationError(AuthenticationException $ex): Error
     {
         return Error::make()
-            ->setStatus($status = $e->getStatusCode())
+            ->setStatus(401)
+            ->setTitle($this->getHttpTitle(401))
+            ->setDetail(__($ex->getMessage()));
+    }
+
+    /**
+     * Convert a HTTP exception to a JSON API error.
+     *
+     * @param HttpExceptionInterface $ex
+     * @return Error
+     */
+    protected function getHttpError(HttpExceptionInterface $ex): Error
+    {
+        return Error::make()
+            ->setStatus($status = $ex->getStatusCode())
             ->setTitle($this->getHttpTitle($status))
-            ->setDetail(__($e->getMessage()));
+            ->setDetail(__($ex->getMessage()));
     }
 
     /**

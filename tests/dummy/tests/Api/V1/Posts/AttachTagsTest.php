@@ -22,6 +22,7 @@ namespace App\Tests\Api\V1\Posts;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -97,6 +98,51 @@ class AttachTagsTest extends TestCase
             'status' => '422',
             'title' => 'Unprocessable Entity',
         ]);
+    }
+
+    public function testUnauthorized(): void
+    {
+        $existing = Tag::factory()->count(2)->create();
+        $this->post->tags()->attach($existing);
+
+        /** @var Collection $tags */
+        $tags = Tag::factory()->count(2)->create();
+
+        $ids = $tags
+            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
+            ->all();
+
+        $response = $this
+            ->jsonApi('tags')
+            ->withData($ids)
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
+
+        $response->assertStatus(401);
+
+        $this->assertDatabaseCount('taggables', 2);
+    }
+
+    public function testForbidden(): void
+    {
+        $existing = Tag::factory()->count(2)->create();
+        $this->post->tags()->attach($existing);
+
+        /** @var Collection $tags */
+        $tags = Tag::factory()->count(2)->create();
+
+        $ids = $tags
+            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
+            ->all();
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('tags')
+            ->withData($ids)
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseCount('taggables', 2);
     }
 
     public function testNotAcceptableMediaType(): void

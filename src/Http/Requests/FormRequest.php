@@ -19,11 +19,15 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Validation\Factory as ValidationFactory;
+use LogicException;
 
 class FormRequest extends BaseFormRequest
 {
@@ -88,9 +92,85 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
+     * Get the model that the request relates to, or fail if there is none.
+     *
+     * @return Model|object
+     */
+    public function modelOrFail(): object
+    {
+        if ($model = $this->model()) {
+            return $model;
+        }
+
+        throw new LogicException('No model exists for this route.');
+    }
+
+    /**
+     * Should default resource authorization be run?
+     *
+     * For authorization to be triggered, authorization must
+     * be enabled for both the server AND the resource schema.
+     *
+     * @return bool
+     */
+    protected function mustAuthorize(): bool
+    {
+        if ($this->jsonApi()->server()->authorizable()) {
+            return $this->schema()->authorizable();
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function passesAuthorization()
+    {
+        /**
+         * If the developer has implemented the `authorize` method, we
+         * will return the result if it is a boolean. This allows
+         * the developer to return a null value to indicate they want
+         * the default authorization to run.
+         */
+        if (method_exists($this, 'authorize')) {
+            if (is_bool($passes = $this->container->call([$this, 'authorize']))) {
+                return $passes;
+            }
+        }
+
+        /**
+         * If the developer has not authorized the request themselves,
+         * we run our default authorization as long as authorization is
+         * enabled for both the server and the schema (checked via the
+         * `mustAuthorize()` method).
+         */
+        if ($this->mustAuthorize() && method_exists($this, 'authorizeResource')) {
+            return $this->container->call([$this, 'authorizeResource']);
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function failedAuthorization()
+    {
+        /** @var Guard $auth */
+        $auth = $this->container->make(Guard::class);
+
+        if ($auth->guest()) {
+            throw new AuthenticationException();
+        }
+
+        throw new AuthorizationException;
+    }
+
+    /**
      * @return ValidationFactory
      */
-    protected function validationErrors(): ValidationFactory
+    final protected function validationErrors(): ValidationFactory
     {
         return $this->container->make(ValidationFactory::class);
     }
@@ -98,8 +178,46 @@ class FormRequest extends BaseFormRequest
     /**
      * @return JsonApiService
      */
-    protected function jsonApi(): JsonApiService
+    final protected function jsonApi(): JsonApiService
     {
         return $this->container->make(JsonApiService::class);
+    }
+
+    /**
+     * Is the request for a specific resource?
+     *
+     * @return bool
+     */
+    final protected function isResource(): bool
+    {
+        return $this->jsonApi()->route()->hasResourceId();
+    }
+
+    /**
+     * Is the request not for a specific resource?
+     *
+     * @return bool
+     */
+    final protected function isNotResource(): bool
+    {
+        return !$this->isResource();
+    }
+
+    /**
+     * Is this a request to modify a relationship?
+     *
+     * @return bool
+     */
+    final protected function isRelationship(): bool
+    {
+        return $this->jsonApi()->route()->hasRelation();
+    }
+
+    /**
+     * @return bool
+     */
+    final protected function isNotRelationship(): bool
+    {
+        return !$this->isRelationship();
     }
 }

@@ -19,17 +19,18 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LaravelJsonApi\Spec\UnexpectedDocumentException;
@@ -128,6 +129,46 @@ class ResourceRequest extends FormRequest
     public function isModifyingRelationship(): bool
     {
         return $this->isUpdatingRelation() || $this->isAttachingRelation() || $this->isDetachingRelation();
+    }
+
+    /**
+     * Perform resource authorization.
+     *
+     * @param Gate $gate
+     * @return bool
+     */
+    public function authorizeResource(Gate $gate): bool
+    {
+        if ($this->isCreating()) {
+            return $gate->check('create', $this->schema()->model());
+        }
+
+        if ($this->isUpdating()) {
+            return $gate->check('update', $this->modelOrFail());
+        }
+
+        if ($this->isModifyingRelationship()) {
+            $related = new RelatedResourceRetriever(
+                $this->jsonApi()->server(),
+                $relation = $this->jsonApi()->route()->relation(),
+                $this
+            );
+
+            if ($this->isAttachingRelation()) {
+                $ability = 'attach';
+            } else if ($this->isDetachingRelation()) {
+                $ability = 'detach';
+            } else {
+                $ability = 'update';
+            }
+
+            return $gate->check(
+                $ability . Str::classify($relation->name()),
+                [$this->modelOrFail(), $related]
+            );
+        }
+
+        return true;
     }
 
     /**
@@ -612,27 +653,9 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Is this a request to modify a relationship?
-     *
-     * @return bool
-     */
-    private function isRelationship(): bool
-    {
-        return $this->jsonApi()->route()->hasRelation();
-    }
-
-    /**
-     * @return bool
-     */
-    private function isNotRelationship(): bool
-    {
-        return !$this->isRelationship();
-    }
-
-    /**
      * @return ResourceContainer
      */
-    private function resources(): ResourceContainer
+    final protected function resources(): ResourceContainer
     {
         return $this->jsonApi()->server()->resources();
     }

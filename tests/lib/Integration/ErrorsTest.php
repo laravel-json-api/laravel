@@ -21,6 +21,8 @@ namespace LaravelJsonApi\Laravel\Tests\Integration;
 
 use App\Models\Post;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
 use Illuminate\Session\TokenMismatchException;
@@ -296,6 +298,55 @@ JSON;
             ->assertExactJson($expected);
     }
 
+    public function testAuthenticationException(): void
+    {
+        Route::get('/test', function () {
+            throw new AuthenticationException('You must sign in.');
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'detail' => 'You must sign in.',
+                    'status' => '401',
+                    'title' => 'Unauthorized',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(401)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
+
+    public function testAuthorizationException(): void
+    {
+        Route::get('/test', function () {
+            throw new AuthorizationException('Access denied.');
+        });
+
+        $expected = [
+            'errors' => [
+                [
+                    'detail' => 'Access denied.',
+                    'status' => '403',
+                    'title' => 'Forbidden',
+                ],
+            ],
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+        ];
+
+        $this->get('/test', ['Accept' => 'application/vnd.api+json'])
+            ->assertStatus(403)
+            ->assertHeader('Content-Type', 'application/vnd.api+json')
+            ->assertExactJson($expected);
+    }
 
     /**
      * If we get a Laravel validation exception we need to convert this to

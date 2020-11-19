@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use Illuminate\Support\Arr;
 
@@ -29,6 +30,32 @@ class IndexTest extends TestCase
     public function test(): void
     {
         $posts = Post::factory()->count(3)->create();
+
+        /** Draft post should not appear. */
+        Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany($posts);
+    }
+
+    public function testWithUser(): void
+    {
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(3)->create();
+
+        /** Draft for this user should appear. */
+        Post::factory()->create([
+            'author_id' => $user,
+            'published_at' => null,
+        ]);
+
+        /** Draft post should not appear. */
+        Post::factory()->create(['published_at' => null]);
 
         $response = $this
             ->withoutExceptionHandling()

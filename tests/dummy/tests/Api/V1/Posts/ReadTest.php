@@ -18,6 +18,7 @@
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 
 class ReadTest extends TestCase
@@ -62,6 +63,55 @@ class ReadTest extends TestCase
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedNull();
+    }
+
+    /**
+     * Draft posts do not appear in our API for guests, because of our
+     * post scope. Therefore, attempting to access a draft post as a
+     * guest should receive a 404 response.
+     */
+    public function testDraftAsGuest(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * Same if an authenticated user attempts to access the
+     * draft post when they are not the author - they would receive
+     * a 404 as it is excluded from the API.
+     */
+    public function testDraftUserIsNotAuthor(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * The author should be able to access their draft post.
+     */
+    public function testDraftAsAuthor(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+        $expected = $this->serializer->post($post)->jsonSerialize();
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOne($expected);
     }
 
     public function testInvalidQueryParameter(): void

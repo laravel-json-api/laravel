@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1;
 
+use App\JsonApi\V1\Posts\PostScope;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Core\Server\Server as BaseServer;
@@ -38,6 +39,7 @@ class Server extends BaseServer
      */
     public function serving(): void
     {
+        Post::addGlobalScope(new PostScope());
         Post::creating(static function (Post $post) {
             $post->author()->associate(Auth::user());
         });

@@ -33,6 +33,7 @@ class CreatePostAndVideoTables extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('author_id');
+            $table->timestamp('published_at')->nullable();
             $table->string('title');
             $table->string('slug');
             $table->string('synopsis');

@@ -84,6 +84,55 @@ class ReadAuthorIdentifierTest extends TestCase
         $response->assertFetchedNull();
     }
 
+
+    /**
+     * Draft posts do not appear in our API for guests, because of our
+     * post scope. Therefore, attempting to access a draft post as a
+     * guest should receive a 404 response.
+     */
+    public function testDraftAsGuest(): void
+    {
+        $this->post->update(['published_at' => null]);
+
+        $response = $this
+            ->jsonApi('users')
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * Same if an authenticated user attempts to access the
+     * draft post when they are not the author - they would receive
+     * a 404 as it is excluded from the API.
+     */
+    public function testDraftUserIsNotAuthor(): void
+    {
+        $this->post->update(['published_at' => null]);
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('users')
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * The author should be able to access their draft post.
+     */
+    public function testDraftAsAuthor(): void
+    {
+        $this->post->update(['published_at' => null]);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('users')
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
+
+        $response->assertFetchedToOne($this->post->author);
+    }
+
     public function testInvalidMediaType(): void
     {
         $this->jsonApi()

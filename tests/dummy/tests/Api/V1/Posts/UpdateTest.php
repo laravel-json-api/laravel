@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
@@ -129,6 +130,29 @@ class UpdateTest extends TestCase
             'status' => '422',
             'title' => 'Unprocessable Entity',
         ]);
+    }
+
+    public function testUnauthorized(): void
+    {
+        $response = $this
+            ->jsonApi('posts')
+            ->withData($this->serialize())
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(401);
+    }
+
+    public function testForbidden(): void
+    {
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('posts')
+            ->withData($this->serialize())
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(403);
     }
 
     public function testNotAcceptableMediaType(): void

@@ -34,6 +34,7 @@ class Post extends Model
      */
     protected $fillable = [
         'content',
+        'published_at',
         'slug',
         'synopsis',
         'title',

@@ -110,6 +110,20 @@ class CreateTest extends TestCase
         $response->assertExactErrorStatus($expected);
     }
 
+    public function testUnauthorized(): void
+    {
+        $post = Post::factory()->make();
+        $data = $this->serialize($post);
+
+        $response = $this
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertStatus(401);
+        $this->assertDatabaseCount('posts', 0);
+    }
+
     public function testNotAcceptableMediaType(): void
     {
         $post = Post::factory()->make();

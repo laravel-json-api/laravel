@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
@@ -26,6 +27,7 @@ use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
+use LaravelJsonApi\Core\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
@@ -96,6 +98,64 @@ class ResourceQuery extends FormRequest implements QueryParameters
         $resolver = self::$queryManyResolver ?: new RequestResolver('Query');
 
         return $resolver($resourceType);
+    }
+
+    /**
+     * Is this a request to view any resource? (Index action.)
+     *
+     * @return bool
+     */
+    public function isViewingAny(): bool
+    {
+        return $this->isMethod('GET') && $this->isNotResource() && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to view a specific resource? (Read action.)
+     *
+     * @return bool
+     */
+    public function isViewingOne(): bool
+    {
+        return $this->isMethod('GET') && $this->isResource() && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to view resources in a relationship (Read related/relationship actions.)
+     *
+     * @return bool
+     */
+    public function isViewingRelationship(): bool
+    {
+        return $this->isMethod('GET') && $this->isRelationship();
+    }
+
+    /**
+     * Perform resource authorization.
+     *
+     * @param Gate $gate
+     * @return bool
+     */
+    public function authorizeResource(Gate $gate): bool
+    {
+        if ($this->isViewingAny()) {
+            return $gate->check('viewAny', $this->schema()->model());
+        }
+
+        if ($this->isViewingOne()) {
+            return $gate->check('view', $this->modelOrFail());
+        }
+
+        if ($this->isViewingRelationship()) {
+            $fieldName = $this->jsonApi()->route()->fieldName();
+
+            return $gate->check(
+                'view' . Str::classify($fieldName),
+                $this->modelOrFail()
+            );
+        }
+
+        return true;
     }
 
     /**
