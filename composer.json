@@ -5,12 +5,11 @@
         "jsonapi.org",
         "json-api",
         "jsonapi",
-        "json:api",
         "laravel"
     ],
-    "homepage": "https://github.com/laravel-json-api/{NAME}",
+    "homepage": "https://github.com/laravel-json-api/laravel",
     "support": {
-        "issues": "https://github.com/laravel-json-api/{NAME}/issues"
+        "issues": "https://github.com/laravel-json-api/laravel/issues"
     },
     "license": "Apache-2.0",
     "authors": [
@@ -26,12 +25,10 @@
     "require": {
         "php": "^7.4",
         "ext-json": "*",
-        "laravel/framework": "^8.0",
-        "neomerx/json-api": "^4.0"
+        "laravel/framework": "^8.0"
     },
     "require-dev": {
-        "cloudcreativity/json-api-testing": "^3.1",
-        "orchestra/testbench": "^6.3",
+        "orchestra/testbench": "^6.4",
         "phpunit/phpunit": "^9.4"
     },
     "autoload": {
