@@ -20,7 +20,9 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
+use LaravelJsonApi\Core\Store\LazyRelation;
 
 class PostPolicy
 {
@@ -100,12 +102,12 @@ class PostPolicy
     /**
      * @param User|null $user
      * @param Post $post
-     * @param callable $tags
+     * @param LazyRelation $tags
      * @return bool
      */
-    public function updateTags(?User $user, Post $post, callable $tags): bool
+    public function updateTags(?User $user, Post $post, LazyRelation $tags): bool
     {
-        $tags();
+        $tags->collect()->each(fn(Tag $tag) => $tag);
 
         return $this->author($user, $post);
     }
@@ -113,10 +115,10 @@ class PostPolicy
     /**
      * @param User|null $user
      * @param Post $post
-     * @param callable $tags
+     * @param LazyRelation $tags
      * @return bool
      */
-    public function attachTags(?User $user, Post $post, callable $tags): bool
+    public function attachTags(?User $user, Post $post, LazyRelation $tags): bool
     {
         return $this->updateTags($user, $post, $tags);
     }
@@ -124,10 +126,10 @@ class PostPolicy
     /**
      * @param User|null $user
      * @param Post $post
-     * @param callable $tags
+     * @param LazyRelation $tags
      * @return bool
      */
-    public function detachTags(?User $user, Post $post, callable $tags): bool
+    public function detachTags(?User $user, Post $post, LazyRelation $tags): bool
     {
         return $this->updateTags($user, $post, $tags);
     }

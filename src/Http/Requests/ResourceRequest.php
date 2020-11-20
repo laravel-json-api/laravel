@@ -25,11 +25,10 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
@@ -156,10 +155,10 @@ class ResourceRequest extends FormRequest
         }
 
         if ($this->isModifyingRelationship()) {
-            $related = new RelatedResourceRetriever(
+            $related = new LazyRelation(
                 $this->jsonApi()->server(),
                 $relation = $this->jsonApi()->route()->relation(),
-                $this
+                $this->json()->all()
             );
 
             if ($this->isAttachingRelation()) {

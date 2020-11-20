@@ -56,6 +56,7 @@ class AttachTagsTest extends TestCase
             ->all();
 
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($ids)
