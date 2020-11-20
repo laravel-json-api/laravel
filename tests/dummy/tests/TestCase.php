@@ -59,4 +59,15 @@ abstract class TestCase extends BaseTestCase
             RouteServiceProvider::class,
         ];
     }
+
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \LaravelJsonApi\Testing\TestExceptionHandler::class
+        );
+    }
 }

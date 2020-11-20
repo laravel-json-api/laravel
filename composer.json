@@ -47,6 +47,10 @@
         {
             "type": "path",
             "url": "../testing"
+        },
+        {
+            "type": "path",
+            "url": "../exceptions"
         }
     ],
     "require": {
@@ -55,6 +59,7 @@
         "laravel-json-api/core": "*",
         "laravel-json-api/eloquent": "*",
         "laravel-json-api/encoder-neomerx": "*",
+        "laravel-json-api/exceptions": "*",
         "laravel-json-api/spec": "*",
         "laravel-json-api/validation": "*",
         "laravel/framework": "^8.0",

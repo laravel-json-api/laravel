@@ -338,48 +338,6 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Get an exception if the JSON is invalid.
-     *
-     * @param \JsonException $ex
-     * @return HttpExceptionInterface
-     */
-    protected function invalidJson(\JsonException $ex): HttpExceptionInterface
-    {
-        return new JsonApiException(Error::make()
-            ->setStatus(Response::HTTP_BAD_REQUEST)
-            ->setCode($ex->getCode())
-            ->setTitle(__('Invalid JSON'))
-            ->setDetail(__($ex->getMessage()))
-        );
-    }
-
-    /**
-     * Get an exception if the JSON is not an object.
-     *
-     * @param UnexpectedDocumentException $ex
-     * @return HttpExceptionInterface
-     */
-    protected function unexpectedDocument(UnexpectedDocumentException $ex): HttpExceptionInterface
-    {
-        return new JsonApiException(Error::make()
-            ->setStatus(Response::HTTP_BAD_REQUEST)
-            ->setTitle(__('Invalid JSON'))
-            ->setDetail(__($ex->getMessage()))
-        );
-    }
-
-    /**
-     * Get an exception for a JSON document that has failed JSON-API specification validation.
-     *
-     * @param ErrorList $errors
-     * @return HttpExceptionInterface
-     */
-    protected function invalidDocument(ErrorList $errors): HttpExceptionInterface
-    {
-        return new JsonApiException($errors);
-    }
-
-    /**
      * @inheritDoc
      */
     protected function createDefaultValidator(ValidationFactory $factory)
@@ -684,18 +642,12 @@ class ResourceRequest extends FormRequest
         /** @var ResourceBuilder $builder */
         $builder = $this->container->make(ResourceBuilder::class);
 
-        try {
-            $document = $builder
-                ->expects($route->resourceType(), $id)
-                ->build($this->getContent());
-        } catch (\JsonException $ex) {
-            throw $this->invalidJson($ex);
-        } catch (UnexpectedDocumentException $ex) {
-            throw $this->unexpectedDocument($ex);
-        }
+        $document = $builder
+            ->expects($route->resourceType(), $id)
+            ->build($this->getContent());
 
         if ($document->invalid()) {
-            throw $this->invalidDocument($document->errors());
+            throw new JsonApiException($document);
         }
     }
 
@@ -703,7 +655,8 @@ class ResourceRequest extends FormRequest
      * Validate the JSON API document for a modify relationship request.
      *
      * @return void
-     * @throws HttpExceptionInterface
+     * @throws UnexpectedDocumentException
+     * @throws JsonApiException
      */
     private function validateRelationshipDocument(): void
     {
@@ -712,18 +665,12 @@ class ResourceRequest extends FormRequest
         /** @var RelationBuilder $builder */
         $builder = $this->container->make(RelationBuilder::class);
 
-        try {
-            $document = $builder
-                ->expects($route->resourceType(), $route->fieldName())
-                ->build($this->getContent());
-        } catch (\JsonException $ex) {
-            throw $this->invalidJson($ex);
-        } catch (UnexpectedDocumentException $ex) {
-            throw $this->unexpectedDocument($ex);
-        }
+        $document = $builder
+            ->expects($route->resourceType(), $route->fieldName())
+            ->build($this->getContent());
 
         if ($document->invalid()) {
-            throw $this->invalidDocument($document->errors());
+            throw new JsonApiException($document);
         }
     }
 
