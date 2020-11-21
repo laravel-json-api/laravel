@@ -28,6 +28,8 @@ class Server extends BaseServer
 {
 
     /**
+     * The base URI namespace for this server.
+     *
      * @var string
      */
     protected string $baseUri = '/api/v1';

@@ -38,6 +38,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        config()->set('json-api', require __DIR__ . '/../../config/json-api.php');
+        config()->set('jsonapi', require __DIR__ . '/../../config/jsonapi.php');
     }
 }

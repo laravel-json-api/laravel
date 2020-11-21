@@ -41,7 +41,7 @@ class ServiceProvider extends BaseServiceProvider
         $router->aliasMiddleware('json-api', BootJsonApi::class);
 
         $this->publishes([
-            __DIR__ . '/../config/json-api.php' => config_path('json-api.php'),
+            __DIR__ . '/../config/jsonapi.php' => config_path('jsonapi.php'),
         ]);
     }
 
