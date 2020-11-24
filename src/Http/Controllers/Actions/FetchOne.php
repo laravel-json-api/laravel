@@ -35,7 +35,7 @@ trait FetchOne
      * @param StoreContract $store
      * @return Responsable
      */
-    public function read(Route $route, StoreContract $store): Responsable
+    public function show(Route $route, StoreContract $store): Responsable
     {
         $request = ResourceQuery::queryOne(
             $resourceType = $route->resourceType()

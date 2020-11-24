@@ -165,11 +165,11 @@ class ResourceRegistrar
      * @param array $options
      * @return IlluminateRoute
      */
-    protected function addResourceRead(string $resourceType, string $controller, array $options): IlluminateRoute
+    protected function addResourceShow(string $resourceType, string $controller, array $options): IlluminateRoute
     {
         $parameter = $this->getResourceParameterName($resourceType, $options);
         $uri = $this->getResourceUri($resourceType, $options);
-        $action = $this->getResourceAction($resourceType, $controller, 'read', $parameter, $options);
+        $action = $this->getResourceAction($resourceType, $controller, 'show', $parameter, $options);
 
         $route = $this->router->get(sprintf('%s/{%s}', $uri, $parameter), $action);
         $route->defaults(Route::RESOURCE_TYPE, $resourceType);
@@ -231,7 +231,7 @@ class ResourceRegistrar
             return $options['resource_uri'];
         }
 
-        return $resourceType;
+        return Str::dasherize($resourceType);
     }
 
     /**
@@ -378,7 +378,7 @@ class ResourceRegistrar
         $methods = [
             'index',
             'store',
-            'read',
+            'show',
             'update',
             'destroy',
         ];

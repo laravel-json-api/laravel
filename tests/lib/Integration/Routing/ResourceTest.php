@@ -33,7 +33,7 @@ class ResourceTest extends TestCase
         return [
             'index' => ['GET', '/api/v1/posts', 'index', false],
             'store' => ['POST', '/api/v1/posts', 'store', false],
-            'read' => ['GET', '/api/v1/posts/123', 'read', true],
+            'show' => ['GET', '/api/v1/posts/123', 'show', true],
             'update' => ['PATCH', '/api/v1/posts/123', 'update', true],
             'destroy' => ['DELETE', '/api/v1/posts/123', 'destroy', true],
         ];
@@ -60,7 +60,7 @@ class ResourceTest extends TestCase
         $route = $this->assertMatch($method, $uri);
         $this->assertSame("App\Http\Controllers\Api\V1\PostController@{$action}", $route->action['controller']);
         $this->assertSame("v1.posts.{$action}", $route->getName());
-        $this->assertSame(['api', 'json-api:v1'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
         $this->assertSame('posts', $route->parameter('resource_type'));
 
         if ($id) {
@@ -142,7 +142,7 @@ class ResourceTest extends TestCase
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'json-api:v1', 'foo'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo'], $route->action['middleware']);
     }
 
     /**
@@ -166,7 +166,7 @@ class ResourceTest extends TestCase
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'json-api:v1', 'foo', 'bar'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar'], $route->action['middleware']);
     }
 
     /**
@@ -258,21 +258,21 @@ class ResourceTest extends TestCase
                 ['PATCH', '/api/v1/posts/1', 404],
                 ['DELETE', '/api/v1/posts/1', 404],
             ]],
-            [['index', 'read'], [
+            [['index', 'show'], [
                 ['GET', '/api/v1/posts', 200],
                 ['POST', '/api/v1/posts', 405],
                 ['GET', '/api/v1/posts/1', 200],
                 ['PATCH', '/api/v1/posts/1', 405],
                 ['DELETE', '/api/v1/posts/1', 405],
             ]],
-            [['store', 'read', 'update', 'destroy'], [
+            [['store', 'show', 'update', 'destroy'], [
                 ['GET', '/api/v1/posts', 405],
                 ['POST', '/api/v1/posts', 200],
                 ['GET', '/api/v1/posts/1', 200],
                 ['PATCH', '/api/v1/posts/1', 200],
                 ['DELETE', '/api/v1/posts/1', 200],
             ]],
-            // the old package used 'create' and 'delete' instead of 'store' and 'destroy'
+            // the old package used 'read', 'create' and 'delete' instead of 'store' and 'destroy'
             [['create', 'read', 'update', 'delete'], [
                 ['GET', '/api/v1/posts', 405],
                 ['POST', '/api/v1/posts', 200],
@@ -395,19 +395,20 @@ class ResourceTest extends TestCase
     public function multiWordProvider(): array
     {
         return [
-            'dash' => ['blog-posts', 'blog_post'],
-            'underscore' => ['blog_posts', 'blog_post'],
-            'camel' => ['blogPosts', 'blogPost'],
+            'dash' => ['blog-posts', 'blog-posts', 'blog_post'],
+            'underscore' => ['blog_posts', 'blog-posts', 'blog_post'],
+            'camel' => ['blogPosts', 'blog-posts', 'blogPost'],
         ];
     }
 
     /**
      * @param string $type
+     * @param string $uri
      * @param string $parameter
      * @dataProvider multiWordProvider
      * @see https://github.com/cloudcreativity/laravel-json-api/issues/224
      */
-    public function testMultiWord(string $type, string $parameter): void
+    public function testMultiWord(string $type, string $uri, string $parameter): void
     {
         $server = $this->createServer('v1');
         $this->createSchema($server, $type, '\d+');
@@ -421,8 +422,8 @@ class ResourceTest extends TestCase
                 });
         });
 
-        $route = $this->assertMatch('GET', "/api/v1/{$type}/123");
-        $this->assertSame("v1.{$type}.read", $route->getName());
+        $route = $this->assertMatch('GET', "/api/v1/{$uri}/123");
+        $this->assertSame("v1.{$type}.show", $route->getName());
         $this->assertSame($type, $route->parameter('resource_type'));
         $this->assertSame($parameter, $route->parameter('resource_id_name'));
         $this->assertSame('\d+', $route->action['where'][$parameter] ?? null);

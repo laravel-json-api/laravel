@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Laravel\Routing;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Routing\RouteCollection;
+use LaravelJsonApi\Core\Support\Str;
 
 class RelationshipRegistrar
 {
@@ -92,10 +93,10 @@ class RelationshipRegistrar
      * @param array $options
      * @return IlluminateRoute
      */
-    protected function addReadRelated(string $fieldName, array $options): IlluminateRoute
+    protected function addShowRelated(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('readRelated', $fieldName, $options);
+        $action = $this->getRelationshipAction('showRelated', $fieldName, $options);
 
         $route = $this->router->get($uri, $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -112,10 +113,10 @@ class RelationshipRegistrar
      * @param array $options
      * @return IlluminateRoute
      */
-    protected function addReadRelationship(string $fieldName, array $options): IlluminateRoute
+    protected function addShowRelationship(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('readRelationship', "{$fieldName}.read", $options);
+        $action = $this->getRelationshipAction('showRelationship', "{$fieldName}.show", $options);
 
         $route = $this->router->get("relationships/{$uri}", $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -193,8 +194,8 @@ class RelationshipRegistrar
     private function getRelationMethods(bool $hasMany, array $options): array
     {
         $methods = [
-            'readRelated',
-            'readRelationship',
+            'showRelated',
+            'showRelationship',
             'updateRelationship',
         ];
 
@@ -250,7 +251,7 @@ class RelationshipRegistrar
             return $options['relationship_uri'];
         }
 
-        return $fieldName;
+        return Str::dasherize($fieldName);
     }
 
     /**

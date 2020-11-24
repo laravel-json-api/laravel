@@ -53,8 +53,9 @@ class PendingRelationshipRegistration
      * @var array
      */
     private array $map = [
-        'related' => 'readRelated',
-        'read' => 'readRelationship',
+        'related' => 'showRelated',
+        'show' => 'showRelationship',
+        'read' => 'showRelationship',
         'update' => 'updateRelationship',
         'replace' => 'updateRelationship',
         'attach' => 'attachRelationship',
@@ -127,7 +128,7 @@ class PendingRelationshipRegistration
      */
     public function readOnly(): self
     {
-        return $this->only('related', 'read');
+        return $this->only('related', 'show');
     }
 
     /**

@@ -35,7 +35,7 @@ trait FetchRelated
      * @param StoreContract $store
      * @return Responsable
      */
-    public function readRelated(Route $route, StoreContract $store): Responsable
+    public function showRelated(Route $route, StoreContract $store): Responsable
     {
         $relation = $route
             ->schema()

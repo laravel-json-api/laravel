@@ -25,6 +25,8 @@ class PostResource extends JsonApiResource
 {
 
     /**
+     * Get the resource's attributes.
+     *
      * @return iterable
      */
     public function attributes(): iterable
@@ -40,6 +42,8 @@ class PostResource extends JsonApiResource
     }
 
     /**
+     * Get the resource's relationships.
+     *
      * @return iterable
      */
     public function relationships(): iterable

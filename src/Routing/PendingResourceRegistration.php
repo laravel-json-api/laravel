@@ -60,6 +60,7 @@ class PendingResourceRegistration
      */
     private array $map = [
         'create' => 'store',
+        'read' => 'show',
         'delete' => 'destroy',
     ];
 
@@ -127,7 +128,7 @@ class PendingResourceRegistration
      */
     public function readOnly(): self
     {
-        return $this->only('index', 'read');
+        return $this->only('index', 'show');
     }
 
     /**

@@ -31,17 +31,17 @@ class HasManyTest extends TestCase
     public function genericProvider(): array
     {
         return [
-            'readRelated' => [
+            'showRelated' => [
                 'GET',
                 '/api/v1/posts/123/tags',
-                'readRelated',
+                'showRelated',
                 'tags',
             ],
-            'readRelationship' => [
+            'showRelationship' => [
                 'GET',
                 '/api/v1/posts/123/relationships/tags',
-                'readRelationship',
-                'tags.read',
+                'showRelationship',
+                'tags.show',
             ],
             'updateRelationship' => [
                 'PATCH',
@@ -87,7 +87,7 @@ class HasManyTest extends TestCase
         $route = $this->assertMatch($method, $uri);
         $this->assertSame("App\Http\Controllers\Api\V1\PostController@{$action}", $route->action['controller']);
         $this->assertSame("v1.posts.{$name}", $route->getName());
-        $this->assertSame(['api', 'json-api:v1'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
         $this->assertSame('posts', $route->parameter('resource_type'));
         $this->assertSame('post', $route->parameter('resource_id_name'));
         $this->assertSame('\d+', $route->action['where']['post'] ?? null);
@@ -146,7 +146,7 @@ class HasManyTest extends TestCase
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'json-api:v1', 'foo', 'bar', 'baz'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz'], $route->action['middleware']);
     }
 
     /**
@@ -186,7 +186,7 @@ class HasManyTest extends TestCase
                 ['POST', '/api/v1/posts/1/relationships/tags', 404],
                 ['DELETE', '/api/v1/posts/1/relationships/tags', 404],
             ]],
-            [['related', 'read'], [
+            [['related', 'show'], [
                 ['GET', '/api/v1/posts/1/tags', 200],
                 ['GET', '/api/v1/posts/1/relationships/tags', 200],
                 ['PATCH', '/api/v1/posts/1/relationships/tags', 405],
@@ -263,7 +263,7 @@ class HasManyTest extends TestCase
                 ['POST', '/api/v1/posts/1/relationships/tags', 200],
                 ['DELETE', '/api/v1/posts/1/relationships/tags', 200],
             ]],
-            [['related', 'read'], [
+            [['related', 'show'], [
                 ['GET', '/api/v1/posts/1/tags', 404],
                 ['GET', '/api/v1/posts/1/relationships/tags', 405],
                 ['PATCH', '/api/v1/posts/1/relationships/tags', 200],
@@ -326,5 +326,30 @@ class HasManyTest extends TestCase
         });
 
         $this->assertRoutes($matches);
+    }
+
+    public function testReadOnly(): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutes(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) {
+                    $server->resource('posts')->relationships(function ($relations) {
+                        $relations->hasMany('tags')->readOnly();
+                    });
+                });
+        });
+
+        $this->assertRoutes([
+            ['GET', '/api/v1/posts/1/tags', 200],
+            ['GET', '/api/v1/posts/1/relationships/tags', 200],
+            ['PATCH', '/api/v1/posts/1/relationships/tags', 405],
+            ['POST', '/api/v1/posts/1/relationships/tags', 405],
+            ['DELETE', '/api/v1/posts/1/relationships/tags', 405],
+        ]);
     }
 }

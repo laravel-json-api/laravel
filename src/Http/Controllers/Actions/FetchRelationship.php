@@ -35,7 +35,7 @@ trait FetchRelationship
      * @param StoreContract $store
      * @return Responsable
      */
-    public function readRelationship(Route $route, StoreContract $store): Responsable
+    public function showRelationship(Route $route, StoreContract $store): Responsable
     {
         $model = $route->model();
         $relation = $route->schema()->relationship(

@@ -52,7 +52,7 @@ class PendingServerRegistration
         $this->router = $router;
         $this->server = $server;
         $this->attributes = [
-            'middleware' => "json-api:{$server->name()}",
+            'middleware' => "jsonapi:{$server->name()}",
             'as' => "{$server->name()}.",
         ];
     }
@@ -89,6 +89,22 @@ class PendingServerRegistration
     {
         $this->attributes['middleware'] = array_merge(
             Arr::wrap($this->attributes['middleware'] ?? []),
+            $middleware
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify middleware that should be removed from the resource routes.
+     *
+     * @param string ...$middleware
+     * @return $this
+     */
+    public function withoutMiddleware(string ...$middleware)
+    {
+        $this->attributes['excluded_middleware'] = array_merge(
+            (array) ($this->options['excluded_middleware'] ?? []),
             $middleware
         );
 
