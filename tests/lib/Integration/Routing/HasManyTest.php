@@ -76,7 +76,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
                 $server->resource('posts')->relationships(function ($relations) {
                     $relations->hasMany('tags');
@@ -107,7 +107,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($action) {
+        $this->defaultApiRoutesWithNamespace(function () use ($action) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -133,7 +133,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -159,7 +159,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -236,7 +236,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($only) {
+        $this->defaultApiRoutesWithNamespace(function () use ($only) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -314,7 +314,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($except) {
+        $this->defaultApiRoutesWithNamespace(function () use ($except) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -333,7 +333,7 @@ class HasManyTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')

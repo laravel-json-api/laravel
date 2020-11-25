@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 
+use App\Http\Controllers\Api\V1\PostController;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
@@ -51,7 +52,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
                 $server->resource('posts');
             });
@@ -76,6 +77,85 @@ class ResourceTest extends TestCase
      * @param string $method
      * @param string $uri
      * @param string $action
+     * @param bool $id
+     * @dataProvider routeProvider
+     */
+    public function testController(string $method, string $uri, string $action, bool $id): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
+                $server->resource('posts', 'BlogPostController');
+            });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(
+            "App\Http\Controllers\Api\V1\BlogPostController@{$action}",
+            $route->action['controller']
+        );
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @param bool $id
+     * @dataProvider routeProvider
+     */
+    public function testControllerFqn(string $method, string $uri, string $action, bool $id): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutes(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->resources(function ($server) {
+                $server->resource('posts', PostController::class);
+            });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(
+            "App\Http\Controllers\Api\V1\PostController@{$action}",
+            $route->action['controller']
+        );
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @param bool $id
+     * @dataProvider routeProvider
+     */
+    public function testDomain(string $method, string $uri, string $action, bool $id): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->domain('api.myapp.com')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) {
+                    $server->resource('posts', 'BlogPostController');
+                });
+        });
+
+        $route = $this->assertMatch($method, "http://api.myapp.com{$uri}");
+        $this->assertSame(
+            "App\Http\Controllers\Api\V1\BlogPostController@{$action}",
+            $route->action['controller']
+        );
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
      * @dataProvider routeProvider
      */
     public function testServerName(string $method, string $uri, string $action): void
@@ -83,7 +163,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -108,7 +188,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($action) {
+        $this->defaultApiRoutesWithNamespace(function () use ($action) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -131,7 +211,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -155,7 +235,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -179,7 +259,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -203,7 +283,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'blog:posts');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -227,7 +307,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -293,7 +373,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($only) {
+        $this->defaultApiRoutesWithNamespace(function () use ($only) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -354,7 +434,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () use ($except) {
+        $this->defaultApiRoutesWithNamespace(function () use ($except) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -371,7 +451,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, 'posts', '\d+');
 
-        $this->defaultApiRoutes(function () {
+        $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
@@ -413,7 +493,7 @@ class ResourceTest extends TestCase
         $server = $this->createServer('v1');
         $this->createSchema($server, $type, '\d+');
 
-        $this->defaultApiRoutes(function () use ($type) {
+        $this->defaultApiRoutesWithNamespace(function () use ($type) {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
