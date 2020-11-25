@@ -184,7 +184,7 @@ class PendingRelationshipRegistration
      * @param string ...$middleware
      * @return $this
      */
-    public function withoutMiddleware(string ...$middleware)
+    public function withoutMiddleware(string ...$middleware): self
     {
         $this->options['excluded_middleware'] = array_merge(
             (array) ($this->options['excluded_middleware'] ?? []),
@@ -192,6 +192,37 @@ class PendingRelationshipRegistration
         );
 
         return $this;
+    }
+
+    /**
+     * Specify that a specified action should have its own named action on the controller.
+     *
+     * @param string ...$actions
+     * @return $this
+     */
+    public function ownAction(string ...$actions): self
+    {
+        $this->options['relationship_own_actions'] = collect($actions)
+            ->map(fn($method) => $this->map[$method] ?? $method)
+            ->all();
+
+        return $this;
+    }
+
+    /**
+     * Specify that all the relationship actions should have their own named action on the controller.
+     *
+     * @return $this
+     */
+    public function ownActions(): self
+    {
+        return $this->ownAction(
+            'related',
+            'show',
+            'update',
+            'attach',
+            'detach',
+        );
     }
 
     /**

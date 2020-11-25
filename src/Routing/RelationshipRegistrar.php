@@ -96,7 +96,12 @@ class RelationshipRegistrar
     protected function addShowRelated(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('showRelated', $fieldName, $options);
+        $action = $this->getRelationshipAction(
+            'showRelated',
+            'showRelated' . Str::classify($fieldName),
+            $fieldName,
+            $options
+        );
 
         $route = $this->router->get($uri, $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -116,7 +121,12 @@ class RelationshipRegistrar
     protected function addShowRelationship(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('showRelationship', "{$fieldName}.show", $options);
+        $action = $this->getRelationshipAction(
+            'showRelationship',
+            'show' . Str::classify($fieldName),
+            "{$fieldName}.show",
+            $options
+        );
 
         $route = $this->router->get("relationships/{$uri}", $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -136,7 +146,12 @@ class RelationshipRegistrar
     protected function addUpdateRelationship(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('updateRelationship', "{$fieldName}.update", $options);
+        $action = $this->getRelationshipAction(
+            'updateRelationship',
+            'update' . Str::classify($fieldName),
+            "{$fieldName}.update",
+            $options
+        );
 
         $route = $this->router->patch("relationships/{$uri}", $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -156,7 +171,12 @@ class RelationshipRegistrar
     protected function addAttachRelationship(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('attachRelationship', "{$fieldName}.attach", $options);
+        $action = $this->getRelationshipAction(
+            'attachRelationship',
+            'attach' . Str::classify($fieldName),
+            "{$fieldName}.attach",
+            $options
+        );
 
         $route = $this->router->post("relationships/{$uri}", $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -176,7 +196,12 @@ class RelationshipRegistrar
     protected function addDetachRelationship(string $fieldName, array $options): IlluminateRoute
     {
         $uri = $this->getRelationshipUri($fieldName, $options);
-        $action = $this->getRelationshipAction('detachRelationship', "{$fieldName}.detach", $options);
+        $action = $this->getRelationshipAction(
+            'detachRelationship',
+            'detach' . Str::classify($fieldName),
+            "{$fieldName}.detach",
+            $options
+        );
 
         $route = $this->router->delete("relationships/{$uri}", $action);
         $route->defaults(Route::RESOURCE_TYPE, $this->resourceType);
@@ -219,12 +244,22 @@ class RelationshipRegistrar
 
     /**
      * @param string $method
+     * @param string $specificMethod
      * @param string $defaultName
      * @param array $options
      * @return array
      */
-    private function getRelationshipAction(string $method, string $defaultName, array $options): array
+    private function getRelationshipAction(
+        string $method,
+        string $specificMethod,
+        string $defaultName,
+        array $options
+    ): array
     {
+        if (in_array($method, $options['relationship_own_actions'] ?? [], true)) {
+            $method = $specificMethod;
+        }
+
         $name = $this->getRelationRouteName($method, $defaultName, $options);
 
         $action = ['as' => $name, 'uses' => $this->controller.'@'.$method];
