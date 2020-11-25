@@ -20,9 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 
 trait FetchRelationship
@@ -33,24 +35,31 @@ trait FetchRelationship
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function showRelationship(Route $route, StoreContract $store): Responsable
+    public function showRelationship(Route $route, StoreContract $store)
     {
-        $model = $route->model();
         $relation = $route->schema()->relationship(
-            $route->fieldName()
+            $fieldName = $route->fieldName()
         );
 
+        $request = $relation->toOne() ?
+            ResourceQuery::queryOne($relation->inverse()) :
+            ResourceQuery::queryMany($relation->inverse());
+
+        $model = $route->model();
+
+        if (method_exists($this, $hook = 'reading' . Str::classify($fieldName))) {
+            $this->{$hook}($model, $request);
+        }
+
         if ($relation->toOne()) {
-            $request = ResourceQuery::queryOne($relation->inverse());
             $data = $store->queryToOne(
                 $route->resourceType(),
                 $model,
                 $relation->name()
             )->using($request)->first();
         } else {
-            $request = ResourceQuery::queryMany($relation->inverse());
             $data = $store->queryToMany(
                 $route->resourceType(),
                 $model,
@@ -58,7 +67,13 @@ trait FetchRelationship
             )->using($request)->getOrPaginate($request->page());
         }
 
-        return new RelationshipResponse(
+        $response = null;
+
+        if (method_exists($this, $hook = 'read' . Str::classify($fieldName))) {
+            $response = $this->{$hook}($model, $data, $request);
+        }
+
+        return $response ?: new RelationshipResponse(
             $model,
             $relation->name(),
             $data

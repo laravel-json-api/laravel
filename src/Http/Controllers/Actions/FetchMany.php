@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
@@ -33,19 +34,29 @@ trait FetchMany
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function index(Route $route, StoreContract $store): Responsable
+    public function index(Route $route, StoreContract $store)
     {
         $request = ResourceQuery::queryMany(
             $resourceType = $route->resourceType()
         );
+
+        if (method_exists($this, 'searching')) {
+            $this->searching($request);
+        }
 
         $data = $store
             ->queryAll($resourceType)
             ->using($request)
             ->firstOrPaginate($request->page());
 
-        return new DataResponse($data);
+        $response = null;
+
+        if (method_exists($this, 'searched')) {
+            $response = $this->searched($data, $request);
+        }
+
+        return $response ?: new DataResponse($data);
     }
 }

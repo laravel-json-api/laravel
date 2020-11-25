@@ -20,9 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 
 trait FetchRelated
@@ -33,30 +35,44 @@ trait FetchRelated
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function showRelated(Route $route, StoreContract $store): Responsable
+    public function showRelated(Route $route, StoreContract $store)
     {
         $relation = $route
             ->schema()
-            ->relationship($route->fieldName());
+            ->relationship($fieldName = $route->fieldName());
+
+        $request = $relation->toOne() ?
+            ResourceQuery::queryOne($relation->inverse()) :
+            ResourceQuery::queryMany($relation->inverse());
+
+        $model = $route->model();
+
+        if (method_exists($this, $hook = 'readingRelated' . Str::classify($fieldName))) {
+            $this->{$hook}($model, $request);
+        }
 
         if ($relation->toOne()) {
-            $request = ResourceQuery::queryOne($relation->inverse());
             $data = $store->queryToOne(
                 $route->resourceType(),
-                $route->modelOrResourceId(),
+                $model,
                 $relation->name()
             )->using($request)->first();
         } else {
-            $request = ResourceQuery::queryMany($relation->inverse());
             $data = $store->queryToMany(
                 $route->resourceType(),
-                $route->modelOrResourceId(),
+                $model,
                 $relation->name()
             )->using($request)->getOrPaginate($request->page());
         }
 
-        return new DataResponse($data);
+        $response = null;
+
+        if (method_exists($this, $hook = 'readRelated' . Str::classify($fieldName))) {
+            $response = $this->{$hook}($model, $data, $request);
+        }
+
+        return $response ?: new DataResponse($data);
     }
 }

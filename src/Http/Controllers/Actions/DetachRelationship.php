@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LogicException;
@@ -38,8 +39,6 @@ trait DetachRelationship
      */
     public function detachRelationship(Route $route, StoreContract $store): Response
     {
-        $model = $route->model();
-
         $relation = $route
             ->schema()
             ->relationship($fieldName = $route->fieldName());
@@ -52,12 +51,25 @@ trait DetachRelationship
             $resourceType = $route->resourceType()
         );
 
-        $query = ResourceQuery::queryOne($resourceType);
+        $query = ResourceQuery::queryMany($resourceType);
 
-        $store->modifyToMany($resourceType, $model, $fieldName)
+        $model = $route->model();
+
+        if (method_exists($this, $hook = 'detaching' . Str::classify($fieldName))) {
+            $this->{$hook}($model, $request, $query);
+        }
+
+        $result = $store
+            ->modifyToMany($resourceType, $model, $fieldName)
             ->using($query)
             ->detach($request->validatedForRelation());
 
-        return response('', Response::HTTP_NO_CONTENT);
+        $response = null;
+
+        if (method_exists($this, $hook = 'detached' . Str::classify($fieldName))) {
+            $response = $this->{$hook}($model, $result, $request, $query);
+        }
+
+        return $response ?: response('', Response::HTTP_NO_CONTENT);
     }
 }

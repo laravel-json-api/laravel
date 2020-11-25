@@ -20,9 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
@@ -34,12 +36,10 @@ trait UpdateRelationship
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function updateRelationship(Route $route, StoreContract $store): Responsable
+    public function updateRelationship(Route $route, StoreContract $store)
     {
-        $model = $route->model();
-
         $relation = $route
             ->schema()
             ->relationship($fieldName = $route->fieldName());
@@ -48,7 +48,15 @@ trait UpdateRelationship
             $resourceType = $route->resourceType()
         );
 
-        $query = ResourceQuery::queryOne($resourceType);
+        $query = $relation->toOne() ?
+            ResourceQuery::queryOne($relation->inverse()) :
+            ResourceQuery::queryMany($relation->inverse());
+
+        $model = $route->model();
+
+        if (method_exists($this, $hook = 'updating' . Str::classify($fieldName))) {
+            $this->{$hook}($model, $request, $query);
+        }
 
         $data = $request->validatedForRelation();
 
@@ -64,7 +72,13 @@ trait UpdateRelationship
                 ->sync($data);
         }
 
-        return new RelationshipResponse(
+        $response = null;
+
+        if (method_exists($this, $hook = 'updated' . Str::classify($fieldName))) {
+            $response = $this->{$hook}($model, $result, $request, $query);
+        }
+
+        return $response ?: new RelationshipResponse(
             $model,
             $fieldName,
             $result

@@ -19,9 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LogicException;
@@ -30,16 +32,14 @@ trait AttachRelationship
 {
 
     /**
-     * Attach records to a has-many relationship.
+     * Attach records to a to-many relationship.
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Response
+     * @return Response|Responsable
      */
-    public function attachRelationship(Route $route, StoreContract $store): Response
+    public function attachRelationship(Route $route, StoreContract $store)
     {
-        $model = $route->model();
-
         $relation = $route
             ->schema()
             ->relationship($fieldName = $route->fieldName());
@@ -52,12 +52,25 @@ trait AttachRelationship
             $resourceType = $route->resourceType()
         );
 
-        $query = ResourceQuery::queryOne($resourceType);
+        $query = ResourceQuery::queryMany($resourceType);
 
-        $store->modifyToMany($resourceType, $model, $fieldName)
+        $model = $route->model();
+
+        if (method_exists($this, $hook = 'attaching' . Str::classify($fieldName))) {
+            $this->{$hook}($model, $request, $query);
+        }
+
+        $result = $store
+            ->modifyToMany($resourceType, $model, $fieldName)
             ->using($query)
             ->attach($request->validatedForRelation());
 
-        return response('', Response::HTTP_NO_CONTENT);
+        $response = null;
+
+        if (method_exists($this, $hook = 'attached' . Str::classify($fieldName))) {
+            $response = $this->{$hook}($model, $result, $request, $query);
+        }
+
+        return $response ?: response('', Response::HTTP_NO_CONTENT);
     }
 }

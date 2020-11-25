@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
@@ -34,9 +35,9 @@ trait Update
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function update(Route $route, StoreContract $store): Responsable
+    public function update(Route $route, StoreContract $store)
     {
         $request = ResourceRequest::forResource(
             $resourceType = $route->resourceType()
@@ -44,11 +45,31 @@ trait Update
 
         $query = ResourceQuery::queryOne($resourceType);
 
+        $model = $route->model();
+
+        if (method_exists($this, 'saving')) {
+            $this->saving($model, $request, $query);
+        }
+
+        if (method_exists($this, 'updating')) {
+            $this->updating($model, $request, $query);
+        }
+
         $model = $store
-            ->update($resourceType, $route->modelOrResourceId())
+            ->update($resourceType, $model)
             ->using($query)
             ->store($request->validated());
 
-        return new DataResponse($model);
+        $response = null;
+
+        if (method_exists($this, 'updated')) {
+            $response = $this->updated($model, $request, $query);
+        }
+
+        if (!$response && method_exists($this, 'saved')) {
+            $response = $this->saved($model, $request, $query);
+        }
+
+        return $response ?: new DataResponse($model);
     }
 }

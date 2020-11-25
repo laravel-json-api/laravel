@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
@@ -32,20 +33,32 @@ trait Destroy
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Response
+     * @return Response|Responsable
      */
-    public function destroy(Route $route, StoreContract $store): Response
+    public function destroy(Route $route, StoreContract $store)
     {
-        ResourceRequest::forResource(
+        $request = ResourceRequest::forResource(
             $resourceType = $route->resourceType()
         );
+
+        $model = $route->model();
+
+        if (method_exists($this, 'deleting')) {
+            $this->deleting($model, $request);
+        }
 
         $store->delete(
             $resourceType,
             $route->modelOrResourceId()
         );
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        $response = null;
+
+        if (method_exists($this, 'deleted')) {
+            $response = $this->deleted($model, $request);
+        }
+
+        return $response ?: response(null, Response::HTTP_NO_CONTENT);
     }
 
 }
