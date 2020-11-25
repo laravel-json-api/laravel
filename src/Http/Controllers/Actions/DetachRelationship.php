@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
@@ -35,9 +36,9 @@ trait DetachRelationship
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Response
+     * @return Response|Responsable
      */
-    public function detachRelationship(Route $route, StoreContract $store): Response
+    public function detachRelationship(Route $route, StoreContract $store)
     {
         $relation = $route
             ->schema()
