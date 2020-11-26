@@ -32,6 +32,10 @@ class PostScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
+        /**
+         * If there is no authenticated user, then we just
+         * need to ensure only published posts are returned.
+         */
         if (Auth::guest()) {
             $builder->whereNotNull(
                 $model->qualifyColumn('published_at')
@@ -39,9 +43,16 @@ class PostScope implements Scope
             return;
         }
 
-        $builder->where(fn($query) => $query
-            ->whereNotNull($model->qualifyColumn('published_at'))
-            ->orWhere($model->qualifyColumn('author_id'), Auth::id()));
+        /**
+         * If there is an authenticated user, then they
+         * can see either published posts OR posts
+         * where they are the author.
+         */
+        $builder->where(function ($query) use ($model) {
+            return $query
+                ->whereNotNull($model->qualifyColumn('published_at'))
+                ->orWhere($model->qualifyColumn('author_id'), Auth::id());
+        });
     }
 
 }
