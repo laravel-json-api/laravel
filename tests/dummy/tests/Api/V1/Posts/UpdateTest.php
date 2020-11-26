@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
@@ -43,6 +44,9 @@ class UpdateTest extends TestCase
 
     public function test(): void
     {
+        $tag = Tag::factory()->create();
+        $this->post->tags()->attach($tag);
+
         $data = $this->serialize();
         $expected = $data->forget('updatedAt')->jsonSerialize();
 
@@ -213,6 +217,12 @@ class UpdateTest extends TestCase
                         'type' => 'users',
                         'id' => (string) $this->post->author->getRouteKey(),
                     ],
+                ],
+                'tags' => [
+                    'data' => $this->post->tags->map(fn(Tag $tag) => [
+                        'type' => 'tags',
+                        'id' => (string) $tag->getRouteKey(),
+                    ])->all(),
                 ],
             ],
         ]);

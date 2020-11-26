@@ -28,6 +28,7 @@ use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Resources\Relation;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
@@ -536,16 +537,19 @@ class ResourceRequest extends FormRequest
     /**
      * Get any existing relationships for the provided record.
      *
-     * As there is no reliable way for us to work this out (as we do not
-     * know the relationship keys), child classes should overload this method
-     * to add existing relationship data.
-     *
      * @param Model|object $model
      * @return iterable
      */
     protected function existingRelationships(object $model): iterable
     {
-        return [];
+        $resource = $this->resources()->create($model);
+
+        /** @var Relation $relationship */
+        foreach ($resource->relationships() as $relationship) {
+            if ($relationship->isValidated()) {
+                yield $relationship->fieldName() => $relationship->data();
+            }
+        }
     }
 
     /**

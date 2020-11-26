@@ -51,7 +51,7 @@ class PostResource extends JsonApiResource
         return [
             $this->relation('author')->showDataIfLoaded(),
             $this->relation('comments'),
-            $this->relation('tags')->showDataIfLoaded(),
+            $this->relation('tags')->showDataIfLoaded()->mustValidate(),
         ];
     }
 
