@@ -106,23 +106,6 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
-     * Should default resource authorization be run?
-     *
-     * For authorization to be triggered, authorization must
-     * be enabled for both the server AND the resource schema.
-     *
-     * @return bool
-     */
-    protected function mustAuthorize(): bool
-    {
-        if ($this->jsonApi()->server()->authorizable()) {
-            return $this->schema()->authorizable();
-        }
-
-        return false;
-    }
-
-    /**
      * @return bool
      */
     protected function passesAuthorization()
@@ -145,7 +128,7 @@ class FormRequest extends BaseFormRequest
          * enabled for both the server and the schema (checked via the
          * `mustAuthorize()` method).
          */
-        if ($this->mustAuthorize() && method_exists($this, 'authorizeResource')) {
+        if (method_exists($this, 'authorizeResource')) {
             return $this->container->call([$this, 'authorizeResource']);
         }
 

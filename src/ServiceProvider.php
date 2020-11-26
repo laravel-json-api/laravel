@@ -50,8 +50,23 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
+        $this->bindAuthorizer();
         $this->bindService();
         $this->bindServer();
+    }
+
+    /**
+     * Bind the authorizer instance into the service container.
+     *
+     * @return void
+     */
+    private function bindAuthorizer(): void
+    {
+        $this->app->bind(Contracts\Auth\Authorizer::class, static function (Application $app) {
+            /** @var Contracts\Routing\Route $route */
+            $route = $app->make(Contracts\Routing\Route::class);
+            return $app->make($route->schema()->authorizer());
+        });
     }
 
     /**

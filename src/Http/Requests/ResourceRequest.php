@@ -19,16 +19,15 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
-use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
@@ -141,42 +140,36 @@ class ResourceRequest extends FormRequest
     /**
      * Perform resource authorization.
      *
-     * @param Gate $gate
+     * @param Authorizer $authorizer
      * @return bool
      */
-    public function authorizeResource(Gate $gate): bool
+    public function authorizeResource(Authorizer $authorizer): bool
     {
         if ($this->isCreating()) {
-            return $gate->check('create', $this->schema()->model());
+            return $authorizer->store($this);
         }
 
         if ($this->isUpdating()) {
-            return $gate->check('update', $this->modelOrFail());
+            return $authorizer->update($this, $this->modelOrFail());
         }
 
         if ($this->isModifyingRelationship()) {
-            $related = new LazyRelation(
-                $this->jsonApi()->server(),
-                $relation = $this->jsonApi()->route()->relation(),
-                $this->json()->all()
-            );
+            $model = $this->modelOrFail();
+            $fieldName = $this->jsonApi()->route()->fieldName();
 
             if ($this->isAttachingRelation()) {
-                $ability = 'attach';
-            } else if ($this->isDetachingRelation()) {
-                $ability = 'detach';
-            } else {
-                $ability = 'update';
+                return $authorizer->attachRelationship($this, $model, $fieldName);
             }
 
-            return $gate->check(
-                $ability . Str::classify($relation->name()),
-                [$this->modelOrFail(), $related]
-            );
+            if ($this->isDetachingRelation()) {
+                return $authorizer->detachRelationship($this, $model, $fieldName);
+            }
+
+            return $authorizer->updateRelationship($this, $model, $fieldName);
         }
 
         if ($this->isDeleting()) {
-            return $gate->check('delete', $this->modelOrFail());
+            return $authorizer->destroy($this, $this->modelOrFail());
         }
 
         return true;

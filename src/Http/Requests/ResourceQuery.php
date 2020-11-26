@@ -19,15 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
-use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
-use LaravelJsonApi\Core\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
@@ -133,25 +132,24 @@ class ResourceQuery extends FormRequest implements QueryParameters
     /**
      * Perform resource authorization.
      *
-     * @param Gate $gate
+     * @param Authorizer $authorizer
      * @return bool
      */
-    public function authorizeResource(Gate $gate): bool
+    public function authorizeResource(Authorizer $authorizer): bool
     {
         if ($this->isViewingAny()) {
-            return $gate->check('viewAny', $this->schema()->model());
+            return $authorizer->index($this);
         }
 
         if ($this->isViewingOne()) {
-            return $gate->check('view', $this->modelOrFail());
+            return $authorizer->show($this, $this->modelOrFail());
         }
 
         if ($this->isViewingRelationship()) {
-            $fieldName = $this->jsonApi()->route()->fieldName();
-
-            return $gate->check(
-                'view' . Str::classify($fieldName),
-                $this->modelOrFail()
+            return $authorizer->showRelationship(
+                $this,
+                $this->modelOrFail(),
+                $this->jsonApi()->route()->fieldName()
             );
         }
 
