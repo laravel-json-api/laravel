@@ -66,6 +66,126 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
+     * Is this a request to view any resource? (Index action.)
+     *
+     * @return bool
+     */
+    public function isViewingAny(): bool
+    {
+        return $this->isMethod('GET') && $this->doesntHaveResourceId() && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to view a specific resource? (Read action.)
+     *
+     * @return bool
+     */
+    public function isViewingOne(): bool
+    {
+        return $this->isMethod('GET') && $this->hasResourceId() && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to view resources in a relationship (Read related/relationship actions.)
+     *
+     * @return bool
+     */
+    public function isViewingRelationship(): bool
+    {
+        return $this->isMethod('GET') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to create a resource?
+     *
+     * @return bool
+     */
+    public function isCreating(): bool
+    {
+        return $this->isMethod('POST') && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to update a resource?
+     *
+     * @return bool
+     */
+    public function isUpdating(): bool
+    {
+        return $this->isMethod('PATCH') && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to replace a resource relationship?
+     *
+     * @return bool
+     */
+    public function isUpdatingRelationship(): bool
+    {
+        return $this->isMethod('PATCH') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to attach records to a resource relationship?
+     *
+     * @return bool
+     */
+    public function isAttachingRelationship(): bool
+    {
+        return $this->isMethod('POST') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to detach records from a resource relationship?
+     *
+     * @return bool
+     */
+    public function isDetachingRelationship(): bool
+    {
+        return $this->isMethod('DELETE') && $this->isRelationship();
+    }
+
+    /**
+     * Is this a request to modify a resource relationship?
+     *
+     * @return bool
+     */
+    public function isModifyingRelationship(): bool
+    {
+        return $this->isUpdatingRelationship() ||
+            $this->isAttachingRelationship() ||
+            $this->isDetachingRelationship();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleting(): bool
+    {
+        return $this->isMethod('DELETE') && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to view or modify a relationship?
+     *
+     * @return bool
+     */
+    public function isRelationship(): bool
+    {
+        return $this->jsonApi()->route()->hasRelation();
+    }
+
+    /**
+     * Is this a request to not view a relationship?
+     *
+     * @return bool
+     */
+    public function isNotRelationship(): bool
+    {
+        return !$this->isRelationship();
+    }
+
+    /**
      * Get the field name for a relationship request.
      *
      * @return string|null
@@ -183,11 +303,11 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
-     * Is the request for a specific resource?
+     * Is there a resource id?
      *
      * @return bool
      */
-    final protected function isResource(): bool
+    private function hasResourceId(): bool
     {
         return $this->jsonApi()->route()->hasResourceId();
     }
@@ -197,26 +317,8 @@ class FormRequest extends BaseFormRequest
      *
      * @return bool
      */
-    final protected function isNotResource(): bool
+    private function doesntHaveResourceId(): bool
     {
-        return !$this->isResource();
-    }
-
-    /**
-     * Is this a request to modify a relationship?
-     *
-     * @return bool
-     */
-    final protected function isRelationship(): bool
-    {
-        return $this->jsonApi()->route()->hasRelation();
-    }
-
-    /**
-     * @return bool
-     */
-    final protected function isNotRelationship(): bool
-    {
-        return !$this->isRelationship();
+        return !$this->hasResourceId();
     }
 }
