@@ -23,6 +23,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\ResourceObject;
@@ -45,6 +46,11 @@ class ResourceRequest extends FormRequest
      * @var callable|null
      */
     private static $requestResolver;
+
+    /**
+     * @var array|null
+     */
+    private ?array $validationData = null;
 
     /**
      * Specify the callback to use to guess the request class for a JSON API resource.
@@ -207,6 +213,15 @@ class ResourceRequest extends FormRequest
      */
     public function validationData()
     {
+        /**
+         * We cache the validation data because the developer may access it in
+         * their `rules` method. In that scenario, we do not want the data to
+         * be calculated twice.
+         */
+        if (is_array($this->validationData)) {
+            return $this->validationData;
+        }
+
         $document = $this->document();
 
         if ($this->isCreating()) {
@@ -220,7 +235,7 @@ class ResourceRequest extends FormRequest
             $data = $document['data'];
         }
 
-        return ResourceObject::fromArray($data)->all();
+        return $this->validationData = ResourceObject::fromArray($data)->all();
     }
 
     /**
@@ -493,21 +508,7 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Extract attributes for a resource update.
-     *
-     * @param Model|object $model
-     * @param array $new
-     * @return array
-     */
-    protected function extractAttributes(object $model, array $new): array
-    {
-        return collect($this->existingAttributes($model))
-            ->merge($new)
-            ->all();
-    }
-
-    /**
-     * Get any existing attributes for the provided model.
+     * Extract existing attributes for the provided model.
      *
      * @param Model|object $model
      * @return iterable
@@ -520,22 +521,7 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Extract relationships for a resource update.
-     *
-     * @param Model|object $model
-     * @param array $new
-     * @return array
-     */
-    protected function extractRelationships(object $model, array $new): array
-    {
-        return collect($this->existingRelationships($model))
-            ->map(fn($value) => $this->convertExistingRelationships($value))
-            ->merge($new)
-            ->all();
-    }
-
-    /**
-     * Get any existing relationships for the provided record.
+     * Extract existing relationships for the provided model.
      *
      * @param Model|object $model
      * @return iterable
@@ -550,6 +536,35 @@ class ResourceRequest extends FormRequest
                 yield $relationship->fieldName() => $relationship->data();
             }
         }
+    }
+
+    /**
+     * Extract attributes for a resource update.
+     *
+     * @param Model|object $model
+     * @param array $new
+     * @return array
+     */
+    private function extractAttributes(object $model, array $new): array
+    {
+        return collect($this->existingAttributes($model))
+            ->merge($new)
+            ->all();
+    }
+
+    /**
+     * Extract relationships for a resource update.
+     *
+     * @param Model|object $model
+     * @param array $new
+     * @return array
+     */
+    private function extractRelationships(object $model, array $new): array
+    {
+        return collect($this->existingRelationships($model))
+            ->map(fn($value) => $this->convertExistingRelationships($value))
+            ->merge($new)
+            ->all();
     }
 
     /**
@@ -617,11 +632,12 @@ class ResourceRequest extends FormRequest
             ];
         }
 
-        $data = collect($value)
-            ->map(fn(JsonApiResource $resource) => ['type' => $resource->type(), 'id' => $resource->id()])
-            ->all();
-
-        return compact('data');
+        return [
+            'data' => collect($value)->map(fn(JsonApiResource $resource) => [
+                'type' => $resource->type(),
+                'id' => $resource->id()
+            ])->all(),
+        ];
     }
 
     /**
