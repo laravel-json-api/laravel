@@ -23,7 +23,6 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Document\ResourceObject;
@@ -41,6 +40,11 @@ use function array_key_exists;
 
 class ResourceRequest extends FormRequest
 {
+
+    /**
+     * @var bool
+     */
+    protected bool $validateExisting = true;
 
     /**
      * @var callable|null
@@ -101,7 +105,7 @@ class ResourceRequest extends FormRequest
      *
      * @return bool
      */
-    public function isUpdatingRelation(): bool
+    public function isUpdatingRelationship(): bool
     {
         return $this->isMethod('PATCH') && $this->isRelationship();
     }
@@ -111,7 +115,7 @@ class ResourceRequest extends FormRequest
      *
      * @return bool
      */
-    public function isAttachingRelation(): bool
+    public function isAttachingRelationship(): bool
     {
         return $this->isMethod('POST') && $this->isRelationship();
     }
@@ -121,7 +125,7 @@ class ResourceRequest extends FormRequest
      *
      * @return bool
      */
-    public function isDetachingRelation(): bool
+    public function isDetachingRelationship(): bool
     {
         return $this->isMethod('DELETE') && $this->isRelationship();
     }
@@ -133,7 +137,9 @@ class ResourceRequest extends FormRequest
      */
     public function isModifyingRelationship(): bool
     {
-        return $this->isUpdatingRelation() || $this->isAttachingRelation() || $this->isDetachingRelation();
+        return $this->isUpdatingRelationship() ||
+            $this->isAttachingRelationship() ||
+            $this->isDetachingRelationship();
     }
 
     /**
@@ -164,11 +170,11 @@ class ResourceRequest extends FormRequest
             $model = $this->modelOrFail();
             $fieldName = $this->jsonApi()->route()->fieldName();
 
-            if ($this->isAttachingRelation()) {
+            if ($this->isAttachingRelationship()) {
                 return $authorizer->attachRelationship($this, $model, $fieldName);
             }
 
-            if ($this->isDetachingRelation()) {
+            if ($this->isDetachingRelationship()) {
                 return $authorizer->detachRelationship($this, $model, $fieldName);
             }
 
@@ -196,16 +202,6 @@ class ResourceRequest extends FormRequest
         }
 
         return $document;
-    }
-
-    /**
-     * Get the field name for a relationship request.
-     *
-     * @return string
-     */
-    public function fieldName(): string
-    {
-        return $this->jsonApi()->route()->fieldName();
     }
 
     /**
@@ -275,7 +271,7 @@ class ResourceRequest extends FormRequest
     public function validatedForRelation()
     {
         $data = $this->validated();
-        $fieldName = $this->fieldName();
+        $fieldName = $this->getFieldName();
 
         if (array_key_exists($fieldName, $data)) {
             return $data[$fieldName];
@@ -388,8 +384,14 @@ class ResourceRequest extends FormRequest
         return $factory->make(
             $this->validationDataForDelete(),
             method_exists($this, 'deleteRules') ? $this->container->call([$this, 'deleteRules']) : [],
-            method_exists($this, 'deleteMessages') ? $this->deleteMessages() : $this->messages(),
-            method_exists($this, 'deleteAttributes') ? $this->deleteAttributes() : $this->attributes()
+            array_merge(
+                $this->messages(),
+                method_exists($this, 'deleteMessages') ? $this->deleteMessages() : []
+            ),
+            array_merge(
+                $this->attributes(),
+                method_exists($this, 'deleteAttributes') ? $this->deleteAttributes() : []
+            )
         );
     }
 
@@ -418,24 +420,24 @@ class ResourceRequest extends FormRequest
      * merge attributes provided by the client over the top of the existing attribute
      * values.
      *
-     * @param Model|object $record
-     *      the record being updated.
+     * @param Model|object $model
+     *      the model being updated.
      * @param array $document
      *      the JSON API document to validate.
      * @return array
      */
-    protected function dataForUpdate(object $record, array $document): array
+    protected function dataForUpdate(object $model, array $document): array
     {
         $data = $document['data'] ?? [];
 
-        if ($this->mustValidateExisting($record, $data)) {
+        if ($this->mustValidateExisting($model, $document)) {
             $data['attributes'] = $this->extractAttributes(
-                $record,
+                $model,
                 $data['attributes'] ?? []
             );
 
             $data['relationships'] = $this->extractRelationships(
-                $record,
+                $model,
                 $data['relationships'] ?? []
             );
         }
@@ -575,7 +577,7 @@ class ResourceRequest extends FormRequest
     private function relationshipRules(): array
     {
         $rules = $this->container->call([$this, 'rules']);
-        $fieldName = $this->fieldName();
+        $fieldName = $this->getFieldName();
 
         return collect($rules)
             ->filter(fn($v, $key) => Str::startsWith($key, $fieldName))

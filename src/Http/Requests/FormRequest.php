@@ -66,6 +66,22 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
+     * Get the field name for a relationship request.
+     *
+     * @return string|null
+     */
+    public function getFieldName(): ?string
+    {
+        $route = $this->jsonApi()->route();
+
+        if ($route->hasRelation()) {
+            return $route->fieldName();
+        }
+
+        return null;
+    }
+
+    /**
      * Get the JSON API schema for the request.
      *
      * @return Schema
