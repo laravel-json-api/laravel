@@ -53,6 +53,7 @@ class PostSchema extends Schema
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
+            DateTime::make('publishedAt')->sortable(),
             Str::make('slug'),
             Str::make('synopsis'),
             BelongsToMany::make('tags'),

@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
@@ -42,11 +43,12 @@ class Serializer
             'id' => (string) $post->getRouteKey(),
             'attributes' => [
                 'content' => $post->content,
-                'createdAt' => $post->created_at->toJSON(),
+                'createdAt' => $post->created_at->jsonSerialize(),
+                'publishedAt' => optional($post->published_at)->jsonSerialize(),
                 'slug' => $post->slug,
                 'synopsis' => $post->synopsis,
                 'title' => $post->title,
-                'updatedAt' => $post->updated_at->toJSON(),
+                'updatedAt' => $post->updated_at->jsonSerialize(),
             ],
             'relationships' => [
                 'author' => [
@@ -75,6 +77,41 @@ class Serializer
     }
 
     /**
+     * Get the expected tag resource.
+     *
+     * @param Tag $tag
+     * @return ResourceObject
+     */
+    public function tag(Tag $tag): ResourceObject
+    {
+        $self = url('/api/v1/tags', $tag);
+
+        return ResourceObject::fromArray([
+            'type' => 'tags',
+            'id' => (string) $tag->getRouteKey(),
+            'attributes' => [
+                'createdAt' => $tag->created_at->jsonSerialize(),
+                'name' => $tag->name,
+                'updatedAt' => $tag->updated_at->jsonSerialize(),
+            ],
+            'relationships' => [
+                'posts' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/posts",
+                        'related' => "{$self}/posts",
+                    ],
+                ],
+                'videos' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/videos",
+                        'related' => "{$self}/videos",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * Get the expected user resource.
      *
      * @param User $user
@@ -88,9 +125,9 @@ class Serializer
             'type' => 'users',
             'id' => (string) $user->getRouteKey(),
             'attributes' => [
-                'createdAt' => $user->created_at->toJSON(),
+                'createdAt' => $user->created_at->jsonSerialize(),
                 'name' => $user->name,
-                'updatedAt' => $user->updated_at->toJSON(),
+                'updatedAt' => $user->updated_at->jsonSerialize(),
             ],
             'links' => [
                 'self' => $self,

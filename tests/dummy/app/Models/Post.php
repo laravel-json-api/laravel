@@ -41,6 +41,13 @@ class Post extends Model
     ];
 
     /**
+     * @var string[]
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
+    /**
      * @return BelongsTo
      */
     public function author(): BelongsTo

@@ -42,11 +42,12 @@ class ReadTagsTest extends TestCase
 
     public function test(): void
     {
-        $expected = Tag::factory()
-            ->count(3)
-            ->create();
+        $tags = Tag::factory()->count(3)->create();
+        $this->post->tags()->attach($tags);
 
-        $this->post->tags()->attach($expected);
+        $expected = $tags
+            ->map(fn(Tag $tag) => $this->serializer->tag($tag)->jsonSerialize())
+            ->all();
 
         $response = $this
             ->jsonApi('tags')
