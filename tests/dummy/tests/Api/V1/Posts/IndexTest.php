@@ -71,10 +71,10 @@ class IndexTest extends TestCase
         $posts = Post::factory()->count(5)->create();
 
         $meta = [
-            'current_page' => 1,
+            'currentPage' => 1,
             'from' => 1,
-            'last_page' => 2,
-            'per_page' => 3,
+            'lastPage' => 2,
+            'perPage' => 3,
             'to' => 3,
             'total' => 5,
         ];
