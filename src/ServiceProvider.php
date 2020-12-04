@@ -40,9 +40,24 @@ class ServiceProvider extends BaseServiceProvider
     {
         $router->aliasMiddleware('jsonapi', BootJsonApi::class);
 
-        $this->publishes([
-            __DIR__ . '/../config/jsonapi.php' => config_path('jsonapi.php'),
-        ]);
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/jsonapi.php' => config_path('jsonapi.php'),
+            ]);
+
+            $this->commands([
+                Console\MakeController::class,
+                Console\MakeFilter::class,
+                Console\MakeQuery::class,
+                Console\MakeRequest::class,
+                Console\MakeRequests::class,
+                Console\MakeResource::class,
+                Console\MakeSchema::class,
+                Console\MakeServer::class,
+                Console\StubPublish::class,
+            ]);
+        }
+
     }
 
     /**
