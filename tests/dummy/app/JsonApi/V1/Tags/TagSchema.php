@@ -26,7 +26,7 @@ use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
-use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
+use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 
 class TagSchema extends Schema
@@ -73,7 +73,7 @@ class TagSchema extends Schema
      */
     public function pagination(): ?Paginator
     {
-        return StandardPaginator::make()->withoutNestedMeta();
+        return PagePagination::make()->withoutNestedMeta();
     }
 
 }
