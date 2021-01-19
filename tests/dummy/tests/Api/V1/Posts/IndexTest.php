@@ -155,6 +155,44 @@ class IndexTest extends TestCase
         $response->assertFetchedOneExact($expected);
     }
 
+    public function testFilteredAndPaginated(): void
+    {
+        $published = Post::factory()->count(5)->create(['published_at' => now()]);
+        Post::factory()->count(2)->create(['published_at' => null]);
+
+        $meta = [
+            'currentPage' => 1,
+            'from' => 1,
+            'lastPage' => 1,
+            'perPage' => 10,
+            'to' => 5,
+            'total' => 5,
+        ];
+
+        $links = [
+            'first' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'filter' => ['published' => 'true'],
+                    'page' => ['number' => 1, 'size' => 10],
+                ]),
+            'last' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'filter' => ['published' => 'true'],
+                    'page' => ['number' => 1, 'size' => 10],
+                ]),
+        ];
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['published' => 'true'])
+            ->page(['number' => 1, 'size' => 10])
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany($published)
+            ->assertMeta($meta)
+            ->assertLinks($links);
+    }
+
     public function testInvalidMediaType(): void
     {
         $this->jsonApi()

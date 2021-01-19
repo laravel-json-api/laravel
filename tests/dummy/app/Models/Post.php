@@ -18,6 +18,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -69,5 +70,21 @@ class Post extends Model
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    /**
+     * @param Builder $query
+     * @param bool $published
+     * @return Builder
+     */
+    public function scopeWherePublished(Builder $query, bool $published): Builder
+    {
+        $column = $this->qualifyColumn('published_at');
+
+        if ($published) {
+            return $query->whereNotNull($column);
+        }
+
+        return $query->whereNull($column);
     }
 }

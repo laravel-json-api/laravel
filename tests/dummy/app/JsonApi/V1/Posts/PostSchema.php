@@ -27,6 +27,7 @@ use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
@@ -69,6 +70,7 @@ class PostSchema extends Schema
     {
         return [
             WhereIn::make('id', $this->idColumn())->delimiter(','),
+            Scope::make('published', 'wherePublished')->asBoolean(),
             Where::make('slug')->singular(),
         ];
     }

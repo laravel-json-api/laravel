@@ -43,6 +43,7 @@ class PostQuery extends ResourceQuery
                 'array',
                 JsonApiRule::filter()->forget('id'),
             ],
+            'filter.published' => ['boolean'],
             'include' => [
                 'nullable',
                 'string',
