@@ -22,7 +22,6 @@ namespace App\Tests\Api\V1\Videos;
 use App\Models\Tag;
 use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
@@ -54,7 +53,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->withoutExceptionHandling()
-            ->actingAs($user = User::factory()->create())
+            ->actingAs($user = $video->owner)
             ->jsonApi('videos')
             ->withData($data)
             ->post('/api/v1/videos');
@@ -96,7 +95,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->withoutExceptionHandling()
-            ->actingAs(User::factory()->create())
+            ->actingAs($video->owner)
             ->jsonApi('videos')
             ->withData($data)
             ->post('/api/v1/videos');
@@ -112,6 +111,29 @@ class CreateTest extends TestCase
         $this->assertDatabaseCount('taggables', 2);
     }
 
+    public function testClientIdAlreadyExists(): void
+    {
+        $video = Video::factory()->make();
+        $existing = Video::factory()->create();
+
+        $data = $this
+            ->serialize($video)
+            ->withId($id = $existing->getRouteKey());
+
+        $response = $this
+            ->actingAs($video->owner)
+            ->jsonApi('videos')
+            ->withData($data)
+            ->post('/api/v1/videos');
+
+        $response->assertExactErrorStatus([
+            'detail' => "Resource {$id} already exists.",
+            'source' => ['pointer' => '/data/id'],
+            'status' => '409',
+            'title' => 'Conflict',
+        ]);
+    }
+
     public function testInvalidClientId(): void
     {
         $video = Video::factory()->make();
@@ -121,7 +143,7 @@ class CreateTest extends TestCase
             ->withId('123456');
 
         $response = $this
-            ->actingAs(User::factory()->create())
+            ->actingAs($video->owner)
             ->jsonApi('videos')
             ->withData($data)
             ->post('/api/v1/videos');

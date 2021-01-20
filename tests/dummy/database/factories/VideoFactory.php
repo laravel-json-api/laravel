@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\User;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -39,6 +40,7 @@ class VideoFactory extends Factory
     public function definition()
     {
         return [
+            'owner_id' => User::factory(),
             'title' => $this->faker->words(3, true),
             'url' => $this->faker->url,
         ];
