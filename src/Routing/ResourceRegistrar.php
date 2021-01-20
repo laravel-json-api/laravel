@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Routing;
 
+use Closure;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Routing\RouteCollection;
@@ -51,6 +52,8 @@ class ResourceRegistrar
     }
 
     /**
+     * Start to register resource routes.
+     *
      * @param string $resourceType
      * @param string|null $controller
      * @return PendingResourceRegistration
@@ -65,13 +68,20 @@ class ResourceRegistrar
     }
 
     /**
+     * Register resource relationship routes.
+     *
      * @param string $resourceType
      * @param string $controller
      * @param array $options
-     * @param \Closure $callback
+     * @param Closure $callback
      * @return RouteCollection
      */
-    public function relationships(string $resourceType, string $controller, array $options, \Closure $callback)
+    public function relationships(
+        string $resourceType,
+        string $controller,
+        array $options,
+        Closure $callback
+    ): RouteCollection
     {
         $parameter = $this->getResourceParameterName($resourceType, $options);
         $attributes = $this->getRelationshipsAction($resourceType, $parameter, $options);
