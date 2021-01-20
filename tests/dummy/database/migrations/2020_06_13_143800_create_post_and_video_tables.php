@@ -47,10 +47,17 @@ class CreatePostAndVideoTables extends Migration
         });
 
         Schema::create('videos', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('uuid')->primary();
             $table->timestamps();
+            $table->unsignedBigInteger('owner_id');
             $table->string('title');
             $table->string('url');
+
+            $table->foreign('owner_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
 
         Schema::create('comments', function (Blueprint $table) {

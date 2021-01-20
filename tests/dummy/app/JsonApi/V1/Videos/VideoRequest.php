@@ -19,31 +19,22 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Videos;
 
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
-class VideoResource extends JsonApiResource
+class VideoRequest extends ResourceRequest
 {
 
     /**
-     * @return iterable
+     * @return array
      */
-    public function attributes(): iterable
+    public function rules(): array
     {
         return [
-            'createdAt' => $this->created_at,
-            'title' => $this->title,
-            'updatedAt' => $this->updated_at,
-            'url' => $this->url,
-        ];
-    }
-
-    /**
-     * @return iterable
-     */
-    public function relationships(): iterable
-    {
-        return [
-            $this->relation('tags')->showDataIfLoaded(),
+            'id' => ['nullable', JsonApiRule::clientId()],
+            'tags' => JsonApiRule::toMany(),
+            'title' => ['required', 'string'],
+            'url' => ['required', 'string'],
         ];
     }
 

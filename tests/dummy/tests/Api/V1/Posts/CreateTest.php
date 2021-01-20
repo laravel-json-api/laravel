@@ -110,6 +110,31 @@ class CreateTest extends TestCase
         $response->assertExactErrorStatus($expected);
     }
 
+    public function testClientId(): void
+    {
+        $post = Post::factory()->make();
+
+        $data = $this
+            ->serialize($post)
+            ->withId('81166677-f3c4-440c-9a4a-12b89802d731')
+            ->jsonSerialize();
+
+        $expected = [
+            'detail' => "Resource type posts does not support client-generated IDs.",
+            'source' => ['pointer' => '/data/id'],
+            'status' => '403',
+            'title' => 'Not Supported',
+        ];
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertExactErrorStatus($expected);
+    }
+
     public function testUnauthorized(): void
     {
         $post = Post::factory()->make();
