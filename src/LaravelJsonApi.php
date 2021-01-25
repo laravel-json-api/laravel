@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel;
 
-use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use Illuminate\Support\Arr;
+use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 
 final class LaravelJsonApi
 {

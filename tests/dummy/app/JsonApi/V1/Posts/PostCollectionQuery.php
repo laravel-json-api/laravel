@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Posts;
 
-use LaravelJsonApi\Validation\Rule as JsonApiRule;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class PostCollectionQuery extends ResourceQuery
 {
