@@ -1,6 +1,6 @@
 {
     "name": "laravel-json-api/laravel",
-    "description": "JSON API for Laravel applications.",
+    "description": "JSON:API for Laravel applications.",
     "keywords": [
         "jsonapi.org",
         "json-api",
@@ -23,34 +23,49 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "ext-json": "*",
+        "laravel-json-api/core": "^1.0.0-alpha.1",
+        "laravel-json-api/eloquent": "^1.0.0-alpha.1",
+        "laravel-json-api/encoder-neomerx": "^1.0.0-alpha.1",
+        "laravel-json-api/exceptions": "^1.0.0-alpha.1",
+        "laravel-json-api/spec": "^1.0.0-alpha.1",
+        "laravel-json-api/validation": "^1.0.0-alpha.1",
         "laravel/framework": "^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.4",
-        "phpunit/phpunit": "^9.4"
+        "laravel-json-api/testing": "^1.0@alpha",
+        "orchestra/testbench": "^6.9",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
-            "LaravelJsonApi\\": "src/"
+            "LaravelJsonApi\\Laravel\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "App\\":  "tests/dummy/app",
+            "App\\Tests\\": "tests/dummy/tests",
             "Database\\Factories\\": "tests/dummy/database/factories",
-            "DummyApp\\":  "tests/dummy/app",
-            "DummyApp\\Tests\\": "tests/dummy/tests",
-            "LaravelJsonApi\\Tests\\": "tests/lib"
+            "LaravelJsonApi\\Laravel\\Tests\\": "tests/lib"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.x-dev",
             "dev-develop": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "LaravelJsonApi\\Laravel\\ServiceProvider"
+            ],
+            "aliases": {
+                "JsonApi": "LaravelJsonApi\\Core\\Facades\\JsonApi",
+                "JsonApiRoute": "LaravelJsonApi\\Laravel\\Facades\\JsonApiRoute"
+            }
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts;
 
-use DummyApp\Post;
-use DummyApp\Tests\Api\V1\TestCase;
+use App\Models\Post;
+use App\Models\User;
+use App\Tests\Api\V1\TestCase;
 use Illuminate\Support\Arr;
 
 class IndexTest extends TestCase
@@ -29,6 +30,32 @@ class IndexTest extends TestCase
     public function test(): void
     {
         $posts = Post::factory()->count(3)->create();
+
+        /** Draft post should not appear. */
+        Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany($posts);
+    }
+
+    public function testWithUser(): void
+    {
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(3)->create();
+
+        /** Draft for this user should appear. */
+        Post::factory()->create([
+            'author_id' => $user,
+            'published_at' => null,
+        ]);
+
+        /** Draft post should not appear. */
+        Post::factory()->create(['published_at' => null]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -44,10 +71,10 @@ class IndexTest extends TestCase
         $posts = Post::factory()->count(5)->create();
 
         $meta = [
-            'current_page' => 1,
+            'currentPage' => 1,
             'from' => 1,
-            'last_page' => 2,
-            'per_page' => 3,
+            'lastPage' => 2,
+            'perPage' => 3,
             'to' => 3,
             'total' => 5,
         ];
@@ -126,6 +153,44 @@ class IndexTest extends TestCase
             ->get('/api/v1/posts');
 
         $response->assertFetchedOneExact($expected);
+    }
+
+    public function testFilteredAndPaginated(): void
+    {
+        $published = Post::factory()->count(5)->create(['published_at' => now()]);
+        Post::factory()->count(2)->create(['published_at' => null]);
+
+        $meta = [
+            'currentPage' => 1,
+            'from' => 1,
+            'lastPage' => 1,
+            'perPage' => 10,
+            'to' => 5,
+            'total' => 5,
+        ];
+
+        $links = [
+            'first' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'filter' => ['published' => 'true'],
+                    'page' => ['number' => 1, 'size' => 10],
+                ]),
+            'last' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'filter' => ['published' => 'true'],
+                    'page' => ['number' => 1, 'size' => 10],
+                ]),
+        ];
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->filter(['published' => 'true'])
+            ->page(['number' => 1, 'size' => 10])
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedMany($published)
+            ->assertMeta($meta)
+            ->assertLinks($links);
     }
 
     public function testInvalidMediaType(): void

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-namespace DummyApp\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts;
 
-use DummyApp\Post;
-use DummyApp\Tests\Api\V1\TestCase;
+use App\Models\Post;
+use App\Models\User;
+use App\Tests\Api\V1\TestCase;
 
 class ReadTest extends TestCase
 {
@@ -26,7 +27,7 @@ class ReadTest extends TestCase
     public function test(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->toArray();
+        $expected = $this->serializer->post($post)->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -40,7 +41,7 @@ class ReadTest extends TestCase
     public function testSlugFilter(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->toArray();
+        $expected = $this->serializer->post($post)->jsonSerialize();
 
         $response = $this
             ->jsonApi()
@@ -62,6 +63,72 @@ class ReadTest extends TestCase
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedNull();
+    }
+
+    /**
+     * Draft posts do not appear in our API for guests, because of our
+     * post scope. Therefore, attempting to access a draft post as a
+     * guest should receive a 404 response.
+     */
+    public function testDraftAsGuest(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * Same if an authenticated user attempts to access the
+     * draft post when they are not the author - they would receive
+     * a 404 as it is excluded from the API.
+     */
+    public function testDraftUserIsNotAuthor(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertStatus(404);
+    }
+
+    /**
+     * The author should be able to access their draft post.
+     */
+    public function testDraftAsAuthor(): void
+    {
+        $post = Post::factory()->create(['published_at' => null]);
+        $expected = $this->serializer->post($post)->jsonSerialize();
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOne($expected);
+    }
+
+    public function testInvalidQueryParameter(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this
+            ->jsonApi('posts')
+            ->includePaths('foo')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertExactErrorStatus([
+            'detail' => 'Include path foo is not allowed.',
+            'source' => ['parameter' => 'include'],
+            'status' => '400',
+            'title' => 'Invalid Query Parameter',
+        ]);
     }
 
     public function testInvalidMediaType(): void

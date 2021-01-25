@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1;
+namespace App\Tests\Api\V1;
 
-use DummyApp\Tests\TestCase as BaseTestCase;
+use App\Tests\TestCase as BaseTestCase;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class TestCase extends BaseTestCase

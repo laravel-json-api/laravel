@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,16 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Posts;
+namespace App\JsonApi\V1\Posts;
 
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use function url;
 
 class PostResource extends JsonApiResource
 {
 
     /**
-     * @return string
-     */
-    public function type(): string
-    {
-        return 'posts';
-    }
-
-    /**
-     * @return string
-     */
-    public function selfUrl(): string
-    {
-        return url('api/v1', [$this->type(), $this->id()]);
-    }
-
-    /**
+     * Get the resource's attributes.
+     *
      * @return iterable
      */
     public function attributes(): iterable
@@ -49,6 +34,7 @@ class PostResource extends JsonApiResource
         return [
             'content' => $this->content,
             'createdAt' => $this->created_at,
+            'publishedAt' => $this->published_at,
             'slug' => $this->slug,
             'synopsis' => $this->synopsis,
             'title' => $this->title,
@@ -57,13 +43,16 @@ class PostResource extends JsonApiResource
     }
 
     /**
+     * Get the resource's relationships.
+     *
      * @return iterable
      */
     public function relationships(): iterable
     {
         return [
-            $this->relation('author'),
+            $this->relation('author')->showDataIfLoaded(),
             $this->relation('comments'),
+            $this->relation('tags')->showDataIfLoaded()->mustValidate(),
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests;
+namespace App\Tests;
 
-use DummyApp\Providers\AppServiceProvider;
-use DummyApp\Providers\AuthServiceProvider;
-use DummyApp\Providers\EventServiceProvider;
-use DummyApp\Providers\RouteServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\AuthServiceProvider;
+use App\Providers\EventServiceProvider;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use LaravelJsonApi\ServiceProvider;
+use LaravelJsonApi\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -40,8 +40,6 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
-        config()->set('json-api', require __DIR__ . '/../config/json-api.php');
     }
 
     /**
@@ -51,11 +49,25 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
+            \LaravelJsonApi\Spec\ServiceProvider::class,
+            \LaravelJsonApi\Validation\ServiceProvider::class,
+            \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
             ServiceProvider::class,
             AppServiceProvider::class,
             AuthServiceProvider::class,
             EventServiceProvider::class,
             RouteServiceProvider::class,
         ];
+    }
+
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \LaravelJsonApi\Testing\TestExceptionHandler::class
+        );
     }
 }

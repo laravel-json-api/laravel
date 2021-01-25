@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,35 +17,46 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 
 trait FetchOne
 {
 
     /**
-     * Fetch one JSON API resource.
+     * Fetch zero to one JSON API resource by id.
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function read(Route $route, StoreContract $store): Responsable
+    public function show(Route $route, StoreContract $store)
     {
         $request = ResourceQuery::queryOne(
             $resourceType = $route->resourceType()
         );
+
+        if (method_exists($this, 'reading')) {
+            $this->reading($request);
+        }
 
         $model = $store
             ->queryOne($resourceType, $route->modelOrResourceId())
             ->using($request)
             ->first();
 
-        return new DataResponse($model);
+        $response = null;
+
+        if (method_exists($this, 'read')) {
+            $response = $this->read($model, $request);
+        }
+
+        return $response ?: new DataResponse($model);
     }
 }

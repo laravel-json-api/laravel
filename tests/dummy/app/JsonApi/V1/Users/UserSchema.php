@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Users;
+namespace App\JsonApi\V1\Users;
 
-use DummyApp\User;
+use App\Models\User;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Pagination\StandardPaginator;
+use LaravelJsonApi\Eloquent\Filters\Where;
+use LaravelJsonApi\Eloquent\Filters\WhereIn;
+use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 
 class UserSchema extends Schema
@@ -42,6 +45,7 @@ class UserSchema extends Schema
     public function fields(): array
     {
         return [
+            ID::make(),
             DateTime::make('createdAt')->readOnly(),
             Str::make('name'),
             DateTime::make('updatedAt')->readOnly(),
@@ -53,7 +57,10 @@ class UserSchema extends Schema
      */
     public function filters(): array
     {
-        return [];
+        return [
+            WhereIn::make('id', $this->idColumn())->delimiter(','),
+            Where::make('email')->singular(),
+        ];
     }
 
     /**
@@ -61,7 +68,7 @@ class UserSchema extends Schema
      */
     public function pagination(): ?Paginator
     {
-        return new StandardPaginator();
+        return PagePagination::make();
     }
 
 }

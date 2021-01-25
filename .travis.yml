@@ -1,0 +1,18 @@
+language: php
+sudo: false
+
+matrix:
+  include:
+    - php: 7.4
+      env:
+        - LARAVEL_VERSION=^8.0
+    - php: 8.0
+      env:
+        - LARAVEL_VERSION=^8.0
+
+install:
+  - composer require "laravel/framework:${LARAVEL_VERSION}" --no-update -n
+  - travis_retry composer install --no-suggest --prefer-dist -n -o
+
+script:
+  - vendor/bin/phpunit

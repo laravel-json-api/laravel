@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1;
 
-use LaravelJsonApi\Http\Controllers\Actions;
+use LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 class PostController
 {
@@ -29,5 +29,10 @@ class PostController
     use Actions\Store;
     use Actions\Update;
     use Actions\Destroy;
+    use Actions\FetchRelated;
+    use Actions\FetchRelationship;
+    use Actions\UpdateRelationship;
+    use Actions\AttachRelationship;
+    use Actions\DetachRelationship;
 
 }

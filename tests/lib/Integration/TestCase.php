@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,54 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Tests\Integration;
+namespace LaravelJsonApi\Laravel\Tests\Integration;
 
-use LaravelJsonApi\ServiceProvider;
+use Illuminate\Support\Facades\Route;
+use LaravelJsonApi\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
 
     /**
-     * @param \Illuminate\Foundation\Application $app
-     * @return array|string[]
+     * @inheritDoc
      */
     protected function getPackageProviders($app)
     {
-        return [ServiceProvider::class];
+        return [
+            \LaravelJsonApi\Spec\ServiceProvider::class,
+            \LaravelJsonApi\Validation\ServiceProvider::class,
+            \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
+            ServiceProvider::class,
+        ];
+    }
+
+    /**
+     * Call the closure within the default Laravel API route setup.
+     *
+     * @param \Closure $callback
+     * @return void
+     * @see https://github.com/laravel/laravel/blob/8.x/app/Providers/RouteServiceProvider.php
+     */
+    protected function defaultApiRoutes(\Closure $callback): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->group($callback);
+    }
+
+    /**
+     * Call the closure within the default Laravel API route setup.
+     *
+     * @param \Closure $callback
+     * @return void
+     * @see https://github.com/laravel/laravel/blob/8.x/app/Providers/RouteServiceProvider.php
+     */
+    protected function defaultApiRoutesWithNamespace(\Closure $callback): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace('App\\Http\\Controllers')
+            ->group($callback);
     }
 }

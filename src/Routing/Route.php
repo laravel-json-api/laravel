@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Routing;
+namespace LaravelJsonApi\Laravel\Routing;
 
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route implements RouteContract
 {
 
     public const RESOURCE_TYPE = 'resource_type';
     public const RESOURCE_ID_NAME = 'resource_id_name';
+    public const RESOURCE_RELATIONSHIP = 'resource_relationship';
 
     use ForwardsCalls;
 
@@ -83,7 +86,7 @@ class Route implements RouteContract
      */
     public function modelOrResourceId()
     {
-        if (!$name = $this->route->parameter(self::RESOURCE_ID_NAME)) {
+        if (!$name = $this->resourceIdName()) {
             throw new LogicException('No JSON API resource id name set on route.');
         }
 
@@ -114,10 +117,111 @@ class Route implements RouteContract
     /**
      * @inheritDoc
      */
+    public function hasResourceId(): bool
+    {
+        return !empty($this->resourceIdName());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function model(): object
+    {
+        $modelOrResourceId = $this->modelOrResourceId();
+
+        if (is_object($modelOrResourceId)) {
+            return $modelOrResourceId;
+        }
+
+        throw new LogicException('Expecting bindings to be substituted.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fieldName(): string
+    {
+        if ($name = $this->route->parameter(self::RESOURCE_RELATIONSHIP)) {
+            return $name;
+        }
+
+        throw new LogicException('No JSON API relationship name set on route.');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function schema(): Schema
     {
         return $this->server->schemas()->schemaFor(
             $this->resourceType()
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasRelation(): bool
+    {
+        return !!$this->route->parameter(self::RESOURCE_RELATIONSHIP);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inverse(): Schema
+    {
+        return $this->server->schemas()->schemaFor(
+            $this->relation()->inverse()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function relation(): Relation
+    {
+        return $this->schema()->relationship(
+            $this->fieldName()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function substituteBindings(): void
+    {
+        if ($this->hasResourceId()) {
+            $this->setModel($this->schema()->repository()->find(
+                $this->resourceId()
+            ));
+        }
+    }
+
+    /**
+     * @param object|null $model
+     * @return void
+     * @throws NotFoundHttpException
+     */
+    private function setModel(?object $model): void
+    {
+        if ($model) {
+            $this->route->setParameter(
+                $this->resourceIdName(),
+                $model
+            );
+            return;
+        }
+
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function resourceIdName(): ?string
+    {
+        return $this->route->parameter(self::RESOURCE_ID_NAME) ?: null;
+    }
+
 }

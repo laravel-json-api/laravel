@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Http\Requests\ResourceQuery;
-use LaravelJsonApi\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait Store
 {
@@ -34,9 +35,9 @@ trait Store
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function store(Route $route, StoreContract $store): Responsable
+    public function store(Route $route, StoreContract $store)
     {
         $request = ResourceRequest::forResource(
             $resourceType = $route->resourceType()
@@ -44,11 +45,29 @@ trait Store
 
         $query = ResourceQuery::queryOne($resourceType);
 
+        if (method_exists($this, 'saving')) {
+            $this->saving(null, $request, $query);
+        }
+
+        if (method_exists($this, 'creating')) {
+            $this->creating($request, $query);
+        }
+
         $model = $store
             ->create($resourceType)
             ->using($query)
             ->store($request->validated());
 
-        return new DataResponse($model);
+        $response = null;
+
+        if (method_exists($this, 'created')) {
+            $response = $this->created($model, $request, $query);
+        }
+
+        if (!$response && method_exists($this, 'saved')) {
+            $response = $this->saved($model, $request, $query);
+        }
+
+        return $response ?: new DataResponse($model);
     }
 }

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,23 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1;
+namespace App\JsonApi\V1;
 
-use DummyApp\JsonApi\V1\Posts\PostSchema;
-use DummyApp\JsonApi\V1\Users\UserSchema;
-use DummyApp\Post;
+use App\JsonApi\V1\Posts\PostScope;
+use App\Models\Post;
+use App\Models\Video;
 use Illuminate\Support\Facades\Auth;
-use LaravelJsonApi\Http\Server as BaseServer;
+use LaravelJsonApi\Core\Server\Server as BaseServer;
 
 class Server extends BaseServer
 {
+
+    /**
+     * The base URI namespace for this server.
+     *
+     * @var string
+     */
+    protected string $baseUri = '/api/v1';
 
     /**
      * Bootstrap the server when it is handling an HTTP request.
@@ -35,8 +42,13 @@ class Server extends BaseServer
      */
     public function serving(): void
     {
+        Post::addGlobalScope(new PostScope());
         Post::creating(static function (Post $post) {
             $post->author()->associate(Auth::user());
+        });
+
+        Video::creating(static function (Video $video) {
+            $video->owner()->associate(Auth::user());
         });
     }
 
@@ -48,8 +60,11 @@ class Server extends BaseServer
     protected function allSchemas(): array
     {
         return [
-            PostSchema::class,
-            UserSchema::class,
+            Comments\CommentSchema::class,
+            Posts\PostSchema::class,
+            Tags\TagSchema::class,
+            Users\UserSchema::class,
+            Videos\VideoSchema::class,
         ];
     }
 }

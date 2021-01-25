@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,15 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi;
+namespace LaravelJsonApi\Laravel;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
-use LaravelJsonApi\Encoder\Neomerx\Factory as EncoderFactory;
-use LaravelJsonApi\Http\Middleware\BootJsonApi;
-use LaravelJsonApi\Http\Server;
-use LaravelJsonApi\Http\ServerRepository;
-use LaravelJsonApi\Routing\Route;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Neomerx\JsonApi\Factories\Factory as NeomerxFactory;
+use LaravelJsonApi\Core\Server\ServerRepository;
+use LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -43,8 +38,26 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot(Router $router): void
     {
-        $this->bootTranslations();
-        $router->aliasMiddleware('json-api', BootJsonApi::class);
+        $router->aliasMiddleware('jsonapi', BootJsonApi::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/jsonapi.php' => config_path('jsonapi.php'),
+            ]);
+
+            $this->commands([
+                Console\MakeController::class,
+                Console\MakeFilter::class,
+                Console\MakeQuery::class,
+                Console\MakeRequest::class,
+                Console\MakeRequests::class,
+                Console\MakeResource::class,
+                Console\MakeSchema::class,
+                Console\MakeServer::class,
+                Console\StubPublish::class,
+            ]);
+        }
+
     }
 
     /**
@@ -52,65 +65,23 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $this->bindEncoder();
-        $this->bindHttp();
-        $this->bindRoute();
+        $this->bindAuthorizer();
         $this->bindService();
-        $this->bindSpecification();
+        $this->bindServer();
     }
 
     /**
-     * Register package translations.
+     * Bind the authorizer instance into the service container.
      *
      * @return void
      */
-    protected function bootTranslations()
+    private function bindAuthorizer(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'jsonapi');
-    }
-
-    /**
-     * Bind the encoder into the service container.
-     *
-     * @return void
-     */
-    private function bindEncoder(): void
-    {
-        $this->app->bind(Contracts\Encoder\Factory::class, EncoderFactory::class);
-        $this->app->bind(FactoryInterface::class, NeomerxFactory::class);
-    }
-
-    /**
-     * Bind HTTP services into the service container.
-     *
-     * @return void
-     */
-    private function bindHttp(): void
-    {
-        $this->app->bind(Contracts\Http\Repository::class, ServerRepository::class);
-        $this->app->bind(Contracts\Http\Server::class, Server::class);
-
-        $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->store();
+        $this->app->bind(Contracts\Auth\Authorizer::class, static function (Application $app) {
+            /** @var Contracts\Routing\Route $route */
+            $route = $app->make(Contracts\Routing\Route::class);
+            return $app->make($route->schema()->authorizer());
         });
-
-        $this->app->bind(Contracts\Schema\Container::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->schemas();
-        });
-
-        $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
-            return $app->make(Contracts\Http\Server::class)->resources();
-        });
-    }
-
-    /**
-     * Bind the route instance into the container.
-     *
-     * @return void
-     */
-    private function bindRoute(): void
-    {
-        $this->app->bind(Contracts\Routing\Route::class, Route::class);
     }
 
     /**
@@ -121,17 +92,27 @@ class ServiceProvider extends BaseServiceProvider
     private function bindService(): void
     {
         $this->app->singleton(JsonApiService::class);
-        $this->app->alias(JsonApiService::class, 'json-api');
     }
 
     /**
-     * Bind the JSON API specification into the service container.
+     * Bind server services into the service container.
      *
      * @return void
      */
-    private function bindSpecification(): void
+    private function bindServer(): void
     {
-        $this->app->bind(Spec\Specification::class, Spec\ServerSpecification::class);
-        $this->app->singleton(Spec\Translator::class);
+        $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
+
+        $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->store();
+        });
+
+        $this->app->bind(Contracts\Schema\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->schemas();
+        });
+
+        $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->resources();
+        });
     }
 }

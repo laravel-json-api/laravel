@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait Destroy
 {
@@ -31,15 +33,32 @@ trait Destroy
      *
      * @param Route $route
      * @param StoreContract $store
-     * @return Response
+     * @return Response|Responsable
      */
-    public function destroy(Route $route, StoreContract $store): Response
+    public function destroy(Route $route, StoreContract $store)
     {
+        $request = ResourceRequest::forResource(
+            $resourceType = $route->resourceType()
+        );
+
+        $model = $route->model();
+
+        if (method_exists($this, 'deleting')) {
+            $this->deleting($model, $request);
+        }
+
         $store->delete(
-            $route->resourceType(),
+            $resourceType,
             $route->modelOrResourceId()
         );
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        $response = null;
+
+        if (method_exists($this, 'deleted')) {
+            $response = $this->deleted($model, $request);
+        }
+
+        return $response ?: response(null, Response::HTTP_NO_CONTENT);
     }
+
 }

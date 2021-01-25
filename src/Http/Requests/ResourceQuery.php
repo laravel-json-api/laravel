@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Requests;
+namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
-use LaravelJsonApi\Core\Resolver\ResourceRequest as ResourceRequestResolver;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
@@ -64,11 +66,11 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Resolve the request instance when querying many resources.
      *
      * @param string $resourceType
-     * @return QueryParameters
+     * @return QueryParameters|ResourceQuery
      */
     public static function queryMany(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: new ResourceRequestResolver('CollectionQuery');
+        $resolver = self::$queryManyResolver ?: new RequestResolver('CollectionQuery');
 
         return $resolver($resourceType);
     }
@@ -88,13 +90,40 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Resolve the request instance when querying one resource.
      *
      * @param string $resourceType
-     * @return QueryParameters
+     * @return QueryParameters|ResourceQuery
      */
     public static function queryOne(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: new ResourceRequestResolver('Query');
+        $resolver = self::$queryManyResolver ?: new RequestResolver('Query');
 
         return $resolver($resourceType);
+    }
+
+    /**
+     * Perform resource authorization.
+     *
+     * @param Authorizer $authorizer
+     * @return bool
+     */
+    public function authorizeResource(Authorizer $authorizer): bool
+    {
+        if ($this->isViewingAny()) {
+            return $authorizer->index($this);
+        }
+
+        if ($this->isViewingOne()) {
+            return $authorizer->show($this, $this->modelOrFail());
+        }
+
+        if ($this->isViewingRelationship()) {
+            return $authorizer->showRelationship(
+                $this,
+                $this->modelOrFail(),
+                $this->jsonApi()->route()->fieldName()
+            );
+        }
+
+        return true;
     }
 
     /**
@@ -186,6 +215,16 @@ class ResourceQuery extends FormRequest implements QueryParameters
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new JsonApiException($this->validationErrors()->createErrorsForQuery(
+            $validator
+        ));
+    }
+
+    /**
      * @return bool
      */
     protected function isAcceptableMediaType(): bool
@@ -205,14 +244,13 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Get an exception if the media type is not acceptable.
      *
      * @return HttpExceptionInterface
-     * @todo add translation
      */
     protected function notAcceptable(): HttpExceptionInterface
     {
         return new HttpException(
             Response::HTTP_NOT_ACCEPTABLE,
-            "The requested resource is capable of generating only content not acceptable "
-            . "according to the Accept headers sent in the request."
+            __("The requested resource is capable of generating only content not acceptable "
+            . "according to the Accept headers sent in the request.")
         );
     }
 }

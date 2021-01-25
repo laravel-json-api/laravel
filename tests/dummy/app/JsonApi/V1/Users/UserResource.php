@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,12 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\JsonApi\V1\Users;
+namespace App\JsonApi\V1\Users;
 
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class UserResource extends JsonApiResource
 {
-
-    /**
-     * @return string
-     */
-    public function type(): string
-    {
-        return 'users';
-    }
-
-    /**
-     * @return string
-     */
-    public function selfUrl(): string
-    {
-        return url('api/v1', [$this->type(), $this->id()]);
-    }
 
     /**
      * @return iterable
@@ -59,6 +43,5 @@ class UserResource extends JsonApiResource
     {
         return [];
     }
-
 
 }

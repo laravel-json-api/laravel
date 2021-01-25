@@ -1,0 +1,35 @@
+<?php
+
+namespace {{ namespace }};
+
+use LaravelJsonApi\Core\Resources\JsonApiResource;
+
+class {{ class }} extends JsonApiResource
+{
+
+    /**
+     * Get the resource's attributes.
+     *
+     * @return iterable
+     */
+    public function attributes(): iterable
+    {
+        return [
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
+        ];
+    }
+
+    /**
+     * Get the resource's relationships.
+     *
+     * @return iterable
+     */
+    public function relationships(): iterable
+    {
+        return [
+            // @TODO
+        ];
+    }
+
+}

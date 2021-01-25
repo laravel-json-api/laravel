@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use DummyApp\Post;
-use DummyApp\User;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PostFactory extends Factory
@@ -42,6 +42,7 @@ class PostFactory extends Factory
         return [
             'author_id' => User::factory(),
             'content' => $this->faker->text,
+            'published_at' => $this->faker->dateTimeThisMonth,
             'slug' => $this->faker->unique()->slug,
             'synopsis' => $this->faker->sentence,
             'title' => $this->faker->words(3, true),

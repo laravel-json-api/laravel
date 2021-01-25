@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Http\Middleware;
+namespace LaravelJsonApi\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
-use LaravelJsonApi\Contracts\Http\Repository;
-use LaravelJsonApi\Contracts\Http\Server;
+use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
+use LaravelJsonApi\Contracts\Server\Repository;
+use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Laravel\Routing\Route;
 
 class BootJsonApi
 {
@@ -66,9 +68,14 @@ class BootJsonApi
             $server = $this->servers->server($name)
         );
 
-        $this->bindPageResolver();
+        $this->container->instance(
+            RouteContract::class,
+            $route = new Route($server, $request->route())
+        );
 
         $server->serving();
+        $route->substituteBindings();
+        $this->bindPageResolver();
 
         return $next($request);
     }

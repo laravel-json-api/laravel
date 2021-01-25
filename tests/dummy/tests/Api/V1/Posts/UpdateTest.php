@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts;
 
-use DummyApp\Post;
-use DummyApp\Tests\Api\V1\TestCase;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
+use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
 class UpdateTest extends TestCase
@@ -42,13 +44,15 @@ class UpdateTest extends TestCase
 
     public function test(): void
     {
+        $tag = Tag::factory()->create();
+        $this->post->tags()->attach($tag);
+
         $data = $this->serialize();
-        $expected = $data->forget('updatedAt')->toArray();
+        $expected = $data->forget('updatedAt')->jsonSerialize();
 
         $response = $this
             ->actingAs($this->post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->withData($data)
             ->includePaths('author')
             ->patch(url('/api/v1/posts', $this->post));
@@ -66,6 +70,94 @@ class UpdateTest extends TestCase
         ]);
     }
 
+    /**
+     * @return array
+     */
+    public function fieldProvider(): array
+    {
+        return [
+            ['content'],
+            ['slug'],
+            ['synopsis'],
+            ['title'],
+        ];
+    }
+
+    /**
+     * @param string $fieldName
+     * @dataProvider fieldProvider
+     */
+    public function testIndividualField(string $fieldName): void
+    {
+        $data = $this->serialize()->only($fieldName);
+
+        $expected = $this->serializer
+            ->post($this->post)
+            ->forget('updatedAt')
+            ->replace($fieldName, $data[$fieldName]);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertUpdated($expected->jsonSerialize());
+
+        $this->assertDatabaseHas('posts', [
+            'author_id' => $this->post->author->getKey(),
+            'content' => $expected['content'],
+            'created_at' => $this->post->created_at,
+            'id' => $this->post->getKey(),
+            'slug' => $expected['slug'],
+            'synopsis' => $expected['synopsis'],
+            'title' => $expected['title'],
+        ]);
+    }
+
+    public function testInvalid(): void
+    {
+        $other = Post::factory()->create();
+
+        $data = $this->serialize()->replace('slug', $other->slug);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertExactErrorStatus([
+            'detail' => 'The slug has already been taken.',
+            'source' => ['pointer' => '/data/attributes/slug'],
+            'status' => '422',
+            'title' => 'Unprocessable Entity',
+        ]);
+    }
+
+    public function testUnauthorized(): void
+    {
+        $response = $this
+            ->jsonApi('posts')
+            ->withData($this->serialize())
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(401);
+    }
+
+    public function testForbidden(): void
+    {
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('posts')
+            ->withData($this->serialize())
+            ->includePaths('author')
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertStatus(403);
+    }
 
     public function testNotAcceptableMediaType(): void
     {
@@ -125,6 +217,12 @@ class UpdateTest extends TestCase
                         'type' => 'users',
                         'id' => (string) $this->post->author->getRouteKey(),
                     ],
+                ],
+                'tags' => [
+                    'data' => $this->post->tags->map(fn(Tag $tag) => [
+                        'type' => 'tags',
+                        'id' => (string) $tag->getRouteKey(),
+                    ])->all(),
                 ],
             ],
         ]);

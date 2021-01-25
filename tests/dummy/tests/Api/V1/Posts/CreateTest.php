@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,30 @@
 
 declare(strict_types=1);
 
-namespace DummyApp\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts;
 
-use DummyApp\Post;
-use DummyApp\Tests\Api\V1\TestCase;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Tests\Api\V1\TestCase;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
 class CreateTest extends TestCase
 {
+
+    /**
+     * @var EloquentCollection
+     */
+    private EloquentCollection $tags;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->tags = Tag::factory()->count(3)->create();
+    }
 
     public function test(): void
     {
@@ -34,15 +50,13 @@ class CreateTest extends TestCase
         $expected = $data
             ->forget('createdAt', 'updatedAt')
             ->replace('author', ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
-            ->toArray();
+            ->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->withData($data)
-            ->includePaths('author')
             ->post('/api/v1/posts');
 
         $id = $response
@@ -57,6 +71,82 @@ class CreateTest extends TestCase
             'synopsis' => $data['synopsis'],
             'title' => $data['title'],
         ]);
+
+        $this->assertDatabaseCount('taggables', 2);
+
+        /** @var Tag $tag */
+        foreach ($this->tags->take(2) as $tag) {
+            $this->assertDatabaseHas('taggables', [
+                'tag_id' => $tag->getKey(),
+                'taggable_id' => $id,
+                'taggable_type' => Post::class,
+            ]);
+        }
+    }
+
+    public function testInvalid(): void
+    {
+        $exists = Post::factory()->create();
+        $post = Post::factory()->make();
+
+        $data = $this
+            ->serialize($post)
+            ->replace('slug', $exists->slug)
+            ->jsonSerialize();
+
+        $expected = [
+            'detail' => 'The slug has already been taken.',
+            'source' => ['pointer' => '/data/attributes/slug'],
+            'status' => '422',
+            'title' => 'Unprocessable Entity',
+        ];
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertExactErrorStatus($expected);
+    }
+
+    public function testClientId(): void
+    {
+        $post = Post::factory()->make();
+
+        $data = $this
+            ->serialize($post)
+            ->withId('81166677-f3c4-440c-9a4a-12b89802d731')
+            ->jsonSerialize();
+
+        $expected = [
+            'detail' => "Resource type posts does not support client-generated IDs.",
+            'source' => ['pointer' => '/data/id'],
+            'status' => '403',
+            'title' => 'Not Supported',
+        ];
+
+        $response = $this
+            ->actingAs($post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertExactErrorStatus($expected);
+    }
+
+    public function testUnauthorized(): void
+    {
+        $post = Post::factory()->make();
+        $data = $this->serialize($post);
+
+        $response = $this
+            ->jsonApi('posts')
+            ->withData($data)
+            ->post('/api/v1/posts');
+
+        $response->assertStatus(401);
+        $this->assertDatabaseCount('posts', 0);
     }
 
     public function testNotAcceptableMediaType(): void
@@ -66,8 +156,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
             ->post('/api/v1/posts');
@@ -83,8 +172,7 @@ class CreateTest extends TestCase
 
         $response = $this
             ->actingAs($post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->contentType('application/json')
             ->withData($data)
             ->post('/api/v1/posts');
@@ -114,6 +202,12 @@ class CreateTest extends TestCase
             'relationships' => [
                 'author' => [
                     'data' => null,
+                ],
+                'tags' => [
+                    'data' => $this->tags->take(2)->map(fn(Tag $tag) => [
+                        'type' => 'tags',
+                        'id' => (string) $tag->getRouteKey(),
+                    ])->all(),
                 ],
             ],
         ]);
