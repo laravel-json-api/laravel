@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2020 Cloud Creativity Limited
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration\Console;
 
-use App\JsonApi\V1\Server;
 use Illuminate\Filesystem\Filesystem;
 use LaravelJsonApi\Laravel\Tests\Integration\TestCase;
 
