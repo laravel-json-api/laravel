@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Posts;
 
+use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class PostResource extends JsonApiResource
@@ -27,9 +28,10 @@ class PostResource extends JsonApiResource
     /**
      * Get the resource's attributes.
      *
+     * @param Request|null $request
      * @return iterable
      */
-    public function attributes(): iterable
+    public function attributes($request): iterable
     {
         return [
             'content' => $this->content,
@@ -45,9 +47,10 @@ class PostResource extends JsonApiResource
     /**
      * Get the resource's relationships.
      *
+     * @param Request|null $request
      * @return iterable
      */
-    public function relationships(): iterable
+    public function relationships($request): iterable
     {
         return [
             $this->relation('author')->showDataIfLoaded(),
