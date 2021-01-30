@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+- [#1](https://github.com/laravel-json-api/laravel/pull/1)
+Resource classes are now optional. If one is not defined, the implementation falls-back to
+using the Eloquent schema to serialize a model. Eloquent schema fields now have new
+`hidden` and `serializeUsing` methods to customise the serialization of models by the schema.
+- Resource classes now support using conditional attributes in their `meta()` method.
+
+### Changed
+- **BREAKING** The JsonApiResource method signatures for the `attributes()`, `relationships()`,
+`meta()`, and `links()` methods have been changed so that they receive the HTTP request as the
+first (and only) parameter. This brings the implementation in line with Laravel's Eloquent
+resources, which receive the request to their `toArray()` method. The slight difference is
+our implementation allows the request to be `null` - this is to cover encoding resources
+outside of HTTP requests, e.g. queued broadcasting. When upgrading, you will need to either
+delete resource classes (as they are now optional), or update the method signatures on any
+classes you are retaining.
+
 ## [1.0.0-alpha.1] - 2021-01-25
 
 Initial release.
