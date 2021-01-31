@@ -56,13 +56,13 @@
             "dev-develop": "1.x-dev"
         },
         "laravel": {
-            "providers": [
-                "LaravelJsonApi\\Laravel\\ServiceProvider"
-            ],
             "aliases": {
                 "JsonApi": "LaravelJsonApi\\Core\\Facades\\JsonApi",
                 "JsonApiRoute": "LaravelJsonApi\\Laravel\\Facades\\JsonApiRoute"
-            }
+            },
+            "providers": [
+                "LaravelJsonApi\\Laravel\\ServiceProvider"
+            ]
         }
     },
     "minimum-stability": "stable",
