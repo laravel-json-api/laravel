@@ -25,9 +25,9 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "laravel-json-api/core": "dev-feature/schema-resources as 1.0.0-alpha.2",
-        "laravel-json-api/eloquent": "dev-feature/schema-resources",
-        "laravel-json-api/encoder-neomerx": "dev-feature/request",
+        "laravel-json-api/core": "^1.0.0-alpha.2",
+        "laravel-json-api/eloquent": "^1.0.0-alpha.2",
+        "laravel-json-api/encoder-neomerx": "^1.0.0-alpha.2",
         "laravel-json-api/exceptions": "^1.0.0-alpha.1",
         "laravel-json-api/spec": "^1.0.0-alpha.1",
         "laravel-json-api/validation": "^1.0.0-alpha.1",
@@ -65,7 +65,7 @@
             }
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
