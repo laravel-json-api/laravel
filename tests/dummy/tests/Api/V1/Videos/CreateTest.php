@@ -56,6 +56,7 @@ class CreateTest extends TestCase
             ->actingAs($user = $video->owner)
             ->jsonApi('videos')
             ->withData($data)
+            ->includePaths('tags')
             ->post('/api/v1/videos');
 
         $id = $response
@@ -98,6 +99,7 @@ class CreateTest extends TestCase
             ->actingAs($video->owner)
             ->jsonApi('videos')
             ->withData($data)
+            ->includePaths('tags')
             ->post('/api/v1/videos');
 
         $response->assertCreatedWithClientId(url('/api/v1/videos'), $expected);

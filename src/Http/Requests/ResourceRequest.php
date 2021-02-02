@@ -449,7 +449,7 @@ class ResourceRequest extends FormRequest
     {
         $resource = $this->resources()->create($model);
 
-        return $resource->attributes();
+        return $resource->attributes($this);
     }
 
     /**
@@ -463,7 +463,7 @@ class ResourceRequest extends FormRequest
         $resource = $this->resources()->create($model);
 
         /** @var Relation $relationship */
-        foreach ($resource->relationships() as $relationship) {
+        foreach ($resource->relationships($this) as $relationship) {
             if ($relationship->isValidated()) {
                 yield $relationship->fieldName() => $relationship->data();
             }
