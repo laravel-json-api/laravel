@@ -24,6 +24,7 @@ use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Schema\ID;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Repository;
 use LaravelJsonApi\Contracts\Server\Server;
@@ -66,14 +67,21 @@ class TestCase extends BaseTestCase
     /**
      * @param Server|MockObject $server
      * @param string $name
-     * @param string $pattern
+     * @param string|null $pattern
+     * @param string|null $uriType
      * @return Schema|MockObject
      */
-    protected function createSchema(Server $server, string $name, string $pattern = '[0-9]+'): Schema
+    protected function createSchema(
+        Server $server,
+        string $name,
+        string $pattern = null,
+        string $uriType = null
+    ): Schema
     {
         $schema = $this->createMock(Schema::class);
+        $schema->method('uriType')->willReturn($uriType ?: $name);
         $schema->method('id')->willReturn($id = $this->createMock(ID::class));
-        $id->method('pattern')->willReturn($pattern);
+        $id->method('pattern')->willReturn($pattern ?: '[0-9]+');
 
         $schemas = $this->createMock(Container::class);
         $schemas->method('schemaFor')->with($name)->willReturn($schema);
@@ -81,6 +89,21 @@ class TestCase extends BaseTestCase
         $server->method('schemas')->willReturn($schemas);
 
         return $schema;
+    }
+
+    /**
+     * @param MockObject $schema
+     * @param string $fieldName
+     * @param string|null $uriName
+     * @return void
+     */
+    protected function createRelation(MockObject $schema, string $fieldName, string $uriName = null): void
+    {
+        $relation = $this->createMock(Relation::class);
+        $relation->method('name')->willReturn($fieldName);
+        $relation->method('uriName')->willReturn($uriName ?: $fieldName);
+
+        $schema->method('relationship')->with($fieldName)->willReturn($relation);
     }
 
     /**

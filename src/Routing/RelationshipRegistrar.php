@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Laravel\Routing;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Routing\RouteCollection;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Support\Str;
 
 class RelationshipRegistrar
@@ -31,6 +32,11 @@ class RelationshipRegistrar
      * @var RegistrarContract
      */
     private RegistrarContract $router;
+
+    /**
+     * @var Schema
+     */
+    private Schema $schema;
 
     /**
      * @var string
@@ -51,17 +57,20 @@ class RelationshipRegistrar
      * RelationshipRegistrar constructor.
      *
      * @param RegistrarContract $router
+     * @param Schema $schema
      * @param string $resourceType
      * @param string $controller
      * @param string $parameter
      */
     public function __construct(
         RegistrarContract $router,
+        Schema $schema,
         string $resourceType,
         string $controller,
         string $parameter
     ) {
         $this->router = $router;
+        $this->schema = $schema;
         $this->resourceType = $resourceType;
         $this->controller = $controller;
         $this->parameter = $parameter;
@@ -95,7 +104,7 @@ class RelationshipRegistrar
      */
     protected function addShowRelated(string $fieldName, array $options): IlluminateRoute
     {
-        $uri = $this->getRelationshipUri($fieldName, $options);
+        $uri = $this->getRelationshipUri($fieldName);
         $action = $this->getRelationshipAction(
             'showRelated',
             'showRelated' . Str::classify($fieldName),
@@ -120,7 +129,7 @@ class RelationshipRegistrar
      */
     protected function addShowRelationship(string $fieldName, array $options): IlluminateRoute
     {
-        $uri = $this->getRelationshipUri($fieldName, $options);
+        $uri = $this->getRelationshipUri($fieldName);
         $action = $this->getRelationshipAction(
             'showRelationship',
             'show' . Str::classify($fieldName),
@@ -145,7 +154,7 @@ class RelationshipRegistrar
      */
     protected function addUpdateRelationship(string $fieldName, array $options): IlluminateRoute
     {
-        $uri = $this->getRelationshipUri($fieldName, $options);
+        $uri = $this->getRelationshipUri($fieldName);
         $action = $this->getRelationshipAction(
             'updateRelationship',
             'update' . Str::classify($fieldName),
@@ -170,7 +179,7 @@ class RelationshipRegistrar
      */
     protected function addAttachRelationship(string $fieldName, array $options): IlluminateRoute
     {
-        $uri = $this->getRelationshipUri($fieldName, $options);
+        $uri = $this->getRelationshipUri($fieldName);
         $action = $this->getRelationshipAction(
             'attachRelationship',
             'attach' . Str::classify($fieldName),
@@ -195,7 +204,7 @@ class RelationshipRegistrar
      */
     protected function addDetachRelationship(string $fieldName, array $options): IlluminateRoute
     {
-        $uri = $this->getRelationshipUri($fieldName, $options);
+        $uri = $this->getRelationshipUri($fieldName);
         $action = $this->getRelationshipAction(
             'detachRelationship',
             'detach' . Str::classify($fieldName),
@@ -277,16 +286,11 @@ class RelationshipRegistrar
 
     /**
      * @param string $fieldName
-     * @param array $options
      * @return string
      */
-    private function getRelationshipUri(string $fieldName, array $options): string
+    private function getRelationshipUri(string $fieldName): string
     {
-        if (isset($options['relationship_uri'])) {
-            return $options['relationship_uri'];
-        }
-
-        return Str::dasherize($fieldName);
+        return $this->schema->relationship($fieldName)->uriName();
     }
 
     /**

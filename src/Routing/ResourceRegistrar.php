@@ -88,9 +88,10 @@ class ResourceRegistrar
 
         $registrar = new RelationshipRegistrar(
             $this->router,
+            $this->server->schemas()->schemaFor($resourceType),
             $resourceType,
             $controller,
-            $parameter
+            $parameter,
         );
 
         $routes = new RouteCollection();
@@ -139,7 +140,7 @@ class ResourceRegistrar
      */
     protected function addResourceIndex(string $resourceType, string $controller, array $options): IlluminateRoute
     {
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
         $action = $this->getResourceAction($resourceType, $controller, 'index', null, $options);
 
         $route = $this->router->get($uri, $action);
@@ -158,7 +159,7 @@ class ResourceRegistrar
      */
     protected function addResourceStore(string $resourceType, string $controller, array $options): IlluminateRoute
     {
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
         $action = $this->getResourceAction($resourceType, $controller, 'store', null, $options);
 
         $route = $this->router->post($uri, $action);
@@ -178,7 +179,7 @@ class ResourceRegistrar
     protected function addResourceShow(string $resourceType, string $controller, array $options): IlluminateRoute
     {
         $parameter = $this->getResourceParameterName($resourceType, $options);
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
         $action = $this->getResourceAction($resourceType, $controller, 'show', $parameter, $options);
 
         $route = $this->router->get(sprintf('%s/{%s}', $uri, $parameter), $action);
@@ -199,7 +200,7 @@ class ResourceRegistrar
     protected function addResourceUpdate(string $resourceType, string $controller, array $options): IlluminateRoute
     {
         $parameter = $this->getResourceParameterName($resourceType, $options);
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
         $action = $this->getResourceAction($resourceType, $controller, 'update', $parameter, $options);
 
         $route = $this->router->patch(sprintf('%s/{%s}', $uri, $parameter), $action);
@@ -220,7 +221,7 @@ class ResourceRegistrar
     protected function addResourceDestroy(string $resourceType, string $controller, array $options): IlluminateRoute
     {
         $parameter = $this->getResourceParameterName($resourceType, $options);
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
         $action = $this->getResourceAction($resourceType, $controller, 'destroy', $parameter, $options);
 
         $route = $this->router->delete(sprintf('%s/{%s}', $uri, $parameter), $action);
@@ -232,16 +233,14 @@ class ResourceRegistrar
 
     /**
      * @param string $resourceType
-     * @param array $options
      * @return string
      */
-    private function getResourceUri(string $resourceType, array $options): string
+    private function getResourceUri(string $resourceType): string
     {
-        if (isset($options['resource_uri'])) {
-            return $options['resource_uri'];
-        }
-
-        return Str::dasherize($resourceType);
+        return $this->server
+            ->schemas()
+            ->schemaFor($resourceType)
+            ->uriType();
     }
 
     /**
@@ -312,7 +311,7 @@ class ResourceRegistrar
      */
     private function getRelationshipsAction(string $resourceType, ?string $parameter, array $options)
     {
-        $uri = $this->getResourceUri($resourceType, $options);
+        $uri = $this->getResourceUri($resourceType);
 
         $action = [
             'prefix' => sprintf('%s/{%s}', $uri, $parameter),

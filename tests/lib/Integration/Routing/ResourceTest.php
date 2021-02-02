@@ -281,14 +281,14 @@ class ResourceTest extends TestCase
     public function testResourceUri(string $method, string $uri): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'blog:posts');
+        $this->createSchema($server, 'blog:posts', null, 'posts');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
                 ->resources(function ($server) {
-                    $server->resource('blog:posts')->uri('posts');
+                    $server->resource('blog:posts');
                 });
         });
 
@@ -467,46 +467,6 @@ class ResourceTest extends TestCase
             ['PATCH', '/api/v1/posts/1', 405],
             ['DELETE', '/api/v1/posts/1', 405],
         ]);
-    }
-
-    /**
-     * @return array
-     */
-    public function multiWordProvider(): array
-    {
-        return [
-            'dash' => ['blog-posts', 'blog-posts', 'blog_post'],
-            'underscore' => ['blog_posts', 'blog-posts', 'blog_post'],
-            'camel' => ['blogPosts', 'blog-posts', 'blogPost'],
-        ];
-    }
-
-    /**
-     * @param string $type
-     * @param string $uri
-     * @param string $parameter
-     * @dataProvider multiWordProvider
-     * @see https://github.com/cloudcreativity/laravel-json-api/issues/224
-     */
-    public function testMultiWord(string $type, string $uri, string $parameter): void
-    {
-        $server = $this->createServer('v1');
-        $this->createSchema($server, $type, '\d+');
-
-        $this->defaultApiRoutesWithNamespace(function () use ($type) {
-            JsonApiRoute::server('v1')
-                ->prefix('v1')
-                ->namespace('Api\\V1')
-                ->resources(function ($server) use ($type) {
-                    $server->resource($type);
-                });
-        });
-
-        $route = $this->assertMatch('GET', "/api/v1/{$uri}/123");
-        $this->assertSame("v1.{$type}.show", $route->getName());
-        $this->assertSame($type, $route->parameter('resource_type'));
-        $this->assertSame($parameter, $route->parameter('resource_id_name'));
-        $this->assertSame('\d+', $route->action['where'][$parameter] ?? null);
     }
 
 }

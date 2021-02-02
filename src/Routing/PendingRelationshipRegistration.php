@@ -83,19 +83,6 @@ class PendingRelationshipRegistration
     }
 
     /**
-     * Set the URI for the relationship, if it is not the same as the field name.
-     *
-     * @param string $uri
-     * @return $this
-     */
-    public function uri(string $uri): self
-    {
-        $this->options['relationship_uri'] = $uri;
-
-        return $this;
-    }
-
-    /**
      * Set the methods the controller should apply to.
      *
      * @param string ...$actions
