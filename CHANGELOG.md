@@ -35,8 +35,9 @@ classes you are retaining.
 ### Removed
 - **BREAKING** The `Arr` schema field has been removed - use the new `ArrayList` or `ArrayHash`
 fields instead.
-- **BREAKING** The `uri` method on relationship routes has been removed. Relationship URIs
-are now set on the schema field for the relationship (via the `withUriFieldName` method).
+- **BREAKING** The `uri` method on resource and relationship routes has been removed:
+  - The resource type URI can now be set on the resource's schema (using the `$uriType` property).
+  - Relationship URIs are now set on the schema field for the relationship (via the `withUriFieldName` method).
 
 ## [1.0.0-alpha.1] - 2021-01-25
 

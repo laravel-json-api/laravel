@@ -67,14 +67,21 @@ class TestCase extends BaseTestCase
     /**
      * @param Server|MockObject $server
      * @param string $name
-     * @param string $pattern
+     * @param string|null $pattern
+     * @param string|null $uriType
      * @return Schema|MockObject
      */
-    protected function createSchema(Server $server, string $name, string $pattern = '[0-9]+'): Schema
+    protected function createSchema(
+        Server $server,
+        string $name,
+        string $pattern = null,
+        string $uriType = null
+    ): Schema
     {
         $schema = $this->createMock(Schema::class);
+        $schema->method('uriType')->willReturn($uriType ?: $name);
         $schema->method('id')->willReturn($id = $this->createMock(ID::class));
-        $id->method('pattern')->willReturn($pattern);
+        $id->method('pattern')->willReturn($pattern ?: '[0-9]+');
 
         $schemas = $this->createMock(Container::class);
         $schemas->method('schemaFor')->with($name)->willReturn($schema);

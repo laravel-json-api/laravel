@@ -83,19 +83,6 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set the URI for the resource type, if it is not the same as the resource type's name.
-     *
-     * @param string $uri
-     * @return $this
-     */
-    public function uri(string $uri): self
-    {
-        $this->options['resource_uri'] = $uri;
-
-        return $this;
-    }
-
-    /**
      * Set the methods the controller should apply to.
      *
      * @param string ...$actions
