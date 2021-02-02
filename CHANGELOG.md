@@ -11,6 +11,11 @@ Resource classes are now optional. If one is not defined, the implementation fal
 using the Eloquent schema to serialize a model. Eloquent schema fields now have new
 `hidden` and `serializeUsing` methods to customise the serialization of models by the schema.
 - Resource classes now support using conditional attributes in their `meta()` method.
+- New field classes `ArrayList` and `ArrayHash` have been added, to distinguish between
+PHP zero-indexed arrays that serialize to JSON arrays (`ArrayList`) and PHP associative
+arrays that serialize to JSON objects (`ArrayHash`). The distinction is required because
+an empty array list can be serialized to `[]` in JSON whereas an empty associative array
+must be serialized to `null` in JSON.
 
 ### Changed
 - **BREAKING** The JsonApiResource method signatures for the `attributes()`, `relationships()`,
@@ -21,6 +26,10 @@ our implementation allows the request to be `null` - this is to cover encoding r
 outside of HTTP requests, e.g. queued broadcasting. When upgrading, you will need to either
 delete resource classes (as they are now optional), or update the method signatures on any
 classes you are retaining.
+
+### Removed
+- **BREAKING** The `Arr` field has been removed - use the new `ArrayList` or `ArrayHash`
+fields instead.
 
 ## [1.0.0-alpha.1] - 2021-01-25
 
