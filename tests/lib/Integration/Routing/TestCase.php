@@ -24,6 +24,7 @@ use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Schema\ID;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Repository;
 use LaravelJsonApi\Contracts\Server\Server;
@@ -81,6 +82,21 @@ class TestCase extends BaseTestCase
         $server->method('schemas')->willReturn($schemas);
 
         return $schema;
+    }
+
+    /**
+     * @param MockObject $schema
+     * @param string $fieldName
+     * @param string|null $uriName
+     * @return void
+     */
+    protected function createRelation(MockObject $schema, string $fieldName, string $uriName = null): void
+    {
+        $relation = $this->createMock(Relation::class);
+        $relation->method('name')->willReturn($fieldName);
+        $relation->method('uriName')->willReturn($uriName ?: $fieldName);
+
+        $schema->method('relationship')->with($fieldName)->willReturn($relation);
     }
 
     /**

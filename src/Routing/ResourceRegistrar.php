@@ -88,9 +88,10 @@ class ResourceRegistrar
 
         $registrar = new RelationshipRegistrar(
             $this->router,
+            $this->server->schemas()->schemaFor($resourceType),
             $resourceType,
             $controller,
-            $parameter
+            $parameter,
         );
 
         $routes = new RouteCollection();

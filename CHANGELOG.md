@@ -33,8 +33,10 @@ classes you are retaining.
   a `v1` server after adding this package to their Laravel application.
 
 ### Removed
-- **BREAKING** The `Arr` field has been removed - use the new `ArrayList` or `ArrayHash`
+- **BREAKING** The `Arr` schema field has been removed - use the new `ArrayList` or `ArrayHash`
 fields instead.
+- **BREAKING** The `uri` method on relationship routes has been removed. Relationship URIs
+are now set on the schema field for the relationship (via the `withUriFieldName` method).
 
 ## [1.0.0-alpha.1] - 2021-01-25
 

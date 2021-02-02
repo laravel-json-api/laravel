@@ -62,7 +62,8 @@ class HasOneTest extends TestCase
     public function test(string $method, string $uri, string $action, string $name): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
@@ -87,13 +88,13 @@ class HasOneTest extends TestCase
      * @param string $method
      * @param string $uri
      * @param string $action
-     * @param string $name
      * @dataProvider genericProvider
      */
-    public function testName(string $method, string $uri, string $action, string $name): void
+    public function testName(string $method, string $uri, string $action): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () use ($action) {
             JsonApiRoute::server('v1')
@@ -121,7 +122,8 @@ class HasOneTest extends TestCase
     public function testMiddleware(string $method, string $uri, string $action, string $name): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
@@ -149,7 +151,8 @@ class HasOneTest extends TestCase
     public function testUri(string $method, string $uri, string $action, string $name): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'user', 'author');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
@@ -157,7 +160,7 @@ class HasOneTest extends TestCase
                 ->namespace('Api\\V1')
                 ->resources(function ($server) {
                     $server->resource('posts')->relationships(function ($relations) {
-                        $relations->hasOne('user')->uri('author');
+                        $relations->hasOne('user');
                     });
                 });
         });
@@ -203,7 +206,8 @@ class HasOneTest extends TestCase
     public function testOnly($only, array $matches): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () use ($only) {
             JsonApiRoute::server('v1')
@@ -258,7 +262,8 @@ class HasOneTest extends TestCase
     public function testExcept($except, array $matches): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () use ($except) {
             JsonApiRoute::server('v1')
@@ -277,7 +282,8 @@ class HasOneTest extends TestCase
     public function testReadOnly(): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')
@@ -334,7 +340,8 @@ class HasOneTest extends TestCase
     public function testOwnAction(string $method, string $uri, string $action, string $expected): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () use ($action) {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) use ($action) {
@@ -361,7 +368,8 @@ class HasOneTest extends TestCase
     public function testOwnActions(string $method, string $uri, string $action, string $expected): void
     {
         $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
@@ -377,4 +385,5 @@ class HasOneTest extends TestCase
         $this->assertSame('post', $route->parameter('resource_id_name'));
         $this->assertSame('author', $route->parameter('resource_relationship'));
     }
+
 }
