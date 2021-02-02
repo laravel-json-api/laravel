@@ -52,19 +52,14 @@ class MakeServerTest extends TestCase
 
     public function test(): void
     {
-        config()->set('jsonapi', [
-            'namespace' => 'JsonApi',
-            'servers' => [
-                'v1' => Server::class,
-            ],
-        ]);
+        config()->set('jsonapi', require __DIR__ . '/../../../../config/jsonapi.php');
 
         $result = $this->artisan('jsonapi:server', [
-            'name' => 'v2'
+            'name' => 'v1'
         ]);
 
         $this->assertSame(0, $result);
-        $this->assertServerCreated('JsonApi', 'V2', '/api/v2');
+        $this->assertServerCreated('JsonApi', 'V1', '/api/v1');
     }
 
     public function testWithUri(): void

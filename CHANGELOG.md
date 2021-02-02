@@ -27,6 +27,11 @@ outside of HTTP requests, e.g. queued broadcasting. When upgrading, you will nee
 delete resource classes (as they are now optional), or update the method signatures on any
 classes you are retaining.
 
+### Fixed
+- [#3](https://github.com/laravel-json-api/laravel/issues/3)
+  Example server registration in the published configuration file prevented developer from creating
+  a `v1` server after adding this package to their Laravel application.
+
 ### Removed
 - **BREAKING** The `Arr` field has been removed - use the new `ArrayList` or `ArrayHash`
 fields instead.
