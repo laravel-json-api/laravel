@@ -31,6 +31,7 @@ classes you are retaining.
 - [#3](https://github.com/laravel-json-api/laravel/issues/3)
   Example server registration in the published configuration file prevented developer from creating
   a `v1` server after adding this package to their Laravel application.
+- Package discovery for sub-packages that have service providers now works correctly.
 
 ### Removed
 - **BREAKING** The `Arr` schema field has been removed - use the new `ArrayList` or `ArrayHash`
