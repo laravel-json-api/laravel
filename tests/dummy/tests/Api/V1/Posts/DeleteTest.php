@@ -44,6 +44,7 @@ class DeleteTest extends TestCase
     public function test(): void
     {
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi()
             ->delete(url('api/v1/posts', $this->post));

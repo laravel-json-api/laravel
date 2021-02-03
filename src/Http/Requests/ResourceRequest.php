@@ -24,11 +24,10 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
-use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
+use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Core\Resources\Relation;
+use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
@@ -40,11 +39,6 @@ use function array_key_exists;
 
 class ResourceRequest extends FormRequest
 {
-
-    /**
-     * @var bool
-     */
-    protected bool $validateExisting = true;
 
     /**
      * @var callable|null
@@ -353,43 +347,37 @@ class ResourceRequest extends FormRequest
      * @param Model|object $model
      *      the model being updated.
      * @param array $document
-     *      the JSON API document to validate.
+     *      the JSON:API document to validate.
      * @return array
      */
     protected function dataForUpdate(object $model, array $document): array
     {
-        $data = $document['data'] ?? [];
+        $existing = $this->extractForUpdate($model);
 
-        if ($this->mustValidateExisting($model, $document)) {
-            $data['attributes'] = $this->extractAttributes(
-                $model,
-                $data['attributes'] ?? []
-            );
-
-            $data['relationships'] = $this->extractRelationships(
-                $model,
-                $data['relationships'] ?? []
-            );
+        if (method_exists($this, 'withExisting')) {
+            $existing = $this->withExisting($model, $existing) ?? $existing;
         }
 
-        return $data;
+        return ResourceObject::fromArray($existing)->merge(
+            $document['data']
+        )->jsonSerialize();
     }
 
     /**
      * Get validation data for modifying a relationship.
      *
-     * @param Model|object $record
+     * @param Model|object $model
      * @param string $fieldName
      * @param array $document
      * @return array
      */
-    protected function dataForRelationship(object $record, string $fieldName, array $document): array
+    protected function dataForRelationship(object $model, string $fieldName, array $document): array
     {
-        $resource = $this->resources()->create($record);
+        $route = $this->jsonApi()->route();
 
         return [
-            'type' => $resource->type(),
-            'id' => $resource->id(),
+            'type' => $route->resourceType(),
+            'id' => $route->resourceId(),
             'relationships' => [
                 $fieldName => [
                     'data' => $document['data'],
@@ -406,14 +394,7 @@ class ResourceRequest extends FormRequest
      */
     protected function dataForDelete(object $record): array
     {
-        $route = $this->jsonApi()->route();
-
-        $data = $this->dataForUpdate($record, [
-            'data' => [
-                'type' => $route->resourceType(),
-                'id' => $route->resourceId(),
-            ],
-        ]);
+        $data = $this->extractForUpdate($record);
 
         if (method_exists($this, 'metaForDelete')) {
             $data['meta'] = (array) $this->metaForDelete($record);
@@ -423,80 +404,36 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * Should existing resource values be provided to the validator for an update request?
+     * Extract the existing values for the provided model.
      *
-     * Child classes can overload this method if they need to programmatically work out
-     * if existing values must be provided to the validator instance for an update request.
-     *
-     * @param Model|object $model
-     *      the model being updated
-     * @param array $document
-     *      the JSON API document provided by the client.
-     * @return bool
-     */
-    protected function mustValidateExisting(object $model, array $document): bool
-    {
-        return false !== $this->validateExisting;
-    }
-
-    /**
-     * Extract existing attributes for the provided model.
-     *
-     * @param Model|object $model
-     * @return iterable
-     */
-    protected function existingAttributes(object $model): iterable
-    {
-        $resource = $this->resources()->create($model);
-
-        return $resource->attributes($this);
-    }
-
-    /**
-     * Extract existing relationships for the provided model.
-     *
-     * @param Model|object $model
-     * @return iterable
-     */
-    protected function existingRelationships(object $model): iterable
-    {
-        $resource = $this->resources()->create($model);
-
-        /** @var Relation $relationship */
-        foreach ($resource->relationships($this) as $relationship) {
-            if ($relationship->isValidated()) {
-                yield $relationship->fieldName() => $relationship->data();
-            }
-        }
-    }
-
-    /**
-     * Extract attributes for a resource update.
-     *
-     * @param Model|object $model
-     * @param array $new
+     * @param object $model
      * @return array
      */
-    private function extractAttributes(object $model, array $new): array
+    private function extractForUpdate(object $model): array
     {
-        return collect($this->existingAttributes($model))
-            ->merge($new)
-            ->all();
+        $encoder = $this->jsonApi()->server()->encoder();
+
+        return $encoder
+            ->withRequest($this)
+            ->withIncludePaths($this->includePathsToExtract($model))
+            ->withResource($model)
+            ->toArray()['data'];
     }
 
     /**
-     * Extract relationships for a resource update.
+     * Get the relationship paths that must be included when extracting the current field values.
      *
-     * @param Model|object $model
-     * @param array $new
-     * @return array
+     * @param object $model
+     * @return IncludePaths
      */
-    private function extractRelationships(object $model, array $new): array
+    private function includePathsToExtract(object $model): IncludePaths
     {
-        return collect($this->existingRelationships($model))
-            ->map(fn($value) => $this->convertExistingRelationships($value))
-            ->merge($new)
-            ->all();
+        $paths = collect($this->schema()->relationships())
+            ->filter(fn (Relation $relation) => $relation->isValidated())
+            ->map(fn (Relation $relation) => $relation->name())
+            ->values();
+
+        return IncludePaths::fromArray($paths);
     }
 
     /**
@@ -512,64 +449,6 @@ class ResourceRequest extends FormRequest
         return collect($rules)
             ->filter(fn($v, $key) => Str::startsWith($key, $fieldName))
             ->all();
-    }
-
-    /**
-     * Convert relationships returned by the `existingRelationships()` method.
-     *
-     * We support the method returning JSON API formatted relationships, e.g.:
-     *
-     * ```
-     * return [
-     *          'author' => [
-     *            'data' => [
-     *              'type' => 'users',
-     *              'id' => (string) $record->author->getRouteKey(),
-     *          ],
-     *      ],
-     * ];
-     * ```
-     *
-     * Or this shorthand:
-     *
-     * ```php
-     * return [
-     *      'author' => $record->author,
-     * ];
-     * ```
-     *
-     * This method converts the shorthand into the JSON API formatted relationships.
-     *
-     * @param $value
-     * @return array
-     */
-    private function convertExistingRelationships($value)
-    {
-        if (is_array($value) && array_key_exists('data', $value)) {
-            return $value;
-        }
-
-        if (is_null($value)) {
-            return ['data' => null];
-        }
-
-        $value = $this->resources()->resolve($value);
-
-        if ($value instanceof JsonApiResource) {
-            return [
-                'data' => [
-                    'type' => $value->type(),
-                    'id' => $value->id(),
-                ],
-            ];
-        }
-
-        return [
-            'data' => collect($value)->map(fn(JsonApiResource $resource) => [
-                'type' => $resource->type(),
-                'id' => $resource->id()
-            ])->all(),
-        ];
     }
 
     /**
@@ -616,14 +495,6 @@ class ResourceRequest extends FormRequest
         if ($document->invalid()) {
             throw new JsonApiException($document);
         }
-    }
-
-    /**
-     * @return ResourceContainer
-     */
-    final protected function resources(): ResourceContainer
-    {
-        return $this->jsonApi()->server()->resources();
     }
 
 }

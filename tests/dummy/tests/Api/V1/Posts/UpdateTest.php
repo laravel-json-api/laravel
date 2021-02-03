@@ -97,6 +97,7 @@ class UpdateTest extends TestCase
             ->replace($fieldName, $data[$fieldName]);
 
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
@@ -165,8 +166,7 @@ class UpdateTest extends TestCase
 
         $response = $this
             ->actingAs($this->post->author)
-            ->jsonApi()
-            ->expects('posts')
+            ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
