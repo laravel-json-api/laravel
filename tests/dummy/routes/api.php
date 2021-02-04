@@ -9,8 +9,8 @@ JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(functio
         $relationships->hasMany('comments')->readOnly();
         $relationships->hasMany('tags');
     })->actions('-actions', function ($actions) {
-        $actions->delete('purge')->name('purge');
-        $actions->withId()->post('publish')->name('publish');
+        $actions->delete('purge');
+        $actions->withId()->post('publish');
     });
 
     /** Videos */
