@@ -55,14 +55,14 @@ class ActionsTest extends TestCase
                 ->namespace('Api\\V1')
                 ->resources(function ($server) use ($func) {
                     $server->resource('posts')->actions(function ($actions) use ($func) {
-                        $actions->{$func}('foo-bar')->name('foobar');
+                        $actions->{$func}('foo-bar');
                     });
                 });
         });
 
         $route = $this->assertMatch($method, '/api/v1/posts/foo-bar');
         $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
-        $this->assertSame("v1.posts.foobar", $route->getName());
+        $this->assertSame("v1.posts.fooBar", $route->getName());
         $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
         $this->assertSame('posts', $route->parameter('resource_type'));
         $this->assertNull($route->parameter('resource_id_name'));
@@ -85,12 +85,42 @@ class ActionsTest extends TestCase
                 ->namespace('Api\\V1')
                 ->resources(function ($server) use ($func) {
                     $server->resource('posts')->actions('-actions', function ($actions) use ($func) {
-                        $actions->{$func}('foo-bar')->name('foobar');
+                        $actions->{$func}('foo-bar');
                     });
                 });
         });
 
         $route = $this->assertMatch($method, '/api/v1/posts/-actions/foo-bar');
+        $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
+        $this->assertSame("v1.posts.fooBar", $route->getName());
+        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
+        $this->assertSame('posts', $route->parameter('resource_type'));
+        $this->assertNull($route->parameter('resource_id_name'));
+        $this->assertArrayNotHasKey('post', $route->wheres);
+    }
+
+    /**
+     * @param string $method
+     * @dataProvider methodProvider
+     */
+    public function testBaseWithName(string $method): void
+    {
+        $func = strtolower($method);
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($func) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) use ($func) {
+                    $server->resource('posts')->actions(function ($actions) use ($func) {
+                        $actions->{$func}('foo-bar')->name('foobar');
+                    });
+                });
+        });
+
+        $route = $this->assertMatch($method, '/api/v1/posts/foo-bar');
         $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
         $this->assertSame("v1.posts.foobar", $route->getName());
         $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
@@ -104,6 +134,66 @@ class ActionsTest extends TestCase
      * @dataProvider methodProvider
      */
     public function testId(string $method): void
+    {
+        $func = strtolower($method);
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($func) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) use ($func) {
+                    $server->resource('posts')->actions(function ($actions) use ($func) {
+                        $actions->withId()->{$func}('foo-bar');
+                    });
+                });
+        });
+
+        $route = $this->assertMatch($method, '/api/v1/posts/123/foo-bar');
+        $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
+        $this->assertSame("v1.posts.fooBar", $route->getName());
+        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
+        $this->assertSame('posts', $route->parameter('resource_type'));
+        $this->assertSame('post', $route->parameter('resource_id_name'));
+        $this->assertSame('\d+', $route->wheres['post'] ?? null);
+    }
+
+    /**
+     * @param string $method
+     * @dataProvider methodProvider
+     */
+    public function testIdWithPrefix(string $method): void
+    {
+        $func = strtolower($method);
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($func) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) use ($func) {
+                    $server->resource('posts')->actions('-actions', function ($actions) use ($func) {
+                        $actions->withId()->{$func}('foo-bar');
+                    });
+                });
+        });
+
+        $route = $this->assertMatch($method, '/api/v1/posts/123/-actions/foo-bar');
+        $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
+        $this->assertSame("v1.posts.fooBar", $route->getName());
+        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
+        $this->assertSame('posts', $route->parameter('resource_type'));
+        $this->assertSame('post', $route->parameter('resource_id_name'));
+        $this->assertSame('\d+', $route->wheres['post'] ?? null);
+    }
+
+    /**
+     * @param string $method
+     * @dataProvider methodProvider
+     */
+    public function testIdWithName(string $method): void
     {
         $func = strtolower($method);
         $server = $this->createServer('v1');
@@ -133,36 +223,6 @@ class ActionsTest extends TestCase
      * @param string $method
      * @dataProvider methodProvider
      */
-    public function testIdWithPrefix(string $method): void
-    {
-        $func = strtolower($method);
-        $server = $this->createServer('v1');
-        $this->createSchema($server, 'posts', '\d+');
-
-        $this->defaultApiRoutesWithNamespace(function () use ($func) {
-            JsonApiRoute::server('v1')
-                ->prefix('v1')
-                ->namespace('Api\\V1')
-                ->resources(function ($server) use ($func) {
-                    $server->resource('posts')->actions('-actions', function ($actions) use ($func) {
-                        $actions->withId()->{$func}('foo-bar')->name('foobar');
-                    });
-                });
-        });
-
-        $route = $this->assertMatch($method, '/api/v1/posts/123/-actions/foo-bar');
-        $this->assertSame("App\Http\Controllers\Api\V1\PostController@fooBar", $route->action['controller']);
-        $this->assertSame("v1.posts.foobar", $route->getName());
-        $this->assertSame(['api', 'jsonapi:v1'], $route->action['middleware']);
-        $this->assertSame('posts', $route->parameter('resource_type'));
-        $this->assertSame('post', $route->parameter('resource_id_name'));
-        $this->assertSame('\d+', $route->wheres['post'] ?? null);
-    }
-
-    /**
-     * @param string $method
-     * @dataProvider methodProvider
-     */
     public function testIdConstraintWorks(string $method): void
     {
         $func = strtolower($method);
@@ -175,7 +235,7 @@ class ActionsTest extends TestCase
                 ->namespace('Api\\V1')
                 ->resources(function ($server) use ($func) {
                     $server->resource('posts')->actions('-actions', function ($actions) use ($func) {
-                        $actions->withId()->{$func}('foo-bar')->name('foobar');
+                        $actions->withId()->{$func}('foo-bar');
                     });
                 });
         });

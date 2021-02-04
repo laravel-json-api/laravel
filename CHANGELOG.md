@@ -7,8 +7,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
-- Can now register routes for custom actions on a resource, using the `actions()` helper method when registering
-  resources.
+- [#12](https://github.com/laravel-json-api/laravel/pull/12) Can now register routes for custom actions on a resource,
+  using the `actions()` helper method when registering resources. See the PR for examples.
 - The `JsonApiController` now has the Laravel `AuthorizesRequests`, `DispatchesJobs` and `ValidatesRequests` traits
   applied.
 
