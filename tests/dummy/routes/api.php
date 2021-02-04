@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\PostController;
+use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(function ($server) {
@@ -8,6 +10,8 @@ JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(functio
         $relationships->hasMany('comments')->readOnly();
         $relationships->hasMany('tags');
     });
+
+    Route::post('posts/{post}/-actions/publish', [PostController::class, 'publish']);
 
     $server->resource('videos')->relationships(function ($relationships) {
         $relationships->hasMany('tags');
