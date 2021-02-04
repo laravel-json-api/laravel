@@ -21,6 +21,8 @@ namespace LaravelJsonApi\Laravel\Routing;
 
 use Closure;
 use Illuminate\Routing\RouteCollection;
+use InvalidArgumentException;
+use function is_string;
 
 class PendingResourceRegistration
 {
@@ -54,6 +56,16 @@ class PendingResourceRegistration
      * @var Closure|null
      */
     private ?Closure $relationships = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $actionsPrefix = null;
+
+    /**
+     * @var Closure|null
+     */
+    private ?Closure $actions = null;
 
     /**
      * @var array|string[]
@@ -195,6 +207,8 @@ class PendingResourceRegistration
     }
 
     /**
+     * Register resource relationship routes.
+     *
      * @param Closure $callback
      * @return $this
      */
@@ -203,6 +217,30 @@ class PendingResourceRegistration
         $this->relationships = $callback;
 
         return $this;
+    }
+
+    /**
+     * Register custom actions for the resource.
+     *
+     * @param string|Closure $prefixOrCallback
+     * @param Closure|null $callback
+     * @return $this
+     */
+    public function actions($prefixOrCallback, Closure $callback = null): self
+    {
+        if ($prefixOrCallback instanceof Closure && null === $callback) {
+            $this->actionsPrefix = null;
+            $this->actions = $prefixOrCallback;
+            return $this;
+        }
+
+        if (is_string($prefixOrCallback) && !empty($prefixOrCallback) && $callback instanceof Closure) {
+            $this->actionsPrefix = $prefixOrCallback;
+            $this->actions = $callback;
+            return $this;
+        }
+
+        throw new InvalidArgumentException('Invalid arguments when registering custom resource actions.');
     }
 
     /**
@@ -229,6 +267,20 @@ class PendingResourceRegistration
             );
 
             foreach ($relations as $route) {
+                $routes->add($route);
+            }
+        }
+
+        if ($this->actions) {
+            $actions = $this->registrar->actions(
+                $this->resourceType,
+                $this->controller,
+                $this->options,
+                $this->actionsPrefix,
+                $this->actions
+            );
+
+            foreach ($actions as $route) {
                 $routes->add($route);
             }
         }

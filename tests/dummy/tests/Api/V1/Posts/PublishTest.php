@@ -20,34 +20,74 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 
 class PublishTest extends TestCase
 {
 
+    /**
+     * @var Post
+     */
+    private Post $post;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->post = Post::factory()->create(['published_at' => null]);
+    }
+
     public function test(): void
     {
         $this->travelTo($date = now()->milliseconds(0));
 
-        $post = Post::factory()->create(['published_at' => null]);
-
         $expected = $this->serializer
-            ->post($post)
+            ->post($this->post)
             ->replace('publishedAt', $date->jsonSerialize())
-            ->jsonSerialize();
+            ->replace('author', ['type' => 'users', 'id' => $this->post->author]);
 
         $response = $this
             ->withoutExceptionHandling()
-            ->actingAs($post->author)
+            ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->contentType('application/json')
-            ->post(url('/api/v1/posts', [$post, '-actions/publish']));
+            ->includePaths('author')
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
-        $response->assertFetchedOneExact($expected);
+        $response->assertFetchedOneExact($expected->jsonSerialize());
+        $response->assertIncluded([$expected['author']]);
 
         $this->assertDatabaseHas('posts', array_replace(
-            $post->getAttributes(),
+            $this->post->getRawOriginal(),
             ['published_at' => $date->toDateTimeString()]
         ));
+    }
+
+    public function testUnauthorized(): void
+    {
+        $response = $this
+            ->jsonApi('posts')
+            ->contentType('application/json')
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
+
+        $response->assertNotFound();
+
+        $this->assertDatabaseHas('posts', $this->post->getRawOriginal());
+    }
+
+    public function testForbidden(): void
+    {
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->jsonApi('posts')
+            ->contentType('application/json')
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
+
+        $response->assertNotFound();
+
+        $this->assertDatabaseHas('posts', $this->post->getRawOriginal());
     }
 }

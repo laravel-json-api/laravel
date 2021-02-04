@@ -44,17 +44,18 @@ class PostController extends Controller
      * Publish a post.
      *
      * @param Store $store
+     * @param PostQuery $query
      * @param Post $post
      * @return DataResponse
      */
-    public function publish(Store $store, Post $post)
+    public function publish(Store $store, PostQuery $query, Post $post)
     {
         $post->update(['published_at' => now()]);
 
-//        $model = $store
-//            ->queryOne('posts', $post)
-//            ->using($request)
-//            ->first();
+        $model = $store
+            ->queryOne('posts', $post)
+            ->using($query)
+            ->first();
 
         return new DataResponse($post);
     }

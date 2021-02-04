@@ -26,6 +26,23 @@ class PostQuery extends ResourceQuery
 {
 
     /**
+     * Authorize the request.
+     *
+     * @return bool|null
+     */
+    public function authorize(): ?bool
+    {
+        if ($this->is('*-actions*')) {
+            return (bool) optional($this->user())->can(
+                'update',
+                $this->model()
+            );
+        }
+
+        return null;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
