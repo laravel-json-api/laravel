@@ -66,6 +66,25 @@ class PublishTest extends TestCase
         ));
     }
 
+    public function testAlreadyPublished(): void
+    {
+        $this->post->update(['published_at' => now()]);
+
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->contentType('application/json')
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
+
+        $response->assertExactErrorStatus([
+            'detail' => 'Post is already published.',
+            'status' => '403',
+            'title' => 'Forbidden',
+        ]);
+
+        $this->assertDatabaseHas('posts', $this->post->getRawOriginal());
+    }
+
     public function testUnauthorized(): void
     {
         $response = $this

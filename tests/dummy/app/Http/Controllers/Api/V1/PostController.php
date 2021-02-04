@@ -21,6 +21,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\JsonApi\V1\Posts\PostQuery;
+use App\JsonApi\V1\Posts\PostSchema;
 use App\Models\Post;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
@@ -58,17 +59,22 @@ class PostController extends Controller
     /**
      * Publish a post.
      *
-     * @param Store $store
+     * @param PostSchema $schema
      * @param PostQuery $query
      * @param Post $post
      * @return Responsable
      */
-    public function publish(Store $store, PostQuery $query, Post $post): Responsable
+    public function publish(PostSchema $schema, PostQuery $query, Post $post): Responsable
     {
+        $this->authorize('update', $post);
+
+        abort_if($post->published_at, 403, 'Post is already published.');
+
         $post->update(['published_at' => now()]);
 
-        $model = $store
-            ->queryOne('posts', $post)
+        $model = $schema
+            ->repository()
+            ->queryOne($post)
             ->using($query)
             ->first();
 
