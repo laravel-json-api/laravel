@@ -414,7 +414,7 @@ class ResourceRegistrar
      * @param string $resourceType
      * @return string
      */
-    public function getIdPattern(string $resourceType): string
+    private function getIdPattern(string $resourceType): string
     {
         return $this->server
             ->schemas()
