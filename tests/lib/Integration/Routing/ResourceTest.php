@@ -469,4 +469,34 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    /**
+     * @return array
+     */
+    public function resourceMethodProvider(): array
+    {
+        return [
+            'GET' => ['GET'],
+            'PATCH' => ['PATCH'],
+            'DELETE' => ['DELETE'],
+        ];
+    }
+
+    /**
+     * @param string $method
+     * @dataProvider resourceMethodProvider
+     */
+    public function testIdConstraintWorks(string $method): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
+                $server->resource('posts');
+            });
+        });
+
+        $this->assertMatch($method, '/api/v1/posts/123');
+        $this->assertNotFound($method, '/api/v1/posts/123abc');
+    }
 }

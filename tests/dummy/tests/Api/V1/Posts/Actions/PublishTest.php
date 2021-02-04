@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Api\V1\Posts;
+namespace App\Tests\Api\V1\Posts\Actions;
 
 use App\Models\Post;
 use App\Models\User;

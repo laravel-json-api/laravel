@@ -22,6 +22,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\JsonApi\V1\Posts\PostQuery;
 use App\Models\Post;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Laravel\Http\Controllers\Actions;
@@ -41,14 +43,27 @@ class PostController extends Controller
     use Actions\DetachRelationship;
 
     /**
+     * @return Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function purge(): Response
+    {
+        $this->authorize('deleteAll', Post::class);
+
+        Post::query()->delete();
+
+        return response('', 204);
+    }
+
+    /**
      * Publish a post.
      *
      * @param Store $store
      * @param PostQuery $query
      * @param Post $post
-     * @return DataResponse
+     * @return Responsable
      */
-    public function publish(Store $store, PostQuery $query, Post $post)
+    public function publish(Store $store, PostQuery $query, Post $post): Responsable
     {
         $post->update(['published_at' => now()]);
 
@@ -57,6 +72,6 @@ class PostController extends Controller
             ->using($query)
             ->first();
 
-        return new DataResponse($post);
+        return new DataResponse($model);
     }
 }

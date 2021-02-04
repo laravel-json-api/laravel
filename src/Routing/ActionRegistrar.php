@@ -76,7 +76,7 @@ class ActionRegistrar
      * @param string $resourceType
      * @param array $options
      * @param string $controller
-     * @param string $prefix
+     * @param string|null $prefix
      */
     public function __construct(
         RegistrarContract $router,
@@ -85,7 +85,7 @@ class ActionRegistrar
         string $resourceType,
         array $options,
         string $controller,
-        string $prefix
+        string $prefix = null
     ) {
         $this->router = $router;
         $this->resource = $resource;
@@ -108,18 +108,91 @@ class ActionRegistrar
     }
 
     /**
+     * Register a new GET route.
+     *
+     * @param string $uri
+     * @param string|null $method
+     * @return IlluminateRoute
+     */
+    public function get(string $uri, string $method = null): IlluminateRoute
+    {
+        return $this->register('get', $uri, $method);
+    }
+
+    /**
+     * Register a new POST route.
+     *
      * @param string $uri
      * @param string|null $method
      * @return IlluminateRoute
      */
     public function post(string $uri, string $method = null): IlluminateRoute
     {
-        $method = $method ?: $this->guessMethod($uri);
+        return $this->register('post', $uri, $method);
+    }
+
+    /**
+     * Register a new PATCH route.
+     *
+     * @param string $uri
+     * @param string|null $method
+     * @return IlluminateRoute
+     */
+    public function patch(string $uri, string $method = null): IlluminateRoute
+    {
+        return $this->register('patch', $uri, $method);
+    }
+
+    /**
+     * Register a new PUT route.
+     *
+     * @param string $uri
+     * @param string|null $method
+     * @return IlluminateRoute
+     */
+    public function put(string $uri, string $method = null): IlluminateRoute
+    {
+        return $this->register('put', $uri, $method);
+    }
+
+    /**
+     * Register a new DELETE route.
+     *
+     * @param string $uri
+     * @param string|null $method
+     * @return IlluminateRoute
+     */
+    public function delete(string $uri, string $method = null): IlluminateRoute
+    {
+        return $this->register('delete', $uri, $method);
+    }
+
+    /**
+     * Register a new OPTIONS route.
+     *
+     * @param string $uri
+     * @param string|null $method
+     * @return IlluminateRoute
+     */
+    public function options(string $uri, string $method = null): IlluminateRoute
+    {
+        return $this->register('options', $uri, $method);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string|null $action
+     * @return IlluminateRoute
+     */
+    public function register(string $method, string $uri, string $action = null): IlluminateRoute
+    {
+        $action = $action ?: $this->guessControllerAction($uri);
         $parameter = $this->getParameter();
 
-        $route = $this->router->post(
+        $route = $this->router->{$method}(
             $this->uri($uri, $parameter),
-            sprintf('%s@%s', $this->controller, $method)
+            sprintf('%s@%s', $this->controller, $action)
         );
 
         $this->route($route, $parameter);
@@ -191,7 +264,7 @@ class ActionRegistrar
      * @param string $uri
      * @return string
      */
-    private function guessMethod(string $uri): string
+    private function guessControllerAction(string $uri): string
     {
         return Str::camel($uri);
     }
