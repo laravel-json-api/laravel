@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+
+- The `JsonApiController` now has the Laravel `AuthorizesRequests`, `DispatchesJobs` and `ValidatesRequests` traits
+  applied.
+
 ### Changed
+
 - [#2](https://github.com/laravel-json-api/laravel/issues/2) **BREAKING** Improved the extraction of existing resource
   field values when constructing validation data for update requests:
     - The `existingAttributes()` and `existingRelationships()` methods on the resource request class has been removed.
