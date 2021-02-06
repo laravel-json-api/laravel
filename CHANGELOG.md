@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file. This projec
   using the `actions()` helper method when registering resources. See the PR for examples.
 - The `JsonApiController` now has the Laravel `AuthorizesRequests`, `DispatchesJobs` and `ValidatesRequests` traits
   applied.
+- [#6](https://github.com/laravel-json-api/laravel/issues/6) Resource class can now use conditional fields in their
+  relationships. This works in the same way as conditional attributes: the resource's `when()` and `mergeWhen()` method
+  should be used to add conditional relationships.
 
 ### Changed
 
