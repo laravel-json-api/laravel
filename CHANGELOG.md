@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file. This projec
 - [#6](https://github.com/laravel-json-api/laravel/issues/6) Resource class can now use conditional fields in their
   relationships. This works in the same way as conditional attributes: the resource's `when()` and `mergeWhen()` method
   should be used to add conditional relationships.
+- [#13](https://github.com/laravel-json-api/laravel/issues/13) Added French translations for JSON:API errors generated
+  by specification parsing and resource/query parameter validation.
 
 ### Changed
 
