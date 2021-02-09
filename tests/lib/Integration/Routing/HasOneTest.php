@@ -386,4 +386,30 @@ class HasOneTest extends TestCase
         $this->assertSame('author', $route->parameter('resource_relationship'));
     }
 
+    /**
+     * @param string $method
+     * @param string $uri
+     * @dataProvider genericProvider
+     */
+    public function testIdConstraintWorks(string $method, string $uri): void
+    {
+        $server = $this->createServer('v1');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->resources(function ($server) {
+                    $server->resource('posts')->relationships(function ($relations) {
+                        $relations->hasOne('author');
+                    });
+                });
+        });
+
+        $this->assertMatch($method, $uri);
+        $this->assertNotFound($method, str_replace('123', '123abc', $uri));
+    }
+
 }

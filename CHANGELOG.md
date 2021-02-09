@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-alpha.3] - 2021-02-09
+
+### Added
+
+- [#12](https://github.com/laravel-json-api/laravel/pull/12) Can now register routes for custom actions on a resource,
+  using the `actions()` helper method when registering resources. See the PR for examples.
+- The `JsonApiController` now has the Laravel `AuthorizesRequests`, `DispatchesJobs` and `ValidatesRequests` traits
+  applied.
+- [#6](https://github.com/laravel-json-api/laravel/issues/6) Resource class can now use conditional fields in their
+  relationships. This works in the same way as conditional attributes: the resource's `when()` and `mergeWhen()` method
+  should be used to add conditional relationships.
+- [#13](https://github.com/laravel-json-api/laravel/issues/13) Added French translations for JSON:API errors generated
+  by specification parsing and resource/query parameter validation.
+- [#7](https://github.com/laravel-json-api/laravel/issues/7) Eloquent schemas now support default eager loading via
+  their `$with` property.
+- [#15](https://github.com/laravel-json-api/laravel/issues/15) When parsing a JSON:API document for compliance with the
+  specification, the client will now receive a clearer error message if they submit a *to-one* relationship object for a
+  *to-many* relationship (and vice-versa).
+
+### Changed
+
+- [#2](https://github.com/laravel-json-api/laravel/issues/2) **BREAKING** Improved the extraction of existing resource
+  field values when constructing validation data for update requests:
+    - The `existingAttributes()` and `existingRelationships()` methods on the resource request class has been removed.
+      If you need to modify the existing values before the client values are merged, implement the `withExisting()`
+      method instead. This receives the model and its JSON representation (as an array).
+    - The `mustValidate()` method must now be called on a schema relationship field. (Previously this was on the
+      resource relation.) By default, belongs-to and morph-to relations will be included when extracting existing
+      values; all other relations will not. Use the `mustValidate()` or `notValidated()` method on the schema relation
+      to alter whether a relation is included in the extracted values.
+
 ## [1.0.0-alpha.2] - 2021-02-02
 
 ### Added

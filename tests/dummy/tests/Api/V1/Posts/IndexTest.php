@@ -101,13 +101,13 @@ class IndexTest extends TestCase
     {
         $posts = Post::factory()->count(2)->create();
 
-        $expected1 = $this->serializer->post($posts[0])->toArray();
+        $expected1 = $this->serializer->post($posts[0])->jsonSerialize();
         $expected1['relationships']['author']['data'] = $user1 = [
             'type' => 'users',
             'id' => (string) $posts[0]->author->getRouteKey(),
         ];
 
-        $expected2 = $this->serializer->post($posts[1])->toArray();
+        $expected2 = $this->serializer->post($posts[1])->jsonSerialize();
         $expected2['relationships']['author']['data'] = $user2 = [
             'type' => 'users',
             'id' => (string) $posts[1]->author->getRouteKey(),
@@ -143,7 +143,7 @@ class IndexTest extends TestCase
     public function testSlugFilter(): void
     {
         $posts = Post::factory()->count(2)->create();
-        $expected = $this->serializer->post($posts[1])->toArray();
+        $expected = $this->serializer->post($posts[1])->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()

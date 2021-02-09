@@ -110,6 +110,43 @@ class ResourceRegistrar
     }
 
     /**
+     * Register resource custom actions.
+     *
+     * @param string $resourceType
+     * @param string $controller
+     * @param array $options
+     * @param string|null $prefix
+     * @param Closure $callback
+     * @return RouteCollection
+     */
+    public function actions(
+        string $resourceType,
+        string $controller,
+        array $options,
+        ?string $prefix,
+        Closure $callback
+    ): RouteCollection
+    {
+        $attributes = $this->getCustomActions($resourceType, $options);
+
+        $actions = new ActionRegistrar(
+            $this->router,
+            $this,
+            $routes = new RouteCollection(),
+            $resourceType,
+            $options,
+            $controller,
+            $prefix
+        );
+
+        $this->router->group($attributes, function () use ($actions, $callback) {
+            $callback($actions);
+        });
+
+        return $routes;
+    }
+
+    /**
      * Register resource routes.
      *
      * @param string $resourceType
@@ -128,6 +165,47 @@ class ResourceRegistrar
         }
 
         return $routes;
+    }
+
+    /**
+     * @param string $resourceType
+     * @param array $options
+     * @return string
+     */
+    public function getResourceParameterName(string $resourceType, array $options): string
+    {
+        if (isset($options['parameter'])) {
+            return $options['parameter'];
+        }
+
+        $param = Str::singular($resourceType);
+
+        /**
+         * Dash-case is not allowed for route parameters. Therefore if the
+         * resource type contains a dash, we will underscore it.
+         */
+        if (Str::contains($param, '-')) {
+            $param = Str::underscore($param);
+        }
+
+        return $param;
+    }
+
+    /**
+     * @param string $resourceType
+     * @param string|null $parameter
+     * @param array $options
+     * @return array
+     */
+    public function getWheres(string $resourceType, ?string $parameter, array $options): array
+    {
+        $where = $options['wheres'] ?? [];
+
+        if ($parameter && !isset($action['where'][$parameter])) {
+            $where[$parameter] = $this->getIdPattern($resourceType);
+        }
+
+        return $where;
     }
 
     /**
@@ -244,30 +322,6 @@ class ResourceRegistrar
     }
 
     /**
-     * @param string $resourceType
-     * @param array $options
-     * @return string
-     */
-    private function getResourceParameterName(string $resourceType, array $options): string
-    {
-        if (isset($options['parameter'])) {
-            return $options['parameter'];
-        }
-
-        $param = Str::singular($resourceType);
-
-        /**
-         * Dash-case is not allowed for route parameters. Therefore if the
-         * resource type contains a dash, we will underscore it.
-         */
-        if (Str::contains($param, '-')) {
-            $param = Str::underscore($param);
-        }
-
-        return $param;
-    }
-
-    /**
      * Get the action array for a resource route.
      *
      * @param string $resourceType
@@ -332,20 +386,28 @@ class ResourceRegistrar
     }
 
     /**
+     * Get the action array for custom the actions group.
+     *
      * @param string $resourceType
-     * @param string|null $parameter
      * @param array $options
      * @return array
      */
-    private function getWheres(string $resourceType, ?string $parameter, array $options): array
+    private function getCustomActions(string $resourceType, array $options)
     {
-        $where = $options['wheres'] ?? [];
+        $action = [
+            'prefix' => $this->getResourceUri($resourceType),
+            'as' => "{$resourceType}.",
+        ];
 
-        if ($parameter && !isset($action['where'][$parameter])) {
-            $where[$parameter] = $this->getIdPattern($resourceType);
+        if (isset($options['middleware'])) {
+            $action['middleware'] = $options['middleware'];
         }
 
-        return $where;
+        if (isset($options['excluded_middleware'])) {
+            $action['excluded_middleware'] = $options['excluded_middleware'];
+        }
+
+        return $action;
     }
 
     /**

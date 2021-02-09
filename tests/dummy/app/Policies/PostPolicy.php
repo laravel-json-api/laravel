@@ -146,6 +146,15 @@ class PostPolicy
 
     /**
      * @param User|null $user
+     * @return bool
+     */
+    public function deleteAll(?User $user): bool
+    {
+        return $user && $user->isAdmin();
+    }
+
+    /**
+     * @param User|null $user
      * @param Post $post
      * @return bool
      */
