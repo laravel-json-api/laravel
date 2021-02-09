@@ -28,7 +28,7 @@
         "laravel-json-api/core": "^1.0.0-alpha.3",
         "laravel-json-api/eloquent": "^1.0.0-alpha.3",
         "laravel-json-api/encoder-neomerx": "^1.0.0-alpha.3",
-        "laravel-json-api/exceptions": "^1.0.0-alpha.1",
+        "laravel-json-api/exceptions": "^1.0.0-alpha.2",
         "laravel-json-api/spec": "^1.0.0-alpha.3",
         "laravel-json-api/validation": "^1.0.0-alpha.3",
         "laravel/framework": "^8.0"
@@ -65,7 +65,7 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
