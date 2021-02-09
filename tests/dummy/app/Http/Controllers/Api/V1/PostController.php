@@ -25,7 +25,6 @@ use App\JsonApi\V1\Posts\PostSchema;
 use App\Models\Post;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
