@@ -1,3 +1,5 @@
+![Tests](https://github.com/laravel-json-api/laravel/workflows/Tests/badge.svg)
+
 # JSON:API for Web Artisans
 
 Implement feature-rich [JSON:API](https://jsonapi.org) compliant APIs in your
