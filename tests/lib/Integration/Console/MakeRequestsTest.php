@@ -54,9 +54,7 @@ class MakeRequestsTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests', [
-            'name' => 'posts'
-        ]);
+        $result = $this->artisan('jsonapi:requests posts');
 
         $this->assertSame(0, $result);
         $this->assertAllCreated();
@@ -69,10 +67,7 @@ class MakeRequestsTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests', [
-            'name' => 'posts',
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:requests posts --server v1');
 
         $this->assertSame(0, $result);
         $this->assertAllCreated();

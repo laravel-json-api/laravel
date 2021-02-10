@@ -54,9 +54,7 @@ class MakeResourceTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:resource', [
-            'name' => 'posts'
-        ]);
+        $result = $this->artisan('jsonapi:resource posts');
 
         $this->assertSame(0, $result);
         $this->assertResourceCreated();
@@ -69,10 +67,7 @@ class MakeResourceTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:resource', [
-            'name' => 'posts',
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:resource posts --server v1');
 
         $this->assertSame(0, $result);
         $this->assertResourceCreated();

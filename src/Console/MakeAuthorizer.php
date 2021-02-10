@@ -71,7 +71,7 @@ class MakeAuthorizer extends GeneratorCommand
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the schema already exists.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Whether the authorizer is for a specific resource type.'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the schema exists in.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the schema exists in.'],
         ];
     }
 

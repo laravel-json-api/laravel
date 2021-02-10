@@ -71,30 +71,4 @@ class StubPublishTest extends TestCase
         }
     }
 
-    /**
-     * @return void
-     */
-    private function assertResourceCreated(): void
-    {
-        $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostResource.php'));
-        $content = file_get_contents($path);
-
-        $tests = [
-            'namespace App\JsonApi\V1\Posts;',
-            'use LaravelJsonApi\Core\Resources\JsonApiResource;',
-            'class PostResource extends JsonApiResource',
-        ];
-
-        foreach ($tests as $expected) {
-            $this->assertStringContainsString($expected, $content);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function assertResourceNotCreated(): void
-    {
-        $this->assertFileDoesNotExist(app_path('JsonApi/V1/Posts/PostResource.php'));
-    }
 }

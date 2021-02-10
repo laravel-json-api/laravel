@@ -104,8 +104,8 @@ class MakeSchema extends GeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the schema already exists'],
-            ['model', 'm', InputOption::VALUE_NONE, 'The model that the schema applies to.'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the schema exists in.'],
+            ['model', 'm', InputOption::VALUE_REQUIRED, 'The model that the schema applies to.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the schema exists in.'],
         ];
     }
 

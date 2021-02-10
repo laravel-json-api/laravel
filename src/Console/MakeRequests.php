@@ -78,7 +78,7 @@ class MakeRequests extends Command
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the request classes even if they already exists'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the requests exists in.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the requests exists in.'],
         ];
     }
 }

@@ -54,9 +54,7 @@ class MakeAuthorizerTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:authorizer', [
-            'name' => 'blog'
-        ]);
+        $result = $this->artisan('jsonapi:authorizer blog');
 
         $this->assertSame(0, $result);
         $this->assertAuthorizerCreated();
@@ -69,10 +67,7 @@ class MakeAuthorizerTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:authorizer', [
-            'name' => 'blog',
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:authorizer blog --server v1');
 
         $this->assertSame(0, $result);
         $this->assertAuthorizerCreated();
@@ -84,10 +79,7 @@ class MakeAuthorizerTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:authorizer', [
-            'name' => 'posts',
-            '--resource' => true,
-        ]);
+        $result = $this->artisan('jsonapi:authorizer posts --resource');
 
         $this->assertSame(0, $result);
         $this->assertResourceAuthorizerCreated();
@@ -100,11 +92,7 @@ class MakeAuthorizerTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:authorizer', [
-            'name' => 'posts',
-            '--resource' => true,
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:authorizer posts --resource --server v1');
 
         $this->assertSame(0, $result);
         $this->assertResourceAuthorizerCreated();

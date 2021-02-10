@@ -59,7 +59,7 @@ class MakeResource extends GeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the resource already exists'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the resource exists in.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the resource exists in.'],
         ];
     }
 

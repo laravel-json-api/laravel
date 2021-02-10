@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file. This projec
 
 - Added missing `jsonapi:authorizer` generator command.
 
+### Fixed
+
+- Optional parameters to generator commands that require values now work correctly. Previously these were incorrectly
+  set up as optional parameters that expected no values.
+
 ## [1.0.0-alpha.3] - 2021-02-09
 
 ### Added

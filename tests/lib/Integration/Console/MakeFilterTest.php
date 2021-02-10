@@ -55,9 +55,7 @@ class MakeFilterTest extends TestCase
             'namespace' => 'JsonApi',
         ]);
 
-        $result = $this->artisan('jsonapi:filter', [
-            'name' => 'CustomFilter'
-        ]);
+        $result = $this->artisan('jsonapi:filter CustomFilter');
 
         $this->assertSame(0, $result);
         $this->assertFilterCreated('JsonApi');

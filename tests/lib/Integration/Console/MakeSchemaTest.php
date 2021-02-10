@@ -54,9 +54,7 @@ class MakeSchemaTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:schema', [
-            'name' => 'posts'
-        ]);
+        $result = $this->artisan('jsonapi:schema posts');
 
         $this->assertSame(0, $result);
         $this->assertSchemaCreated('App\Models\Post', 'Post');
@@ -68,10 +66,7 @@ class MakeSchemaTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:schema', [
-            'name' => 'posts',
-            '--model' => 'BlogPost',
-        ]);
+        $result = $this->artisan('jsonapi:schema posts --model BlogPost');
 
         $this->assertSame(0, $result);
         $this->assertSchemaCreated('App\Models\BlogPost', 'BlogPost');
@@ -99,10 +94,7 @@ class MakeSchemaTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:schema', [
-            'name' => 'posts',
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:schema posts --server v1');
 
         $this->assertSame(0, $result);
         $this->assertSchemaCreated('App\Models\Post', 'Post');
