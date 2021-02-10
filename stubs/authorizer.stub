@@ -1,0 +1,120 @@
+<?php
+
+namespace {{ namespace }};
+
+use LaravelJsonApi\Contracts\Auth\Authorizer;
+
+class {{ class }} implements Authorizer
+{
+
+    /**
+     * Authorize the index controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function index($request): bool
+    {
+        // TODO: Implement index() method.
+    }
+
+    /**
+     * Authorize the store controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function store($request): bool
+    {
+        // TODO: Implement store() method.
+    }
+
+    /**
+     * Authorize the show controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @return bool
+     */
+    public function show($request, object $model): bool
+    {
+        // TODO: Implement show() method.
+    }
+
+    /**
+     * Authorize the update controller action.
+     *
+     * @param object $model
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    public function update($request, object $model): bool
+    {
+        // TODO: Implement update() method.
+    }
+
+    /**
+     * Authorize the destroy controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @return bool
+     */
+    public function destroy($request, object $model): bool
+    {
+        // TODO: Implement destroy() method.
+    }
+
+    /**
+     * Authorize the show-related and show-relationship controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @param string $fieldName
+     * @return bool
+     */
+    public function showRelationship($request, object $model, string $fieldName): bool
+    {
+        // TODO: Implement showRelationship() method.
+    }
+
+    /**
+     * Authorize the update-relationship controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @param string $fieldName
+     * @return bool
+     */
+    public function updateRelationship($request, object $model, string $fieldName): bool
+    {
+        // TODO: Implement updateRelationship() method.
+    }
+
+    /**
+     * Authorize the attach-relationship controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @param string $fieldName
+     * @return bool
+     */
+    public function attachRelationship($request, object $model, string $fieldName): bool
+    {
+        // TODO: Implement attachRelationship() method.
+    }
+
+    /**
+     * Authorize the detach-relationship controller action.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param object $model
+     * @param string $fieldName
+     * @return bool
+     */
+    public function detachRelationship($request, object $model, string $fieldName): bool
+    {
+        // TODO: Implement detachRelationship() method.
+    }
+
+}

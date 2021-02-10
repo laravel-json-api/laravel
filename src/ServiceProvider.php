@@ -46,6 +46,7 @@ class ServiceProvider extends BaseServiceProvider
             ]);
 
             $this->commands([
+                Console\MakeAuthorizer::class,
                 Console\MakeController::class,
                 Console\MakeFilter::class,
                 Console\MakeQuery::class,
