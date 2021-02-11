@@ -39,9 +39,23 @@ trait Destroy
     {
         $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
-        ) ?? \request();
+        );
 
         $model = $route->model();
+
+        /**
+         * The resource request class is optional for deleting,
+         * as delete validation is optional. However, if we do not have
+         * a resource request then the action will not have been authorized.
+         * So we need to trigger authorization in this case.
+         */
+        if (!$request) {
+            $route->authorizer()->destroy(
+                $request = \request(),
+                $model,
+            );
+        }
+
         $response = null;
 
         if (method_exists($this, 'deleting')) {

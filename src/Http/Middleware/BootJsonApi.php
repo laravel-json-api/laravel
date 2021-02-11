@@ -70,7 +70,7 @@ class BootJsonApi
 
         $this->container->instance(
             RouteContract::class,
-            $route = new Route($server, $request->route())
+            $route = new Route($this->container, $server, $request->route())
         );
 
         $server->serving();

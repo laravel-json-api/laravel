@@ -81,7 +81,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Contracts\Auth\Authorizer::class, static function (Application $app) {
             /** @var Contracts\Routing\Route $route */
             $route = $app->make(Contracts\Routing\Route::class);
-            return $app->make($route->schema()->authorizer());
+            return $route->authorizer();
         });
     }
 
