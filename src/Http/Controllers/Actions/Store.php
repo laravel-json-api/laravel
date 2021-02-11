@@ -55,7 +55,7 @@ trait Store
 
         $model = $store
             ->create($resourceType)
-            ->using($query)
+            ->withRequest($query)
             ->store($request->validated());
 
         $response = null;

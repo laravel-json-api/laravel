@@ -63,12 +63,12 @@ trait UpdateRelationship
         if ($relation->toOne()) {
             $result = $store
                 ->modifyToOne($resourceType, $model, $fieldName)
-                ->using($query)
+                ->withRequest($query)
                 ->associate($data);
         } else {
             $result = $store
                 ->modifyToMany($resourceType, $model, $fieldName)
-                ->using($query)
+                ->withRequest($query)
                 ->sync($data);
         }
 

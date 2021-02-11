@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 
 - Added missing `jsonapi:authorizer` generator command.
+- The Eloquent schema now has `indexQuery` and `relatableQuery` methods. These allow filtering for authorization
+  purposes when a list of resources is being retrieved. For instance, it could filter those queries so that only models
+  belonging to the authenticated user are returned.
+
+### Changed
+
+- [#22](https://github.com/laravel-json-api/laravel/issues/22) **BREAKING** The `index` and `store` methods on the
+  authorizer contract now receive the model class as their second argument. This is useful for authorizers that are used
+  for multiple resource types.
+- **BREAKING** When querying or modifying models via the schema repository or store, calls to `using()` must be replaced
+  with `withRequest()`. This change was made to make it clearer that the request class can be passed into query
+  builders.
 
 ### Fixed
 

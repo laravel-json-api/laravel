@@ -48,7 +48,7 @@ trait FetchMany
 
         $data = $store
             ->queryAll($resourceType)
-            ->using($request)
+            ->withRequest($request)
             ->firstOrPaginate($request->page());
 
         $response = null;

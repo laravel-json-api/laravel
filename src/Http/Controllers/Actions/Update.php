@@ -57,7 +57,7 @@ trait Update
 
         $model = $store
             ->update($resourceType, $model)
-            ->using($query)
+            ->withRequest($query)
             ->store($request->validated());
 
         $response = null;

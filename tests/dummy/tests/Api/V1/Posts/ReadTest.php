@@ -54,12 +54,12 @@ class ReadTest extends TestCase
 
     public function testSlugFilterDoesNotMatch(): void
     {
-        $post = Post::factory()->create();
+        $post = Post::factory()->create(['slug' => 'foo-bar']);
 
         $response = $this
             ->jsonApi()
             ->expects('posts')
-            ->filter(['slug' => 'foobar'])
+            ->filter(['slug' => 'baz-bat'])
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedNull();

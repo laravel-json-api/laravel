@@ -83,7 +83,10 @@ class ResourceRequest extends FormRequest
     public function authorizeResource(Authorizer $authorizer): bool
     {
         if ($this->isCreating()) {
-            return $authorizer->store($this);
+            return $authorizer->store(
+                $this,
+                $this->schema()->model(),
+            );
         }
 
         if ($this->isUpdating()) {

@@ -58,13 +58,13 @@ trait FetchRelated
                 $route->resourceType(),
                 $model,
                 $relation->name()
-            )->using($request)->first();
+            )->withRequest($request)->first();
         } else {
             $data = $store->queryToMany(
                 $route->resourceType(),
                 $model,
                 $relation->name()
-            )->using($request)->getOrPaginate($request->page());
+            )->withRequest($request)->getOrPaginate($request->page());
         }
 
         $response = null;

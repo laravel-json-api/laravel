@@ -62,7 +62,7 @@ trait DetachRelationship
 
         $result = $store
             ->modifyToMany($resourceType, $model, $fieldName)
-            ->using($query)
+            ->withRequest($query)
             ->detach($request->validatedForRelation());
 
         $response = null;

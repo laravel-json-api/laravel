@@ -62,7 +62,7 @@ trait AttachRelationship
 
         $result = $store
             ->modifyToMany($resourceType, $model, $fieldName)
-            ->using($query)
+            ->withRequest($query)
             ->attach($request->validatedForRelation());
 
         $response = null;

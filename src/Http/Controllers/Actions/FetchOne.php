@@ -48,7 +48,7 @@ trait FetchOne
 
         $model = $store
             ->queryOne($resourceType, $route->modelOrResourceId())
-            ->using($request)
+            ->withRequest($request)
             ->first();
 
         $response = null;
