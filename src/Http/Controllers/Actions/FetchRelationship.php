@@ -48,9 +48,14 @@ trait FetchRelationship
             ResourceQuery::queryMany($relation->inverse());
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, $hook = 'reading' . Str::classify($fieldName))) {
-            $this->{$hook}($model, $request);
+            $response = $this->{$hook}($model, $request);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         if ($relation->toOne()) {
@@ -66,8 +71,6 @@ trait FetchRelationship
                 $relation->name()
             )->withRequest($request)->getOrPaginate($request->page());
         }
-
-        $response = null;
 
         if (method_exists($this, $hook = 'read' . Str::classify($fieldName))) {
             $response = $this->{$hook}($model, $data, $request);

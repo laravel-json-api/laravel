@@ -42,17 +42,20 @@ trait Destroy
         ) ?? \request();
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, 'deleting')) {
-            $this->deleting($model, $request);
+            $response = $this->deleting($model, $request);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $store->delete(
             $resourceType,
             $route->modelOrResourceId()
         );
-
-        $response = null;
 
         if (method_exists($this, 'deleted')) {
             $response = $this->deleted($model, $request);

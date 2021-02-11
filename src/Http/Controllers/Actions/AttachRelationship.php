@@ -55,17 +55,20 @@ trait AttachRelationship
         $query = ResourceQuery::queryMany($resourceType);
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, $hook = 'attaching' . Str::classify($fieldName))) {
-            $this->{$hook}($model, $request, $query);
+            $response = $this->{$hook}($model, $request, $query);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $result = $store
             ->modifyToMany($resourceType, $model, $fieldName)
             ->withRequest($query)
             ->attach($request->validatedForRelation());
-
-        $response = null;
 
         if (method_exists($this, $hook = 'attached' . Str::classify($fieldName))) {
             $response = $this->{$hook}($model, $result, $request, $query);

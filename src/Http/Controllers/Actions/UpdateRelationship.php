@@ -53,9 +53,14 @@ trait UpdateRelationship
             ResourceQuery::queryMany($relation->inverse());
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, $hook = 'updating' . Str::classify($fieldName))) {
-            $this->{$hook}($model, $request, $query);
+            $response = $this->{$hook}($model, $request, $query);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $data = $request->validatedForRelation();
@@ -71,8 +76,6 @@ trait UpdateRelationship
                 ->withRequest($query)
                 ->sync($data);
         }
-
-        $response = null;
 
         if (method_exists($this, $hook = 'updated' . Str::classify($fieldName))) {
             $response = $this->{$hook}($model, $result, $request, $query);

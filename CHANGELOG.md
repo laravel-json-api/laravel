@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file. This projec
 - [#23](https://github.com/laravel-json-api/laravel/issues/23) The resource request class now does not need to exist for
   the destroy controller action. Previously the implementation was expecting the resource request class to exist, even
   though delete validation was optional.
+- [#24](https://github.com/laravel-json-api/laravel/issues/24) Controller actions will now stop executing and return a
+  response if one is returned by the *before* action hooks: i.e. `searching`, `reading`, `saving`, `creating`,
+  `updating`, `deleting`, `readingRelated<Name>`, `reading<Name>`, `updating<Name>`, `attaching<Name>` and
+  `detaching<Name>`.
 
 ### Changed
 
