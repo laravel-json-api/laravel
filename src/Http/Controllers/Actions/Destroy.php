@@ -37,9 +37,9 @@ trait Destroy
      */
     public function destroy(Route $route, StoreContract $store)
     {
-        $request = ResourceRequest::forResource(
+        $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
-        );
+        ) ?? \request();
 
         $model = $route->model();
 

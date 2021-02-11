@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file. This projec
 - The Eloquent schema now has `indexQuery` and `relatableQuery` methods. These allow filtering for authorization
   purposes when a list of resources is being retrieved. For instance, it could filter those queries so that only models
   belonging to the authenticated user are returned.
+- [#23](https://github.com/laravel-json-api/laravel/issues/23) The resource request class now does not need to exist for
+  the destroy controller action. Previously the implementation was expecting the resource request class to exist, even
+  though delete validation was optional.
 
 ### Changed
 

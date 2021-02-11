@@ -75,6 +75,19 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * Resolve the request instance for the specified resource type, if it exists.
+     *
+     * @param string $resourceType
+     * @return ResourceRequest|null
+     */
+    public static function forResourceIfExists(string $resourceType): ?ResourceRequest
+    {
+        $resolver = self::$requestResolver ?: new RequestResolver('Request');
+
+        return $resolver($resourceType, true);
+    }
+
+    /**
      * Perform resource authorization.
      *
      * @param Authorizer $authorizer
