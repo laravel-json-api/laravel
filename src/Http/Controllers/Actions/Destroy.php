@@ -19,8 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
@@ -34,6 +37,7 @@ trait Destroy
      * @param Route $route
      * @param StoreContract $store
      * @return Response|Responsable
+     * @throws AuthenticationException|AuthorizationException
      */
     public function destroy(Route $route, StoreContract $store)
     {
@@ -50,10 +54,13 @@ trait Destroy
          * So we need to trigger authorization in this case.
          */
         if (!$request) {
-            $route->authorizer()->destroy(
+            $check = $route->authorizer()->destroy(
                 $request = \request(),
                 $model,
             );
+
+            throw_if(false === $check && Auth::guest(), new AuthenticationException());
+            throw_if(false === $check, new AuthorizationException());
         }
 
         $response = null;

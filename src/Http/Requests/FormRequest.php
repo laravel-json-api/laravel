@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\Eloquent\Model;
@@ -283,7 +282,7 @@ class FormRequest extends BaseFormRequest
             throw new AuthenticationException();
         }
 
-        throw new AuthorizationException;
+        parent::failedAuthorization();
     }
 
     /**
