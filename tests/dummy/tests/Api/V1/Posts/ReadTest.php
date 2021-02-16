@@ -88,7 +88,7 @@ class ReadTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('posts')
-            ->includePaths('author', 'tags')
+            ->includePaths('tags')
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedOneExact($expected);
