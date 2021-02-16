@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file. This projec
   set up as optional parameters that expected no values.
 - [#25](https://github.com/laravel-json-api/laravel/issues/25) The encoder now correctly handles conditional fields when
   iterating over a resource's relationships.
+- [#26](https://github.com/laravel-json-api/laravel/issues/26) Fix parsing the `fields` query parameter to field set
+  value objects.
 
 ## [1.0.0-alpha.3] - 2021-02-09
 

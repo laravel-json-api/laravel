@@ -65,6 +65,24 @@ class ReadTest extends TestCase
         $response->assertFetchedNull();
     }
 
+    public function testSparseFieldSets(): void
+    {
+        $post = Post::factory()->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->only('slug', 'synopsis', 'title')
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->sparseFields('posts', ['slug', 'synopsis', 'title'])
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected);
+    }
+
     /**
      * Draft posts do not appear in our API for guests, because of our
      * post scope. Therefore, attempting to access a draft post as a
