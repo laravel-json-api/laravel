@@ -18,6 +18,13 @@ All notable changes to this project will be documented in this file. This projec
   response if one is returned by the *before* action hooks: i.e. `searching`, `reading`, `saving`, `creating`,
   `updating`, `deleting`, `readingRelated<Name>`, `reading<Name>`, `updating<Name>`, `attaching<Name>` and
   `detaching<Name>`.
+- [#37](https://github.com/laravel-json-api/laravel/issues/37) Can now use constructor dependency injection in `Server`
+  classes.
+- [#40](https://github.com/laravel-json-api/laravel/issues/40) There is now a new `MetaResponse` class that can be used
+  when returning meta-only responses. In addition, response classes have been updated to add a `withServer` method. This
+  can be used to specify the named server the response should use to encode the JSON:API document. This has to be used
+  when returning responses from routes that have not run the JSON:API middleware (i.e. there is no default server
+  available via the service container).
 
 ### Changed
 

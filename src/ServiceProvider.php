@@ -102,7 +102,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     private function bindServer(): void
     {
-        $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
+        $this->app->singleton(Contracts\Server\Repository::class, ServerRepository::class);
 
         $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
             return $app->make(Contracts\Server\Server::class)->store();
