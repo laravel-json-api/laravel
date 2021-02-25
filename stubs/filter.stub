@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use LaravelJsonApi\Core\Str;
+use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Eloquent\Contracts\Filter;
 use LaravelJsonApi\Eloquent\Filters\Concerns\DeserializesValue;
 use LaravelJsonApi\Eloquent\Filters\Concerns\IsSingular;
