@@ -43,6 +43,8 @@ All notable changes to this project will be documented in this file. This projec
   iterating over a resource's relationships.
 - [#26](https://github.com/laravel-json-api/laravel/issues/26) Fix parsing the `fields` query parameter to field set
   value objects.
+- [#34](https://github.com/laravel-json-api/laravel/issues/34) Do not require server option when generating a generic
+  authorizer with multiple servers present.
 
 ## [1.0.0-alpha.3] - 2021-02-09
 

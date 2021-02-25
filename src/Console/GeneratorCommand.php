@@ -40,12 +40,14 @@ abstract class GeneratorCommand extends BaseGeneratorCommand
      */
     public function handle()
     {
-        if (!$server = $this->getServerInput()) {
+        $server = $this->getServerInput();
+
+        if ($this->doesRequireServer() && empty($server)) {
             $this->error('You must use the server option when you have more than one API.');
             return 1;
         }
 
-        if (is_null($this->getServerNamespace($server))) {
+        if (!empty($server) && is_null($this->getServerNamespace($server))) {
             $this->error("Server {$server} does not exist in your jsonapi.servers configuration.");
             return 1;
         }
@@ -134,6 +136,18 @@ abstract class GeneratorCommand extends BaseGeneratorCommand
     protected function getClassType(): string
     {
         return $this->classType;
+    }
+
+    /**
+     * Does the generator require a server to be specified?
+     *
+     * Child classes can overload this method if a server is not required.
+     *
+     * @return bool
+     */
+    protected function doesRequireServer(): bool
+    {
+        return true;
     }
 
     /**

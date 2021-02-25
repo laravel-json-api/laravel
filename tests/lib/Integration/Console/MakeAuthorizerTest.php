@@ -48,7 +48,7 @@ class MakeAuthorizerTest extends TestCase
         $files->deleteDirectory(app_path('JsonApi'));
     }
 
-    public function test(): void
+    public function testGeneric(): void
     {
         config()->set('jsonapi.servers', [
             'v1' => Server::class,
@@ -57,20 +57,27 @@ class MakeAuthorizerTest extends TestCase
         $result = $this->artisan('jsonapi:authorizer blog');
 
         $this->assertSame(0, $result);
-        $this->assertAuthorizerCreated();
+        $this->assertGenericAuthorizerCreated();
     }
 
-    public function testWithServer(): void
+    /**
+     * As a generic authorizer is not created in a server namespace, the
+     * developer shouldn't have to provide a server argument even if there
+     * are multiple servers.
+     *
+     * @see https://github.com/laravel-json-api/laravel/issues/34
+     */
+    public function testGenericWithMultipleServers(): void
     {
         config()->set('jsonapi.servers', [
             'beta' => 'App\JsonApi\Beta\Server',
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:authorizer blog --server v1');
+        $result = $this->artisan('jsonapi:authorizer blog');
 
         $this->assertSame(0, $result);
-        $this->assertAuthorizerCreated();
+        $this->assertGenericAuthorizerCreated();
     }
 
     public function testResource(): void
@@ -121,8 +128,9 @@ class MakeAuthorizerTest extends TestCase
         ]);
 
         $result = $this->artisan('jsonapi:authorizer', [
-            'name' => 'blog',
+            'name' => 'posts',
             '--server' => 'v2',
+            '--resource' => true,
         ]);
 
         $this->assertSame(1, $result);
@@ -132,7 +140,7 @@ class MakeAuthorizerTest extends TestCase
     /**
      * @return void
      */
-    private function assertAuthorizerCreated(): void
+    private function assertGenericAuthorizerCreated(): void
     {
         $this->assertFileExists($path = app_path('JsonApi/Authorizers/BlogAuthorizer.php'));
         $content = file_get_contents($path);

@@ -52,6 +52,10 @@ class MakeAuthorizer extends GeneratorCommand
         return $this->resolveStubPath('authorizer.stub');
     }
 
+    /**
+     * @param string $rootNamespace
+     * @return string
+     */
     protected function getDefaultNamespace($rootNamespace)
     {
         if ($this->option('resource')) {
@@ -61,6 +65,14 @@ class MakeAuthorizer extends GeneratorCommand
         $jsonApi = trim(config('jsonapi.namespace') ?: 'JsonApi', '\\');
 
         return $rootNamespace . '\\' . $jsonApi . '\\' . 'Authorizers';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function doesRequireServer(): bool
+    {
+        return true === $this->option('resource');
     }
 
     /**
