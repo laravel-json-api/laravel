@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** When querying or modifying models via the schema repository or store, calls to `using()` must be replaced
   with `withRequest()`. This change was made to make it clearer that the request class can be passed into query
   builders.
+- [#28](https://github.com/laravel-json-api/laravel/issues/28) The sparse field sets validation rule will now reject
+  with a specific message identifying any resource types in the parameter that do not exist.
 
 ### Fixed
 
