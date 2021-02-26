@@ -95,7 +95,7 @@ class AttachTagsTest extends TestCase
 
         $response->assertExactErrorStatus([
             'detail' => 'The tags field must be a to-many relationship containing tags resources.',
-            'source' => ['pointer' => '/data/relationships/tags'],
+            'source' => ['pointer' => '/data/0'],
             'status' => '422',
             'title' => 'Unprocessable Entity',
         ]);

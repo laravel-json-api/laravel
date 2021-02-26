@@ -27,6 +27,11 @@ All notable changes to this project will be documented in this file. This projec
   available via the service container).
 - [#9](https://github.com/laravel-json-api/laravel/issues/9) The Laravel route registrar is now passed through to
   the `resources`, `relationships` and `actions` callbacks as the second function argument.
+- [#36](https://github.com/laravel-json-api/laravel/issues/36) Eloquent schemas now support complex singular filter
+  logic, via the `Schema::isSingular()` method.
+- [#33](https://github.com/laravel-json-api/laravel/issues/33) Specification compliance will now reject an incorrect
+  resource type in a relationship. For example, if a relationship expects `tags` but the client sends `posts`, the
+  request will be rejected with an error message that `posts` are not supported.
 
 ### Changed
 
