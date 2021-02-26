@@ -17,37 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Laravel\Tests\Integration;
+namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
-use App\JsonApi\V1\Server;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LaravelJsonApi\Core\Responses\MetaResponse;
-use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class ResponseTest extends TestCase
 {
-
-    use DatabaseMigrations;
-    use MakesJsonApiRequests;
-
-    /**
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->loadLaravelMigrations();
-        $this->loadMigrationsFrom(__DIR__ . '/../../dummy/database/migrations');
-
-        config()->set('jsonapi', [
-            'servers' => ['v1' => Server::class],
-        ]);
-    }
 
     /**
      * Test that a data response can be returned from a custom route.

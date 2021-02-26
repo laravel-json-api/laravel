@@ -17,14 +17,32 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Laravel\Tests\Integration;
+namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
-use Illuminate\Support\Facades\Route;
+use App\JsonApi\V1\Server;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use LaravelJsonApi\Laravel\ServiceProvider;
+use LaravelJsonApi\Testing\MakesJsonApiRequests;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+
+    use DatabaseMigrations;
+    use MakesJsonApiRequests;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->loadLaravelMigrations();
+        $this->loadMigrationsFrom(__DIR__ . '/../../dummy/database/migrations');
+
+        config()->set('jsonapi', require __DIR__ . '/../../dummy/config/jsonapi.php');
+    }
 
     /**
      * @inheritDoc
