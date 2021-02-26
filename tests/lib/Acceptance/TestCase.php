@@ -57,4 +57,15 @@ class TestCase extends BaseTestCase
         ];
     }
 
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \LaravelJsonApi\Testing\TestExceptionHandler::class
+        );
+    }
+
 }

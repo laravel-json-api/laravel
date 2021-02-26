@@ -45,6 +45,8 @@ All notable changes to this project will be documented in this file. This projec
   value objects.
 - [#34](https://github.com/laravel-json-api/laravel/issues/34) Do not require server option when generating a generic
   authorizer with multiple servers present.
+- [#29](https://github.com/laravel-json-api/laravel/issues/29) Do not reject delete requests without a `Content-Type`
+  header.
 
 ## [1.0.0-alpha.3] - 2021-02-09
 
