@@ -36,6 +36,8 @@ All notable changes to this project will be documented in this file. This projec
   builders.
 - [#28](https://github.com/laravel-json-api/laravel/issues/28) The sparse field sets validation rule will now reject
   with a specific message identifying any resource types in the parameter that do not exist.
+- [#35](https://github.com/laravel-json-api/laravel/issues/35) The `Relation::type()` method must now be used when
+  setting the inverse resource type for the relation.
 
 ### Fixed
 
@@ -49,6 +51,11 @@ All notable changes to this project will be documented in this file. This projec
   authorizer with multiple servers present.
 - [#29](https://github.com/laravel-json-api/laravel/issues/29) Do not reject delete requests without a `Content-Type`
   header.
+
+### Deprecated
+
+- The `Relation::inverseType()` method is deprecated and will be removed in `1.0-stable`. Use `Relation::type()`
+  instead.
 
 ## [1.0.0-alpha.3] - 2021-02-09
 
