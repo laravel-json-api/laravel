@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file. This projec
   can be used to specify the named server the response should use to encode the JSON:API document. This has to be used
   when returning responses from routes that have not run the JSON:API middleware (i.e. there is no default server
   available via the service container).
+- [#9](https://github.com/laravel-json-api/laravel/issues/9) The Laravel route registrar is now passed through to
+  the `resources`, `relationships` and `actions` callbacks as the second function argument.
 
 ### Changed
 

@@ -99,7 +99,7 @@ class ResourceRegistrar
         $this->router->group($attributes, function () use ($registrar, $callback, $routes) {
             $relationships = new Relationships($registrar);
 
-            $callback($relationships);
+            $callback($relationships, $this->router);
 
             foreach ($relationships->register() as $route) {
                 $routes->add($route);
@@ -140,7 +140,7 @@ class ResourceRegistrar
         );
 
         $this->router->group($attributes, function () use ($actions, $callback) {
-            $callback($actions);
+            $callback($actions, $this->router);
         });
 
         return $routes;
