@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
-use App\JsonApi\V1\Server;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
