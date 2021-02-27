@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added
 
@@ -58,6 +58,8 @@ All notable changes to this project will be documented in this file. This projec
   authorizer with multiple servers present.
 - [#29](https://github.com/laravel-json-api/laravel/issues/29) Do not reject delete requests without a `Content-Type`
   header.
+- [#11](https://github.com/laravel-json-api/laravel/issues/11) Fixed iterating over an empty *to-many* generator twice
+  in the underlying compound document encoder.
 
 ### Deprecated
 
