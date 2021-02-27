@@ -46,6 +46,7 @@ class ServiceProvider extends BaseServiceProvider
             ]);
 
             $this->commands([
+                Console\MakeAuthorizer::class,
                 Console\MakeController::class,
                 Console\MakeFilter::class,
                 Console\MakeQuery::class,
@@ -80,7 +81,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Contracts\Auth\Authorizer::class, static function (Application $app) {
             /** @var Contracts\Routing\Route $route */
             $route = $app->make(Contracts\Routing\Route::class);
-            return $app->make($route->schema()->authorizer());
+            return $route->authorizer();
         });
     }
 
@@ -101,7 +102,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     private function bindServer(): void
     {
-        $this->app->bind(Contracts\Server\Repository::class, ServerRepository::class);
+        $this->app->singleton(Contracts\Server\Repository::class, ServerRepository::class);
 
         $this->app->bind(Contracts\Store\Store::class, static function (Application $app) {
             return $app->make(Contracts\Server\Server::class)->store();

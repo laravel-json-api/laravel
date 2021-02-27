@@ -91,7 +91,7 @@ class MakeQuery extends GeneratorCommand
             ['collection', 'c', InputOption::VALUE_NONE, 'Create a query collection class.'],
             ['both', 'b', InputOption::VALUE_NONE, 'Create a query and a query collection class.'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the query already exists'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the query exists in.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the query exists in.'],
         ];
     }
 

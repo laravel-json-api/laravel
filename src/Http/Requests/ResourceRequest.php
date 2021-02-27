@@ -75,6 +75,19 @@ class ResourceRequest extends FormRequest
     }
 
     /**
+     * Resolve the request instance for the specified resource type, if it exists.
+     *
+     * @param string $resourceType
+     * @return ResourceRequest|null
+     */
+    public static function forResourceIfExists(string $resourceType): ?ResourceRequest
+    {
+        $resolver = self::$requestResolver ?: new RequestResolver('Request');
+
+        return $resolver($resourceType, true);
+    }
+
+    /**
      * Perform resource authorization.
      *
      * @param Authorizer $authorizer
@@ -83,7 +96,10 @@ class ResourceRequest extends FormRequest
     public function authorizeResource(Authorizer $authorizer): bool
     {
         if ($this->isCreating()) {
-            return $authorizer->store($this);
+            return $authorizer->store(
+                $this,
+                $this->schema()->model(),
+            );
         }
 
         if ($this->isUpdating()) {
@@ -208,19 +224,25 @@ class ResourceRequest extends FormRequest
     }
 
     /**
-     * @inheritDoc
+     * Prepare the data for validation.
+     *
+     * Before validating the data, we need to:
+     *
+     * 1. Ensure the media type is supported;
+     * 2. Parse the document for compliance with the JSON:API spec.
+     *
+     * We only need to do this for the requests where we are expecting a JSON:API document,
+     * i.e. resource create/update requests and requests to modify a resource's relationship.
+     *
+     * @return void
      */
     protected function prepareForValidation()
     {
-        /** Content negotiation. */
-        if (!$this->isSupportedMediaType()) {
-            throw $this->unsupportedMediaType();
-        }
-
-        /** JSON API spec compliance. */
         if ($this->isCreating() || $this->isUpdating()) {
+            $this->assertSupportedMediaType();
             $this->validateResourceDocument();
         } else if ($this->isModifyingRelationship()) {
+            $this->assertSupportedMediaType();
             $this->validateRelationshipDocument();
         }
     }
@@ -401,6 +423,16 @@ class ResourceRequest extends FormRequest
         }
 
         return $data;
+    }
+
+    /**
+     * @throws HttpExceptionInterface
+     */
+    private function assertSupportedMediaType(): void
+    {
+        if (!$this->isSupportedMediaType()) {
+            throw $this->unsupportedMediaType();
+        }
     }
 
     /**

@@ -18,6 +18,7 @@
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 
@@ -33,6 +34,61 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected);
+    }
+
+    public function testIncludeAuthorAndTags(): void
+    {
+        $post = Post::factory()
+            ->has(Tag::factory()->count(2))
+            ->create();
+
+        $tags = $post->tags()->get();
+
+        $identifiers = $tags->map(
+            fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()]
+        )->all();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->replace('author', $author = ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
+            ->replace('tags', $identifiers)
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->includePaths('author', 'tags')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected)->assertIncluded([
+            $author,
+            $identifiers[0],
+            $identifiers[1],
+        ]);
+    }
+
+    /**
+     * This test exists because we had a bug in the encoder that was caused
+     * by including an empty relationship.
+     *
+     * @see https://github.com/neomerx/json-api/issues/252
+     */
+    public function testIncludeEmptyTags(): void
+    {
+        $post = Post::factory()->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->replace('tags', [])
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->includePaths('tags')
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedOneExact($expected);
@@ -54,15 +110,33 @@ class ReadTest extends TestCase
 
     public function testSlugFilterDoesNotMatch(): void
     {
-        $post = Post::factory()->create();
+        $post = Post::factory()->create(['slug' => 'foo-bar']);
 
         $response = $this
             ->jsonApi()
             ->expects('posts')
-            ->filter(['slug' => 'foobar'])
+            ->filter(['slug' => 'baz-bat'])
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedNull();
+    }
+
+    public function testSparseFieldSets(): void
+    {
+        $post = Post::factory()->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->only('slug', 'synopsis', 'title')
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->sparseFields('posts', ['slug', 'synopsis', 'title'])
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected);
     }
 
     /**

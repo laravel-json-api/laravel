@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 
+use Illuminate\Contracts\Routing\Registrar;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
@@ -67,7 +68,8 @@ class HasOneTest extends TestCase
 
         $this->defaultApiRoutesWithNamespace(function () {
             JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
-                $server->resource('posts')->relationships(function ($relations) {
+                $server->resource('posts')->relationships(function ($relations, $routes) {
+                    $this->assertInstanceOf(Registrar::class, $routes);
                     $relations->hasOne('author');
                 });
             });

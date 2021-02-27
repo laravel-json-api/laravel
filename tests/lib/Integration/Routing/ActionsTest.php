@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 
+use Illuminate\Contracts\Routing\Registrar;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 class ActionsTest extends TestCase
@@ -54,7 +55,8 @@ class ActionsTest extends TestCase
                 ->prefix('v1')
                 ->namespace('Api\\V1')
                 ->resources(function ($server) use ($func) {
-                    $server->resource('posts')->actions(function ($actions) use ($func) {
+                    $server->resource('posts')->actions(function ($actions, $routes) use ($func) {
+                        $this->assertInstanceOf(Registrar::class, $routes);
                         $actions->{$func}('foo-bar');
                     });
                 });

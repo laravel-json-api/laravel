@@ -54,9 +54,7 @@ class MakeQueryTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:query', [
-            'name' => 'posts'
-        ]);
+        $result = $this->artisan('jsonapi:query posts');
 
         $this->assertSame(0, $result);
         $this->assertQueryCreated();
@@ -69,10 +67,7 @@ class MakeQueryTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:query', [
-            'name' => 'posts',
-            '--collection' => true,
-        ]);
+        $result = $this->artisan('jsonapi:query posts --collection');
 
         $this->assertSame(0, $result);
         $this->assertQueryCollectionCreated();
@@ -85,10 +80,7 @@ class MakeQueryTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:query', [
-            'name' => 'posts',
-            '--both' => true,
-        ]);
+        $result = $this->artisan('jsonapi:query posts --both');
 
         $this->assertSame(0, $result);
         $this->assertQueryCreated();
@@ -101,11 +93,7 @@ class MakeQueryTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:query', [
-            'name' => 'posts',
-            '--both' => true,
-            '--collection' => true,
-        ]);
+        $result = $this->artisan('jsonapi:query posts --both --collection');
 
         $this->assertSame(0, $result);
         $this->assertQueryCreated();
@@ -119,10 +107,7 @@ class MakeQueryTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:query', [
-            'name' => 'posts',
-            '--server' => 'v1',
-        ]);
+        $result = $this->artisan('jsonapi:query posts --server v1');
 
         $this->assertSame(0, $result);
         $this->assertQueryCreated();

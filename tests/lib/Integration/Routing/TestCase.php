@@ -205,4 +205,33 @@ class TestCase extends BaseTestCase
     {
         return Request::create($url, $method);
     }
+
+    /**
+     * Call the closure within the default Laravel API route setup.
+     *
+     * @param \Closure $callback
+     * @return void
+     * @see https://github.com/laravel/laravel/blob/8.x/app/Providers/RouteServiceProvider.php
+     */
+    protected function defaultApiRoutes(\Closure $callback): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->group($callback);
+    }
+
+    /**
+     * Call the closure within the default Laravel API route setup.
+     *
+     * @param \Closure $callback
+     * @return void
+     * @see https://github.com/laravel/laravel/blob/8.x/app/Providers/RouteServiceProvider.php
+     */
+    protected function defaultApiRoutesWithNamespace(\Closure $callback): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace('App\\Http\\Controllers')
+            ->group($callback);
+    }
 }

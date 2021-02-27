@@ -54,9 +54,7 @@ class MakeServerTest extends TestCase
     {
         config()->set('jsonapi', require __DIR__ . '/../../../../config/jsonapi.php');
 
-        $result = $this->artisan('jsonapi:server', [
-            'name' => 'v1'
-        ]);
+        $result = $this->artisan('jsonapi:server v1');
 
         $this->assertSame(0, $result);
         $this->assertServerCreated('JsonApi', 'V1', '/api/v1');
@@ -71,10 +69,7 @@ class MakeServerTest extends TestCase
             ],
         ]);
 
-        $result = $this->artisan('jsonapi:server', [
-            'name' => 'v2',
-            '--uri' => 'http://example.com/foo/bar/',
-        ]);
+        $result = $this->artisan('jsonapi:server v2 --uri "http://example.com/foo/bar/"');
 
         $this->assertSame(0, $result);
         $this->assertServerCreated('JsonApi', 'V2', 'http://example.com/foo/bar');

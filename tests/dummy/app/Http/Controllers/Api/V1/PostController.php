@@ -74,7 +74,7 @@ class PostController extends Controller
         $model = $schema
             ->repository()
             ->queryOne($post)
-            ->using($query)
+            ->withRequest($query)
             ->first();
 
         return new DataResponse($model);

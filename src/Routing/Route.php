@@ -19,8 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Routing;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Traits\ForwardsCalls;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
@@ -38,6 +40,11 @@ class Route implements RouteContract
     use ForwardsCalls;
 
     /**
+     * @var Container
+     */
+    private Container $container;
+
+    /**
      * @var Server
      */
     private Server $server;
@@ -50,11 +57,13 @@ class Route implements RouteContract
     /**
      * Route constructor.
      *
+     * @param Container $container
      * @param Server $server
      * @param IlluminateRoute $route
      */
-    public function __construct(Server $server, IlluminateRoute $route)
+    public function __construct(Container $container, Server $server, IlluminateRoute $route)
     {
+        $this->container = $container;
         $this->server = $server;
         $this->route = $route;
     }
@@ -155,6 +164,16 @@ class Route implements RouteContract
     {
         return $this->server->schemas()->schemaFor(
             $this->resourceType()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function authorizer(): Authorizer
+    {
+        return $this->container->make(
+            $this->schema()->authorizer()
         );
     }
 

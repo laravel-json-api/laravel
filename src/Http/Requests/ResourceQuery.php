@@ -108,7 +108,10 @@ class ResourceQuery extends FormRequest implements QueryParameters
     public function authorizeResource(Authorizer $authorizer): bool
     {
         if ($this->isViewingAny()) {
-            return $authorizer->index($this);
+            return $authorizer->index(
+                $this,
+                $this->schema()->model(),
+            );
         }
 
         if ($this->isViewingOne()) {
@@ -119,7 +122,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
             return $authorizer->showRelationship(
                 $this,
                 $this->modelOrFail(),
-                $this->jsonApi()->route()->fieldName()
+                $this->jsonApi()->route()->fieldName(),
             );
         }
 

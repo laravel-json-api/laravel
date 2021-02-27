@@ -55,17 +55,20 @@ trait DetachRelationship
         $query = ResourceQuery::queryMany($resourceType);
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, $hook = 'detaching' . Str::classify($fieldName))) {
-            $this->{$hook}($model, $request, $query);
+            $response = $this->{$hook}($model, $request, $query);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $result = $store
             ->modifyToMany($resourceType, $model, $fieldName)
-            ->using($query)
+            ->withRequest($query)
             ->detach($request->validatedForRelation());
-
-        $response = null;
 
         if (method_exists($this, $hook = 'detached' . Str::classify($fieldName))) {
             $response = $this->{$hook}($model, $result, $request, $query);

@@ -46,21 +46,24 @@ trait Update
         $query = ResourceQuery::queryOne($resourceType);
 
         $model = $route->model();
+        $response = null;
 
         if (method_exists($this, 'saving')) {
-            $this->saving($model, $request, $query);
+            $response = $this->saving($model, $request, $query);
         }
 
-        if (method_exists($this, 'updating')) {
-            $this->updating($model, $request, $query);
+        if (!$response && method_exists($this, 'updating')) {
+            $response = $this->updating($model, $request, $query);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $model = $store
             ->update($resourceType, $model)
-            ->using($query)
+            ->withRequest($query)
             ->store($request->validated());
-
-        $response = null;
 
         if (method_exists($this, 'updated')) {
             $response = $this->updated($model, $request, $query);

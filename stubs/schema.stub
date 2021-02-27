@@ -23,7 +23,7 @@ class {{ class }} extends Schema
     /**
      * Get the resource fields.
      *
-     * @return iterable
+     * @return array
      */
     public function fields(): array
     {

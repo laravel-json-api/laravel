@@ -26,7 +26,10 @@
     <testsuite name="Integration">
       <directory suffix="Test.php">./tests/lib/Integration/</directory>
     </testsuite>
-    <testsuite name="Acceptance">
+      <testsuite name="Acceptance">
+          <directory suffix="Test.php">./tests/lib/Acceptance/</directory>
+      </testsuite>
+    <testsuite name="Dummy">
       <directory suffix="Test.php">./tests/dummy/tests/</directory>
     </testsuite>
   </testsuites>

@@ -23,7 +23,7 @@ use App\JsonApi\V1\Server;
 use Illuminate\Filesystem\Filesystem;
 use LaravelJsonApi\Laravel\Tests\Integration\TestCase;
 
-class MakeRequestsTest extends TestCase
+class MakeAuthorizerTest extends TestCase
 {
 
     /**
@@ -48,29 +48,61 @@ class MakeRequestsTest extends TestCase
         $files->deleteDirectory(app_path('JsonApi'));
     }
 
-    public function test(): void
+    public function testGeneric(): void
     {
         config()->set('jsonapi.servers', [
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests posts');
+        $result = $this->artisan('jsonapi:authorizer blog');
 
         $this->assertSame(0, $result);
-        $this->assertAllCreated();
+        $this->assertGenericAuthorizerCreated();
     }
 
-    public function testServer(): void
+    /**
+     * As a generic authorizer is not created in a server namespace, the
+     * developer shouldn't have to provide a server argument even if there
+     * are multiple servers.
+     *
+     * @see https://github.com/laravel-json-api/laravel/issues/34
+     */
+    public function testGenericWithMultipleServers(): void
     {
         config()->set('jsonapi.servers', [
             'beta' => 'App\JsonApi\Beta\Server',
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests posts --server v1');
+        $result = $this->artisan('jsonapi:authorizer blog');
 
         $this->assertSame(0, $result);
-        $this->assertAllCreated();
+        $this->assertGenericAuthorizerCreated();
+    }
+
+    public function testResource(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:authorizer posts --resource');
+
+        $this->assertSame(0, $result);
+        $this->assertResourceAuthorizerCreated();
+    }
+
+    public function testResourceWithServer(): void
+    {
+        config()->set('jsonapi.servers', [
+            'beta' => 'App\JsonApi\Beta\Server',
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:authorizer posts --resource --server v1');
+
+        $this->assertSame(0, $result);
+        $this->assertResourceAuthorizerCreated();
     }
 
     public function testNoServer(): void
@@ -80,12 +112,13 @@ class MakeRequestsTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests', [
+        $result = $this->artisan('jsonapi:authorizer', [
             'name' => 'posts',
+            '--resource' => true,
         ]);
 
         $this->assertSame(1, $result);
-        $this->assertNotCreated();
+        $this->assertAuthorizerNotCreated();
     }
 
     public function testInvalidServer(): void
@@ -94,60 +127,28 @@ class MakeRequestsTest extends TestCase
             'v1' => Server::class,
         ]);
 
-        $result = $this->artisan('jsonapi:requests', [
+        $result = $this->artisan('jsonapi:authorizer', [
             'name' => 'posts',
             '--server' => 'v2',
+            '--resource' => true,
         ]);
 
         $this->assertSame(1, $result);
-        $this->assertNotCreated();
+        $this->assertAuthorizerNotCreated();
     }
 
     /**
      * @return void
      */
-    private function assertAllCreated(): void
+    private function assertGenericAuthorizerCreated(): void
     {
-        $this->assertRequestCreated();
-        $this->assertQueryCreated();
-        $this->assertQueryCollectionCreated();
-    }
-
-    /**
-     * @return void
-     */
-    private function assertRequestCreated(): void
-    {
-        $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostRequest.php'));
+        $this->assertFileExists($path = app_path('JsonApi/Authorizers/BlogAuthorizer.php'));
         $content = file_get_contents($path);
 
         $tests = [
-            'namespace App\JsonApi\V1\Posts',
-            'use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;',
-            'class PostRequest extends ResourceRequest',
-        ];
-
-        foreach ($tests as $expected) {
-            $this->assertStringContainsString($expected, $content);
-        }
-    }
-
-
-    /**
-     * @return void
-     */
-    private function assertQueryCreated(): void
-    {
-        $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostQuery.php'));
-        $content = file_get_contents($path);
-
-        $tests = [
-            'namespace App\JsonApi\V1\Posts',
-            'use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;',
-            'use LaravelJsonApi\Validation\Rule as JsonApiRule;',
-            'class PostQuery extends ResourceQuery',
-            "'page' => JsonApiRule::notSupported(),",
-            "'sort' => JsonApiRule::notSupported(),",
+            'namespace App\JsonApi\Authorizers;',
+            'use LaravelJsonApi\Contracts\Auth\Authorizer;',
+            'class BlogAuthorizer implements Authorizer',
         ];
 
         foreach ($tests as $expected) {
@@ -158,18 +159,15 @@ class MakeRequestsTest extends TestCase
     /**
      * @return void
      */
-    private function assertQueryCollectionCreated(): void
+    private function assertResourceAuthorizerCreated(): void
     {
-        $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostCollectionQuery.php'));
+        $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostAuthorizer.php'));
         $content = file_get_contents($path);
 
         $tests = [
-            'namespace App\JsonApi\V1\Posts',
-            'use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;',
-            'use LaravelJsonApi\Validation\Rule as JsonApiRule;',
-            'class PostCollectionQuery extends ResourceQuery',
-            'JsonApiRule::page(),',
-            'JsonApiRule::sort(),',
+            'namespace App\JsonApi\V1\Posts;',
+            'use LaravelJsonApi\Contracts\Auth\Authorizer;',
+            'class PostAuthorizer implements Authorizer',
         ];
 
         foreach ($tests as $expected) {
@@ -180,10 +178,9 @@ class MakeRequestsTest extends TestCase
     /**
      * @return void
      */
-    private function assertNotCreated(): void
+    private function assertAuthorizerNotCreated(): void
     {
-        $this->assertFileDoesNotExist(app_path('JsonApi/V1/Posts/PostRequest.php'));
-        $this->assertFileDoesNotExist(app_path('JsonApi/V1/Posts/PostQuery.php'));
-        $this->assertFileDoesNotExist(app_path('JsonApi/V1/Posts/PostCollection.php'));
+        $this->assertFileDoesNotExist(app_path('JsonApi/V1/BlogAuthorizer.php'));
+        $this->assertFileDoesNotExist(app_path('JsonApi/V1/Posts/PostAuthorizer.php'));
     }
 }

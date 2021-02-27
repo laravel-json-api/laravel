@@ -44,21 +44,24 @@ trait Store
         );
 
         $query = ResourceQuery::queryOne($resourceType);
+        $response = null;
 
         if (method_exists($this, 'saving')) {
-            $this->saving(null, $request, $query);
+            $response = $this->saving(null, $request, $query);
         }
 
-        if (method_exists($this, 'creating')) {
-            $this->creating($request, $query);
+        if (!$response && method_exists($this, 'creating')) {
+            $response = $this->creating($request, $query);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $model = $store
             ->create($resourceType)
-            ->using($query)
+            ->withRequest($query)
             ->store($request->validated());
-
-        $response = null;
 
         if (method_exists($this, 'created')) {
             $response = $this->created($model, $request, $query);

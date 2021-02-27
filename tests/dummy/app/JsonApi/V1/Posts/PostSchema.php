@@ -50,7 +50,7 @@ class PostSchema extends Schema
     {
         return [
             ID::make(),
-            BelongsTo::make('author')->inverseType('users')->readOnly(),
+            BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),

@@ -47,9 +47,10 @@ class RequestResolver
 
     /**
      * @param string $resourceType
-     * @return FormRequest|mixed
+     * @param bool $allowNull whether null can be returned for non-existent classes.
+     * @return FormRequest|null
      */
-    public function __invoke(string $resourceType): FormRequest
+    public function __invoke(string $resourceType, bool $allowNull = false): ?FormRequest
     {
         $app = app();
 
@@ -59,7 +60,9 @@ class RequestResolver
             ));
 
             if (!class_exists($fqn) && !$app->bound($fqn)) {
-                if ('CollectionQuery' === $this->type) {
+                if (true === $allowNull) {
+                    return null;
+                } else if ('CollectionQuery' === $this->type) {
                     $fqn = AnonymousCollectionQuery::class;
                 } else if ('Query' === $this->type) {
                     $fqn = AnonymousQuery::class;

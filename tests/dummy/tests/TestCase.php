@@ -23,7 +23,9 @@ use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\RouteServiceProvider;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Date;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -38,8 +40,22 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        /** Fix "now" so that updated at dates are predictable. */
+        Date::setTestNow(CarbonImmutable::now()->startOfSecond());
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Date::setTestNow();
     }
 
     /**

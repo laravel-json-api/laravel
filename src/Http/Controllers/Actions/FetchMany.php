@@ -42,16 +42,20 @@ trait FetchMany
             $resourceType = $route->resourceType()
         );
 
+        $response = null;
+
         if (method_exists($this, 'searching')) {
-            $this->searching($request);
+            $response = $this->searching($request);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $data = $store
             ->queryAll($resourceType)
-            ->using($request)
+            ->withRequest($request)
             ->firstOrPaginate($request->page());
-
-        $response = null;
 
         if (method_exists($this, 'searched')) {
             $response = $this->searched($data, $request);

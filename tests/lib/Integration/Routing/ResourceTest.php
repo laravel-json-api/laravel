@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 
 use App\Http\Controllers\Api\V1\PostController;
+use Illuminate\Contracts\Routing\Registrar;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
@@ -53,7 +54,8 @@ class ResourceTest extends TestCase
         $this->createSchema($server, 'posts', '\d+');
 
         $this->defaultApiRoutesWithNamespace(function () {
-            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server, $routes) {
+                $this->assertInstanceOf(Registrar::class, $routes);
                 $server->resource('posts');
             });
         });

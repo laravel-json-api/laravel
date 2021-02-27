@@ -42,16 +42,20 @@ trait FetchOne
             $resourceType = $route->resourceType()
         );
 
+        $response = null;
+
         if (method_exists($this, 'reading')) {
-            $this->reading($request);
+            $response = $this->reading($request);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $model = $store
             ->queryOne($resourceType, $route->modelOrResourceId())
-            ->using($request)
+            ->withRequest($request)
             ->first();
-
-        $response = null;
 
         if (method_exists($this, 'read')) {
             $response = $this->read($model, $request);

@@ -129,7 +129,7 @@ class MakeServer extends BaseGeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the server already exists'],
-            ['uri', null, InputOption::VALUE_NONE, 'The base URI of the server.'],
+            ['uri', null, InputOption::VALUE_REQUIRED, 'The base URI of the server.'],
         ];
     }
 

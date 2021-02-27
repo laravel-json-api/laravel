@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-alpha.4] - 2021-02-27
+
+### Added
+
+- Added missing `jsonapi:authorizer` generator command.
+- The Eloquent schema now has `indexQuery` and `relatableQuery` methods. These allow filtering for authorization
+  purposes when a list of resources is being retrieved. For instance, it could filter those queries so that only models
+  belonging to the authenticated user are returned.
+- [#23](https://github.com/laravel-json-api/laravel/issues/23) The resource request class now does not need to exist for
+  the destroy controller action. Previously the implementation was expecting the resource request class to exist, even
+  though delete validation was optional.
+- [#24](https://github.com/laravel-json-api/laravel/issues/24) Controller actions will now stop executing and return a
+  response if one is returned by the *before* action hooks: i.e. `searching`, `reading`, `saving`, `creating`,
+  `updating`, `deleting`, `readingRelated<Name>`, `reading<Name>`, `updating<Name>`, `attaching<Name>` and
+  `detaching<Name>`.
+- [#37](https://github.com/laravel-json-api/laravel/issues/37) Can now use constructor dependency injection in `Server`
+  classes.
+- [#40](https://github.com/laravel-json-api/laravel/issues/40) There is now a new `MetaResponse` class that can be used
+  when returning meta-only responses. In addition, response classes have been updated to add a `withServer` method. This
+  can be used to specify the named server the response should use to encode the JSON:API document. This has to be used
+  when returning responses from routes that have not run the JSON:API middleware (i.e. there is no default server
+  available via the service container).
+- [#9](https://github.com/laravel-json-api/laravel/issues/9) The Laravel route registrar is now passed through to
+  the `resources`, `relationships` and `actions` callbacks as the second function argument.
+- [#36](https://github.com/laravel-json-api/laravel/issues/36) Eloquent schemas now support complex singular filter
+  logic, via the `Schema::isSingular()` method.
+- [#33](https://github.com/laravel-json-api/laravel/issues/33) Specification compliance will now reject an incorrect
+  resource type in a relationship. For example, if a relationship expects `tags` but the client sends `posts`, the
+  request will be rejected with an error message that `posts` are not supported.
+
+### Changed
+
+- [#22](https://github.com/laravel-json-api/laravel/issues/22) **BREAKING** The `index` and `store` methods on the
+  authorizer contract now receive the model class as their second argument. This is useful for authorizers that are used
+  for multiple resource types.
+- **BREAKING** When querying or modifying models via the schema repository or store, calls to `using()` must be replaced
+  with `withRequest()`. This change was made to make it clearer that the request class can be passed into query
+  builders.
+- [#28](https://github.com/laravel-json-api/laravel/issues/28) The sparse field sets validation rule will now reject
+  with a specific message identifying any resource types in the parameter that do not exist.
+- [#35](https://github.com/laravel-json-api/laravel/issues/35) The `Relation::type()` method must now be used when
+  setting the inverse resource type for the relation.
+
+### Fixed
+
+- Optional parameters to generator commands that require values now work correctly. Previously these were incorrectly
+  set up as optional parameters that expected no values.
+- [#25](https://github.com/laravel-json-api/laravel/issues/25) The encoder now correctly handles conditional fields when
+  iterating over a resource's relationships.
+- [#26](https://github.com/laravel-json-api/laravel/issues/26) Fix parsing the `fields` query parameter to field set
+  value objects.
+- [#34](https://github.com/laravel-json-api/laravel/issues/34) Do not require server option when generating a generic
+  authorizer with multiple servers present.
+- [#29](https://github.com/laravel-json-api/laravel/issues/29) Do not reject delete requests without a `Content-Type`
+  header.
+- [#11](https://github.com/laravel-json-api/laravel/issues/11) Fixed iterating over an empty *to-many* generator twice
+  in the underlying compound document encoder.
+
+### Deprecated
+
+- The `Relation::inverseType()` method is deprecated and will be removed in `1.0-stable`. Use `Relation::type()`
+  instead.
+
 ## [1.0.0-alpha.3] - 2021-02-09
 
 ### Added

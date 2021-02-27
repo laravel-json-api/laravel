@@ -59,7 +59,7 @@ class MakeRequest extends GeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the request already exists'],
-            ['server', 's', InputOption::VALUE_NONE, 'The JSON:API server the request exists in.'],
+            ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the request exists in.'],
         ];
     }
 

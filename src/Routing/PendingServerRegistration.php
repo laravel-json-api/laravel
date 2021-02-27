@@ -145,7 +145,7 @@ class PendingServerRegistration
             $callback(new ResourceRegistrar(
                 $this->router,
                 $this->server
-            ));
+            ), $this->router);
         });
     }
 }

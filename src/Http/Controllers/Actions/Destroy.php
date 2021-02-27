@@ -19,8 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
@@ -34,25 +37,46 @@ trait Destroy
      * @param Route $route
      * @param StoreContract $store
      * @return Response|Responsable
+     * @throws AuthenticationException|AuthorizationException
      */
     public function destroy(Route $route, StoreContract $store)
     {
-        $request = ResourceRequest::forResource(
+        $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
         );
 
         $model = $route->model();
 
+        /**
+         * The resource request class is optional for deleting,
+         * as delete validation is optional. However, if we do not have
+         * a resource request then the action will not have been authorized.
+         * So we need to trigger authorization in this case.
+         */
+        if (!$request) {
+            $check = $route->authorizer()->destroy(
+                $request = \request(),
+                $model,
+            );
+
+            throw_if(false === $check && Auth::guest(), new AuthenticationException());
+            throw_if(false === $check, new AuthorizationException());
+        }
+
+        $response = null;
+
         if (method_exists($this, 'deleting')) {
-            $this->deleting($model, $request);
+            $response = $this->deleting($model, $request);
+        }
+
+        if ($response) {
+            return $response;
         }
 
         $store->delete(
             $resourceType,
             $route->modelOrResourceId()
         );
-
-        $response = null;
 
         if (method_exists($this, 'deleted')) {
             $response = $this->deleted($model, $request);
