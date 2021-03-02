@@ -36,6 +36,7 @@ class PostResource extends JsonApiResource
         return [
             'content' => $this->content,
             'createdAt' => $this->created_at,
+            'deletedAt' => $this->deleted_at,
             'publishedAt' => $this->published_at,
             'slug' => $this->slug,
             'synopsis' => $this->synopsis,

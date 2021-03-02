@@ -50,7 +50,7 @@ class PostController extends Controller
     {
         $this->authorize('deleteAll', Post::class);
 
-        Post::query()->delete();
+        Post::query()->forceDelete();
 
         return response('', 204);
     }

@@ -32,6 +32,7 @@ class CreatePostAndVideoTables extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
             $table->unsignedBigInteger('author_id');
             $table->timestamp('published_at')->nullable();
             $table->string('title');

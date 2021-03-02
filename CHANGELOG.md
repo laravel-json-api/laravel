@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+- [#43](https://github.com/laravel-json-api/laravel/issues/43) The package now supports soft-deleting resources. For
+  full details on how to apply this to resource schemas, refer to the new *Soft Deleting* chapter in the documentation.
+
 ## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added

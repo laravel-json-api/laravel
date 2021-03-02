@@ -26,15 +26,20 @@ use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
+use LaravelJsonApi\Eloquent\Fields\SoftDelete;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
+use LaravelJsonApi\Eloquent\Filters\WhereTrashed;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
+use LaravelJsonApi\Eloquent\SoftDeletes;
 
 class PostSchema extends Schema
 {
+
+    use SoftDeletes;
 
     /**
      * The model the schema corresponds to.
@@ -54,6 +59,7 @@ class PostSchema extends Schema
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
+            SoftDelete::make('deletedAt')->sortable(),
             DateTime::make('publishedAt')->sortable(),
             Str::make('slug'),
             Str::make('synopsis'),
@@ -72,6 +78,7 @@ class PostSchema extends Schema
             WhereIn::make('id', $this->idColumn())->delimiter(','),
             Scope::make('published', 'wherePublished')->asBoolean(),
             Where::make('slug')->singular(),
+            WhereTrashed::make('trashed'),
         ];
     }
 
