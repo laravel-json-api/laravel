@@ -28,10 +28,10 @@ use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
 use LaravelJsonApi\Eloquent\Fields\SoftDelete;
 use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Filters\OnlyTrashed;
 use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
-use LaravelJsonApi\Eloquent\Filters\WhereTrashed;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
@@ -78,7 +78,7 @@ class PostSchema extends Schema
             WhereIn::make('id', $this->idColumn())->delimiter(','),
             Scope::make('published', 'wherePublished')->asBoolean(),
             Where::make('slug')->singular(),
-            WhereTrashed::make('trashed'),
+            OnlyTrashed::make('trashed'),
         ];
     }
 
