@@ -84,12 +84,15 @@ class MakeSchema extends GeneratorCommand
         }
 
         $model = class_basename($model);
+        $schema = $this->option('proxy') ? 'ProxySchema' : 'Schema';
 
         $replace = [
             '{{ namespacedModel }}' => $namespacedModel,
             '{{namespacedModel}}' => $namespacedModel,
             '{{ model }}' => $model,
             '{{model}}' => $model,
+            '{{ schema }}' => $schema,
+            '{{schema}}' => $schema,
         ];
 
         return str_replace(
@@ -105,6 +108,7 @@ class MakeSchema extends GeneratorCommand
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the schema already exists'],
             ['model', 'm', InputOption::VALUE_REQUIRED, 'The model that the schema applies to.'],
+            ['proxy', 'p', InputOption::VALUE_NONE, 'Create a schema for an Eloquent model proxy.'],
             ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the schema exists in.'],
         ];
     }
