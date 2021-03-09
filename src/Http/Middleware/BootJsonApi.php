@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Laravel\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\AbstractPaginator;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Contracts\Server\Repository;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Laravel\Routing\Route;
 
 class BootJsonApi
@@ -63,6 +63,10 @@ class BootJsonApi
      */
     public function handle($request, Closure $next, string $name)
     {
+        /**
+         * When handling a HTTP request, both the JSON:API server and
+         * request classes can be singletons bound into the container.
+         */
         $this->container->instance(
             Server::class,
             $server = $this->servers->server($name)
@@ -73,25 +77,29 @@ class BootJsonApi
             $route = new Route($this->container, $server, $request->route())
         );
 
-        $server->serving();
+        /**
+         * Before we do anything, we must ensure the server is set up to
+         * handle a HTTP request. We do that by invoking the `serving()`
+         * hook on the server instance.
+         */
+        if (method_exists($server, 'serving')) {
+            $this->container->call([$server, 'serving']);
+        }
+
+        /**
+         * Once the server is set up, we can substitute bindings. This must
+         * happen after the `serving` hook, in case that hook has added any
+         * Eloquent scopes.
+         */
         $route->substituteBindings();
-        $this->bindPageResolver();
+
+        /**
+         * We will also override the Laravel page resolver, as we know this is
+         * a JSON:API request, and the specification would have the page number
+         * nested under the `page` query parameter.
+         */
+        PagePagination::bindPageResolver();
 
         return $next($request);
-    }
-
-    /**
-     * Override the page resolver to read the page parameter from the JSON API request.
-     *
-     * @return void
-     */
-    protected function bindPageResolver(): void
-    {
-        /** Override the current page resolution */
-        AbstractPaginator::currentPageResolver(static function ($pageName) {
-            $pagination = \request()->query($pageName);
-
-            return $pagination['number'] ?? null;
-        });
     }
 }
