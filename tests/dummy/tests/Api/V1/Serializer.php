@@ -43,13 +43,13 @@ class Serializer
             'id' => (string) $post->getRouteKey(),
             'attributes' => [
                 'content' => $post->content,
-                'createdAt' => $post->created_at->jsonSerialize(),
+                'createdAt' => optional($post->created_at)->jsonSerialize(),
                 'deletedAt' => optional($post->deleted_at)->jsonSerialize(),
                 'publishedAt' => optional($post->published_at)->jsonSerialize(),
                 'slug' => $post->slug,
                 'synopsis' => $post->synopsis,
                 'title' => $post->title,
-                'updatedAt' => $post->updated_at->jsonSerialize(),
+                'updatedAt' => optional($post->updated_at)->jsonSerialize(),
             ],
             'relationships' => [
                 'author' => [

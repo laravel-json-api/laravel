@@ -115,6 +115,17 @@ class PostPolicy
      * @param LazyRelation $tags
      * @return bool
      */
+    public function updateMedia(?User $user, Post $post, LazyRelation $tags): bool
+    {
+        return $this->author($user, $post);
+    }
+
+    /**
+     * @param User|null $user
+     * @param Post $post
+     * @param LazyRelation $tags
+     * @return bool
+     */
     public function updateTags(?User $user, Post $post, LazyRelation $tags): bool
     {
         $tags->collect()->each(fn(Tag $tag) => $tag);
@@ -128,9 +139,31 @@ class PostPolicy
      * @param LazyRelation $tags
      * @return bool
      */
+    public function attachMedia(?User $user, Post $post, LazyRelation $tags): bool
+    {
+        return $this->author($user, $post);
+    }
+
+    /**
+     * @param User|null $user
+     * @param Post $post
+     * @param LazyRelation $tags
+     * @return bool
+     */
     public function attachTags(?User $user, Post $post, LazyRelation $tags): bool
     {
         return $this->updateTags($user, $post, $tags);
+    }
+
+    /**
+     * @param User|null $user
+     * @param Post $post
+     * @param LazyRelation $tags
+     * @return bool
+     */
+    public function detachMedia(?User $user, Post $post, LazyRelation $tags): bool
+    {
+        return $this->author($user, $post);
     }
 
     /**

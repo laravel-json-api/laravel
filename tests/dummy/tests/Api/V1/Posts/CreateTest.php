@@ -19,33 +19,35 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\V1\Posts;
 
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
 class CreateTest extends TestCase
 {
 
-    /**
-     * @var EloquentCollection
-     */
-    private EloquentCollection $tags;
-
-    /**
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->tags = Tag::factory()->count(3)->create();
-    }
-
     public function test(): void
     {
-        $post = Post::factory()->make();
-        $data = $this->serialize($post);
+        $tags = Tag::factory()->count(3)->create()->take(2);
+        $tagIds = $tags->map(fn(Tag $tag) => ['type' => 'tags', 'id' => $tag])->all();
+
+        $images = Image::factory()->count(2)->create()->take(1);
+        $videos = Video::factory()->count(2)->create()->take(1);
+
+        $mediaIds = collect($images)->merge($videos)->map(fn($model) => [
+            'type' => ($model instanceof Image) ? 'images' : 'videos',
+            'id' => $model,
+        ])->all();
+
+        $post = Post::factory()->make(['published_at' => null]);
+
+        $data = $this
+            ->serialize($post)
+            ->replace('media', $mediaIds)
+            ->replace('tags', $tagIds);
 
         $expected = $data
             ->forget('createdAt', 'updatedAt')
@@ -56,6 +58,7 @@ class CreateTest extends TestCase
             ->withoutExceptionHandling()
             ->actingAs($post->author)
             ->jsonApi('posts')
+            ->includePaths('author', 'media', 'tags')
             ->withData($data)
             ->post('/api/v1/posts');
 
@@ -74,12 +77,25 @@ class CreateTest extends TestCase
 
         $this->assertDatabaseCount('taggables', 2);
 
-        /** @var Tag $tag */
-        foreach ($this->tags->take(2) as $tag) {
+        foreach ($tags as $tag) {
             $this->assertDatabaseHas('taggables', [
                 'tag_id' => $tag->getKey(),
                 'taggable_id' => $id,
                 'taggable_type' => Post::class,
+            ]);
+        }
+
+        foreach ($images as $image) {
+            $this->assertDatabaseHas('image_post', [
+                'image_uuid' => $image->getKey(),
+                'post_id' => $id,
+            ]);
+        }
+
+        foreach ($videos as $video) {
+            $this->assertDatabaseHas('post_video', [
+                'post_id' => $id,
+                'video_uuid' => $video->getKey(),
             ]);
         }
     }
@@ -189,27 +205,10 @@ class CreateTest extends TestCase
      */
     private function serialize(Post $post): ResourceObject
     {
-        return ResourceObject::fromArray([
-            'type' => 'posts',
-            'attributes' => [
-                'content' => $post->content,
-                'createdAt' => null,
-                'slug' => $post->slug,
-                'synopsis' => $post->synopsis,
-                'title' => $post->title,
-                'updatedAt' => null,
-            ],
-            'relationships' => [
-                'author' => [
-                    'data' => null,
-                ],
-                'tags' => [
-                    'data' => $this->tags->take(2)->map(fn(Tag $tag) => [
-                        'type' => 'tags',
-                        'id' => (string) $tag->getRouteKey(),
-                    ])->all(),
-                ],
-            ],
-        ]);
+        return $this->serializer
+            ->post($post)
+            ->replace('author', null)
+            ->withoutId()
+            ->withoutLinks();
     }
 }

@@ -45,7 +45,7 @@ class ImageSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make(),
+            ID::make()->uuid(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('url'),
             DateTime::make('updatedAt')->sortable()->readOnly(),
