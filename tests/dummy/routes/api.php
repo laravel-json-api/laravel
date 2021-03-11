@@ -7,6 +7,7 @@ JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(functio
     $server->resource('posts')->relationships(function ($relationships) {
         $relationships->hasOne('author')->readOnly();
         $relationships->hasMany('comments')->readOnly();
+        $relationships->hasMany('media')->readOnly();
         $relationships->hasMany('tags');
     })->actions('-actions', function ($actions) {
         $actions->delete('purge');

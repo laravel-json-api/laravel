@@ -75,6 +75,16 @@ class PostPolicy
      * @param Post $post
      * @return bool
      */
+    public function viewMedia(?User $user, Post $post): bool
+    {
+        return $this->view($user, $post);
+    }
+
+    /**
+     * @param User|null $user
+     * @param Post $post
+     * @return bool
+     */
     public function viewTags(?User $user, Post $post): bool
     {
         return $this->view($user, $post);

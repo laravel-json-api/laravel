@@ -82,10 +82,17 @@ class ReadTest extends TestCase
         $images = $post->images()->get();
         $videos = $post->videos()->get();
 
+        /** @var Tag $tag */
+        $tag = Tag::factory()->create();
+        $tag->videos()->save($videos[0]);
+
         $ids = collect($images)->merge($videos)->map(fn($model) => [
             'type' => ($model instanceof Image) ? 'images' : 'videos',
             'id' => (string) $model->getRouteKey(),
         ])->all();
+
+        $included = $ids;
+        $included[] = ['type' => 'tags', 'id' => (string) $tag->getRouteKey()];
 
         $expected = $this->serializer
             ->post($post)
@@ -95,10 +102,10 @@ class ReadTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('posts')
-            ->includePaths('media')
+            ->includePaths('media.tags')
             ->get(url('/api/v1/posts', $post));
 
-        $response->assertFetchedOneExact($expected)->assertIncluded($ids);
+        $response->assertFetchedOneExact($expected)->assertIncluded($included);
     }
 
     /**

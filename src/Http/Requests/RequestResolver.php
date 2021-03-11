@@ -31,9 +31,60 @@ class RequestResolver
 {
 
     /**
+     * @var array
+     */
+    private static array $custom = [];
+
+    /**
      * @var string
      */
     private string $type;
+
+    /**
+     * Register a custom binding for a query.
+     *
+     * @param string $resourceType
+     * @param string $class
+     */
+    public static function registerQuery(string $resourceType, string $class): void
+    {
+        self::register('Query', $resourceType, $class);
+    }
+
+    /**
+     * Register a custom binding for a collection query.
+     *
+     * @param string $resourceType
+     * @param string $class
+     */
+    public static function registerCollectionQuery(string $resourceType, string $class): void
+    {
+        self::register('CollectionQuery', $resourceType, $class);
+    }
+
+    /**
+     * Register a custom binding for a resource request.
+     *
+     * @param string $resourceType
+     * @param string $class
+     */
+    public static function registerRequest(string $resourceType, string $class): void
+    {
+        self::register('Request', $resourceType, $class);
+    }
+
+    /**
+     * Register a custom binding.
+     *
+     * @param string $type
+     * @param string $resourceType
+     * @param string $class
+     */
+    private static function register(string $type, string $resourceType, string $class): void
+    {
+        self::$custom[$type] = self::$custom[$type] ?? [];
+        self::$custom[$type][$resourceType] = $class;
+    }
 
     /**
      * ResourceRequest constructor.
@@ -55,7 +106,7 @@ class RequestResolver
         $app = app();
 
         try {
-            $fqn = Str::replaceLast('Schema', $this->type, get_class(
+            $fqn = $this->custom($resourceType) ?: Str::replaceLast('Schema', $this->type, get_class(
                 $app->make(SchemaContainer::class)->schemaFor($resourceType)
             ));
 
@@ -77,5 +128,18 @@ class RequestResolver
                $resourceType
            ), 0, $ex);
         }
+    }
+
+    /**
+     * Check whether a custom class has been registered for the resource type.
+     *
+     * @param string $resourceType
+     * @return string|null
+     */
+    private function custom(string $resourceType): ?string
+    {
+        $values = self::$custom[$this->type] ?? [];
+
+        return $values[$resourceType] ?? null;
     }
 }

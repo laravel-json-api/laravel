@@ -30,7 +30,7 @@
         "laravel-json-api/encoder-neomerx": "^1.0.0-alpha.4",
         "laravel-json-api/exceptions": "^1.0.0-alpha.2",
         "laravel-json-api/spec": "^1.0.0-alpha.4",
-        "laravel-json-api/validation": "^1.0.0-alpha.4",
+        "laravel-json-api/validation": "^1.0.0-alpha.5",
         "laravel/framework": "^8.0"
     },
     "require-dev": {

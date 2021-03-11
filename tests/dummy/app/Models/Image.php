@@ -39,6 +39,11 @@ class Image extends Model
     protected $primaryKey = 'uuid';
 
     /**
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * @var string[]
      */
     protected $fillable = ['url'];
