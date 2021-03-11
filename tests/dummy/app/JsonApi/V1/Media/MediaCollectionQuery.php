@@ -41,7 +41,7 @@ class MediaCollectionQuery extends ResourceQuery
             'filter' => [
                 'nullable',
                 'array',
-                JsonApiRule::notSupported(),
+                JsonApiRule::filter(['id']),
             ],
             'include' => [
                 'nullable',

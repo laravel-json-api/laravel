@@ -85,10 +85,55 @@ class ReadMediaTest extends TestCase
             ->includePaths('tags')
             ->get(url('/api/v1/posts', [$this->post, 'media']));
 
-        $response->willSeeType('comments')->assertFetchedMany($expected);
-        $response->assertIncluded([
+        $response->assertFetchedMany($expected)->assertIncluded([
             ['type' => 'tags', 'id' => $tag],
         ]);
+    }
+
+    public function testFilter1(): void
+    {
+        $images = Image::factory()->count(3)->create();
+        $videos = Video::factory()->count(3)->create();
+
+        $this->post->images()->saveMany($images);
+        $this->post->videos()->saveMany($videos);
+
+        $expected = collect([$images[1], $videos[2]]);
+
+        $ids = $expected->map(fn($model) => (string) $model->getRouteKey());
+
+        $response = $this
+            ->jsonApi('videos')
+            ->filter(['id' => $ids])
+            ->get(url('/api/v1/posts', [$this->post, 'media']));
+
+        $response->assertFetchedMany($expected->map(fn ($model) => [
+            'type' => ($model instanceof Image) ? 'images' : 'videos',
+            'id' => (string) $model->getRouteKey(),
+        ])->all());
+    }
+
+    public function testFilter2(): void
+    {
+        $images = Image::factory()->count(3)->create();
+        $videos = Video::factory()->count(3)->create();
+
+        $this->post->images()->saveMany($images);
+        $this->post->videos()->saveMany($videos);
+
+        $expected = $images->take(2);
+
+        $ids = $expected->map(fn($model) => (string) $model->getRouteKey());
+
+        $response = $this
+            ->jsonApi('videos')
+            ->filter(['id' => $ids])
+            ->get(url('/api/v1/posts', [$this->post, 'media']));
+
+        $response->assertFetchedMany($expected->map(fn (Image $model) => [
+            'type' => 'images',
+            'id' => (string) $model->getRouteKey(),
+        ])->all());
     }
 
     public function testInvalidMediaType(): void
