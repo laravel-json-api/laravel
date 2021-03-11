@@ -11,7 +11,11 @@ All notable changes to this project will be documented in this file. This projec
   full details on how to apply this to resource schemas, refer to the new *Soft Deleting* chapter in the documentation.
 - Multi-resource models are now supported. This allows developers to represent a single model class as multiple
   different JSON:API resource types within an API. Refer to documentation for details of how to implement.
+- [#8](https://github.com/laravel-json-api/laravel/issues/8) The new `MorphToMany` relation field can now be used to add
+  polymorphic to-many relations to a schema. Refer to documentation for details.
 - Developers can now type-hint dependencies in their server's `serving()` method.
+- Can now manually register request, query and collection query classes using the `RequestResolver::registerRequest()`,
+  `RequestResolver::registerQuery()` and `RequestResolver::registerCollectionQuery()` static methods.
 
 ## [1.0.0-alpha.4] - 2021-02-27
 
