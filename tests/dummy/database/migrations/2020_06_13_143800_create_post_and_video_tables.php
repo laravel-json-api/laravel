@@ -47,6 +47,12 @@ class CreatePostAndVideoTables extends Migration
                 ->onUpdate('cascade');
         });
 
+        Schema::create('images', function (Blueprint $table) {
+            $table->uuid('uuid')->primary();
+            $table->timestamps();
+            $table->string('url');
+        });
+
         Schema::create('videos', function (Blueprint $table) {
             $table->uuid('uuid')->primary();
             $table->timestamps();
@@ -101,6 +107,42 @@ class CreatePostAndVideoTables extends Migration
                 ->on('tags')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+        });
+
+        Schema::create('image_post', function (Blueprint $table) {
+            $table->uuid('image_uuid');
+            $table->unsignedBigInteger('post_id');
+            $table->primary(['image_uuid', 'post_id']);
+
+            $table->foreign('image_uuid')
+                ->references('uuid')
+                ->on('images')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreign('post_id')
+                ->references('id')
+                ->on('posts')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+        });
+
+        Schema::create('post_video', function (Blueprint $table) {
+            $table->unsignedBigInteger('post_id');
+            $table->uuid('video_uuid');
+            $table->primary(['post_id', 'video_uuid']);
+
+            $table->foreign('post_id')
+                ->references('id')
+                ->on('posts')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreign('video_uuid')
+                ->references('uuid')
+                ->on('videos')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
         });
     }
 

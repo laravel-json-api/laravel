@@ -64,6 +64,12 @@ class Serializer
                         'related' => "{$self}/comments",
                     ],
                 ],
+                'media' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/media",
+                        'related' => "{$self}/media",
+                    ],
+                ],
                 'tags' => [
                     'links' => [
                         'self' => "{$self}/relationships/tags",
