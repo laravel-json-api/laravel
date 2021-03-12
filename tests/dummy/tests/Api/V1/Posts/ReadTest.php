@@ -17,9 +17,11 @@
 
 namespace App\Tests\Api\V1\Posts;
 
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
 
 class ReadTest extends TestCase
@@ -68,6 +70,42 @@ class ReadTest extends TestCase
             $identifiers[0],
             $identifiers[1],
         ]);
+    }
+
+    public function testIncludeMedia(): void
+    {
+        $post = Post::factory()
+            ->has(Image::factory()->count(2))
+            ->has(Video::factory()->count(2))
+            ->create([]);
+
+        $images = $post->images()->get();
+        $videos = $post->videos()->get();
+
+        /** @var Tag $tag */
+        $tag = Tag::factory()->create();
+        $tag->videos()->save($videos[0]);
+
+        $ids = collect($images)->merge($videos)->map(fn($model) => [
+            'type' => ($model instanceof Image) ? 'images' : 'videos',
+            'id' => (string) $model->getRouteKey(),
+        ])->all();
+
+        $included = $ids;
+        $included[] = ['type' => 'tags', 'id' => (string) $tag->getRouteKey()];
+
+        $expected = $this->serializer
+            ->post($post)
+            ->replace('media', $ids)
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->includePaths('media.tags')
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected)->assertIncluded($included);
     }
 
     /**

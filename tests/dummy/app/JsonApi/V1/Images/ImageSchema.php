@@ -17,44 +17,27 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Posts;
+namespace App\JsonApi\V1\Images;
 
-use App\Models\Post;
+use App\Models\Image;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
-use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
-use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
-use LaravelJsonApi\Eloquent\Fields\Relations\MorphToMany;
-use LaravelJsonApi\Eloquent\Fields\SoftDelete;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Filters\OnlyTrashed;
-use LaravelJsonApi\Eloquent\Filters\Scope;
-use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use LaravelJsonApi\Eloquent\SoftDeletes;
 
-class PostSchema extends Schema
+class ImageSchema extends Schema
 {
-
-    use SoftDeletes;
 
     /**
      * The model the schema corresponds to.
      *
      * @var string
      */
-    public static string $model = Post::class;
-
-    /**
-     * The maximum depth of include paths.
-     *
-     * @var int
-     */
-    protected int $maxDepth = 3;
+    public static string $model = Image::class;
 
     /**
      * @inheritDoc
@@ -62,21 +45,9 @@ class PostSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make(),
-            BelongsTo::make('author')->type('users')->readOnly(),
-            HasMany::make('comments')->readOnly(),
-            Str::make('content'),
+            ID::make()->uuid(),
             DateTime::make('createdAt')->sortable()->readOnly(),
-            SoftDelete::make('deletedAt')->sortable(),
-            MorphToMany::make('media', [
-                BelongsToMany::make('images'),
-                BelongsToMany::make('videos'),
-            ]),
-            DateTime::make('publishedAt')->sortable(),
-            Str::make('slug'),
-            Str::make('synopsis'),
-            BelongsToMany::make('tags'),
-            Str::make('title')->sortable(),
+            Str::make('url'),
             DateTime::make('updatedAt')->sortable()->readOnly(),
         ];
     }
@@ -88,9 +59,6 @@ class PostSchema extends Schema
     {
         return [
             WhereIn::make('id', $this->idColumn())->delimiter(','),
-            Scope::make('published', 'wherePublished')->asBoolean(),
-            Where::make('slug')->singular(),
-            OnlyTrashed::make('trashed'),
         ];
     }
 

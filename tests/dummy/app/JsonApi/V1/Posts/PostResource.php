@@ -56,6 +56,8 @@ class PostResource extends JsonApiResource
         return [
             $this->relation('author')->showDataIfLoaded(),
             $this->relation('comments'),
+            $this->relation('media')
+                ->withData(fn() => $this->schema->relationship('media')->value($this->resource)),
             $this->relation('tags')->showDataIfLoaded(),
         ];
     }
