@@ -24,6 +24,7 @@ use App\Models\Post;
 use App\Models\Video;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Core\Server\Server as BaseServer;
+use LaravelJsonApi\Laravel\Http\Requests\RequestResolver;
 
 class Server extends BaseServer
 {
@@ -50,6 +51,8 @@ class Server extends BaseServer
         Video::creating(static function (Video $video) {
             $video->owner()->associate(Auth::user());
         });
+
+        RequestResolver::registerCollectionQuery('media', Media\MediaCollectionQuery::class);
     }
 
     /**
@@ -61,6 +64,7 @@ class Server extends BaseServer
     {
         return [
             Comments\CommentSchema::class,
+            Images\ImageSchema::class,
             Posts\PostSchema::class,
             Tags\TagSchema::class,
             Users\UserSchema::class,

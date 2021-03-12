@@ -23,6 +23,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
+use Illuminate\Support\Facades\Date;
 use LaravelJsonApi\Core\Document\ResourceObject;
 
 class UpdateTest extends TestCase
@@ -116,6 +117,73 @@ class UpdateTest extends TestCase
         ]);
     }
 
+    public function testSoftDelete(): void
+    {
+        $deleted = false;
+
+        Post::deleted(function () use (&$deleted) {
+            $deleted = true;
+        });
+
+        $date = Date::yesterday()->startOfSecond();
+
+        $data = $this->serialize()
+            ->only('deletedAt')
+            ->replace('deletedAt', $date->toJSON());
+
+        $expected = $this->serializer
+            ->post($this->post)
+            ->forget('updatedAt')
+            ->replace('deletedAt', $date->toJSON());
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertUpdated($expected->jsonSerialize());
+
+        $this->assertSoftDeleted($this->post);
+        $this->assertTrue($deleted);
+    }
+
+    public function testRestore(): void
+    {
+        $this->post->forceFill(['deleted_at' => Date::now()])->save();
+
+        $restored = false;
+
+        Post::restored(function () use (&$restored) {
+            $restored = true;
+        });
+
+        $data = $this->serialize()
+            ->only('deletedAt')
+            ->replace('deletedAt', null);
+
+        $expected = $this->serializer
+            ->post($this->post)
+            ->forget('updatedAt')
+            ->replace('deletedAt', null);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->actingAs($this->post->author)
+            ->jsonApi('posts')
+            ->withData($data)
+            ->patch(url('/api/v1/posts', $this->post));
+
+        $response->assertUpdated($expected->jsonSerialize());
+
+        $this->assertDatabaseHas('posts', array_merge($this->post->getOriginal(), [
+            'deleted_at' => null,
+        ]));
+
+        $this->assertTrue($restored);
+    }
+
     public function testInvalid(): void
     {
         $other = Post::factory()->create();
@@ -206,6 +274,7 @@ class UpdateTest extends TestCase
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
+                'deletedAt' => optional($this->post->deleted_at)->toJSON(),
                 'slug' => $other->slug,
                 'synopsis' => $other->synopsis,
                 'title' => $other->title,

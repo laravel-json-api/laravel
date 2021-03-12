@@ -100,6 +100,22 @@ class MakeSchemaTest extends TestCase
         $this->assertSchemaCreated('App\Models\Post', 'Post');
     }
 
+    public function testProxy(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:schema', [
+            'name' => 'user-accounts',
+            '--proxy' => true,
+            '--model' => '\App\JsonApi\Proxies\UserAccount',
+        ]);
+
+        $this->assertSame(0, $result);
+        $this->assertProxySchemaCreated('App\JsonApi\Proxies\UserAccount', 'UserAccount');
+    }
+
     public function testNoServer(): void
     {
         config()->set('jsonapi.servers', [
@@ -144,6 +160,29 @@ class MakeSchemaTest extends TestCase
             'namespace App\JsonApi\V1\Posts;',
             'use LaravelJsonApi\Eloquent\Schema;',
             'class PostSchema extends Schema',
+            "use {$namespacedModel};",
+            "public static string \$model = {$model}::class;",
+        ];
+
+        foreach ($tests as $expected) {
+            $this->assertStringContainsString($expected, $content);
+        }
+    }
+
+    /**
+     * @param string $namespacedModel
+     * @param string $model
+     * @return void
+     */
+    private function assertProxySchemaCreated(string $namespacedModel, string $model): void
+    {
+        $this->assertFileExists($path = app_path('JsonApi/V1/UserAccounts/UserAccountSchema.php'));
+        $content = file_get_contents($path);
+
+        $tests = [
+            'namespace App\JsonApi\V1\UserAccounts;',
+            'use LaravelJsonApi\Eloquent\ProxySchema;',
+            'class UserAccountSchema extends ProxySchema',
             "use {$namespacedModel};",
             "public static string \$model = {$model}::class;",
         ];
