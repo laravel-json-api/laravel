@@ -71,7 +71,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     public static function queryMany(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: new RequestResolver('CollectionQuery');
+        $resolver = self::$queryManyResolver ?: new RequestResolver(RequestResolver::COLLECTION_QUERY);
 
         return $resolver($resourceType);
     }
@@ -95,7 +95,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     public static function queryOne(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: new RequestResolver('Query');
+        $resolver = self::$queryManyResolver ?: new RequestResolver(RequestResolver::QUERY);
 
         return $resolver($resourceType);
     }

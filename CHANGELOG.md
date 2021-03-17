@@ -16,6 +16,12 @@ All notable changes to this project will be documented in this file. This projec
   response document. For *to-many* relationships that are countable, this will mean the top-level `meta` member will
   contain the count of the relationship.
 
+### Changed
+
+- The `LaravelJsonApi::registerQuery()`, `LaravelJsonApi::registerCollectionQuery()` and
+  `LaravelJsonApi::registerRequest()` methods must now be used to register custom HTTP request classes for specified
+  resource types. Previously methods could be called on the `RequestResolver` classes, but these have now been removed.
+
 ### Fixed
 
 - Relationship endpoints that return resource identifiers now correctly include page meta in the top-level meta member

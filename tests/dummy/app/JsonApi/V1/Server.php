@@ -24,7 +24,7 @@ use App\Models\Post;
 use App\Models\Video;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Core\Server\Server as BaseServer;
-use LaravelJsonApi\Laravel\Http\Requests\RequestResolver;
+use LaravelJsonApi\Laravel\LaravelJsonApi;
 
 class Server extends BaseServer
 {
@@ -52,7 +52,7 @@ class Server extends BaseServer
             $video->owner()->associate(Auth::user());
         });
 
-        RequestResolver::registerCollectionQuery('media', Media\MediaCollectionQuery::class);
+        LaravelJsonApi::registerCollectionQuery(Media\MediaCollectionQuery::class, 'media');
     }
 
     /**

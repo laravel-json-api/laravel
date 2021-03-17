@@ -30,10 +30,22 @@ use function sprintf;
 class RequestResolver
 {
 
+    public const QUERY = 'Query';
+    public const COLLECTION_QUERY = 'CollectionQuery';
+    public const REQUEST = 'Request';
+
     /**
      * @var array
      */
     private static array $custom = [];
+
+    /**
+     * @var array
+     */
+    private static array $defaults = [
+        self::QUERY => AnonymousQuery::class,
+        self::COLLECTION_QUERY => AnonymousCollectionQuery::class,
+    ];
 
     /**
      * @var string
@@ -41,36 +53,14 @@ class RequestResolver
     private string $type;
 
     /**
-     * Register a custom binding for a query.
+     * Use the provided class as the default class for the specified request type.
      *
-     * @param string $resourceType
+     * @param string $type
      * @param string $class
      */
-    public static function registerQuery(string $resourceType, string $class): void
+    public static function useDefault(string $type, string $class): void
     {
-        self::register('Query', $resourceType, $class);
-    }
-
-    /**
-     * Register a custom binding for a collection query.
-     *
-     * @param string $resourceType
-     * @param string $class
-     */
-    public static function registerCollectionQuery(string $resourceType, string $class): void
-    {
-        self::register('CollectionQuery', $resourceType, $class);
-    }
-
-    /**
-     * Register a custom binding for a resource request.
-     *
-     * @param string $resourceType
-     * @param string $class
-     */
-    public static function registerRequest(string $resourceType, string $class): void
-    {
-        self::register('Request', $resourceType, $class);
+        self::$defaults[$type] = $class;
     }
 
     /**
@@ -80,7 +70,7 @@ class RequestResolver
      * @param string $resourceType
      * @param string $class
      */
-    private static function register(string $type, string $resourceType, string $class): void
+    public static function register(string $type, string $resourceType, string $class): void
     {
         self::$custom[$type] = self::$custom[$type] ?? [];
         self::$custom[$type][$resourceType] = $class;
@@ -113,10 +103,8 @@ class RequestResolver
             if (!class_exists($fqn) && !$app->bound($fqn)) {
                 if (true === $allowNull) {
                     return null;
-                } else if ('CollectionQuery' === $this->type) {
-                    $fqn = AnonymousCollectionQuery::class;
-                } else if ('Query' === $this->type) {
-                    $fqn = AnonymousQuery::class;
+                } else if (isset(self::$defaults[$this->type])) {
+                    $fqn = self::$defaults[$this->type];
                 }
             }
 
