@@ -52,7 +52,9 @@ class ReadTagIdentifiersTest extends TestCase
             ->jsonApi('tags')
             ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertFetchedToMany($expected);
+        $response->assertFetchedToMany($expected)->assertExactMeta([
+            'count' => 3,
+        ]);
     }
 
     public function testSort(): void

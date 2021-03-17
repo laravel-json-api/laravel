@@ -60,12 +60,47 @@ class ReadCommentIdentifiersTest extends TestCase
                 'self' => $self,
                 'related' => url('/api/v1/posts', [$this->post, 'comments']),
             ],
+            'meta' => [
+                'count' => 3,
+            ],
             'data' => $expected->map(fn(Comment $comment) => [
                 'type' => 'comments',
                 'id' => (string) $comment->getRouteKey(),
             ])->all(),
             'jsonapi' => [
                 'version' => '1.0',
+            ],
+        ]);
+    }
+
+    public function testPaginated(): void
+    {
+        $comments = Comment::factory()
+            ->count(5)
+            ->create(['post_id' => $this->post]);
+
+        $expected = $comments->toBase()->sortBy('id')->take(3);
+
+        Comment::factory()
+            ->for(Post::factory())
+            ->create();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('comments')
+            ->page(['number' => '1', 'size' => '3'])
+            ->sort('id')
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+
+        $response->assertFetchedToManyInOrder($expected)->assertExactMeta([
+            'count' => 5,
+            'page' => [
+                'currentPage' => 1,
+                'from' => 1,
+                'lastPage' => 2,
+                'perPage' => 3,
+                'to' => 3,
+                'total' => 5,
             ],
         ]);
     }

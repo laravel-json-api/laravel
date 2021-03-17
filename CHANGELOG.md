@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#18](https://github.com/laravel-json-api/laravel/issues/18) Added a `withCount` query parameter. For Eloquent
+  resources, this allows a client to request the relationship count for the primary data's relationships. Refer to
+  documentation for implementation details.
+- There is now a `Core\Reponses\RelatedResponse` class for returning the result for a related resources endpoint. For
+  example, the `/api/v1/posts/1/comments` endpoint. Previously the `DataResponse` class was used. While this class can
+  still be used, the new `RelatedResponse` class merges relationship meta into the top-level `meta` member of the
+  response document. For *to-many* relationships that are countable, this will mean the top-level `meta` member will
+  contain the count of the relationship.
+
+### Fixed
+
+- Relationship endpoints that return resource identifiers now correctly include page meta in the top-level meta member
+  of the document, if the results are paginated. Previously the page meta was incorrectly omitted.
+
 ## [1.0.0-alpha.5] - 2021-03-12
 
 ### Added

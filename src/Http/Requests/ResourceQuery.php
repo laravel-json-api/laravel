@@ -25,6 +25,7 @@ use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\FieldSets;
+use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -196,15 +197,29 @@ class ResourceQuery extends FormRequest implements QueryParameters
     /**
      * @inheritDoc
      */
-    public function filter(): ?array
+    public function filter(): ?FilterParameters
     {
         $data = $this->validated();
 
         if (array_key_exists('filter', $data)) {
-            return $data['filter'];
+            return FilterParameters::fromArray($data['filter'] ?? []);
         }
 
         return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function unrecognisedParameters(): array
+    {
+        return collect($this->validated())->forget([
+            'include',
+            'fields',
+            'sort',
+            'page',
+            'filter',
+        ])->all();
     }
 
     /**

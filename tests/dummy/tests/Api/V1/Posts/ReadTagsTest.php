@@ -53,7 +53,9 @@ class ReadTagsTest extends TestCase
             ->jsonApi('tags')
             ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
-        $response->assertFetchedMany($expected);
+        $response->assertFetchedMany($expected)->assertExactMeta([
+            'count' => count($expected)
+        ]);
     }
 
     public function testSort(): void
@@ -72,6 +74,25 @@ class ReadTagsTest extends TestCase
         $response->assertFetchedManyInOrder(
             $tags->sortByDesc('name')
         );
+    }
+
+    public function testWithCount(): void
+    {
+        $tags = Tag::factory()->count(3)->create();
+        $this->post->tags()->attach($tags);
+
+        $expected = $tags->map(fn(Tag $tag) => $this->serializer
+            ->tag($tag)
+            ->withRelationshipMeta('posts', ['count' => 1])
+            ->jsonSerialize()
+        )->all();
+
+        $response = $this
+            ->jsonApi('tags')
+            ->query(['withCount' => 'posts'])
+            ->get(url('/api/v1/posts', [$this->post, 'tags']));
+
+        $response->assertFetchedManyExact($expected);
     }
 
     public function testInvalidQueryParameter(): void

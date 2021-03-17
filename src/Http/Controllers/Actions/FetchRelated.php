@@ -23,7 +23,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Responses\RelatedResponse;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 
@@ -76,6 +76,10 @@ trait FetchRelated
             $response = $this->{$hook}($model, $data, $request);
         }
 
-        return $response ?: new DataResponse($data);
+        return $response ?: new RelatedResponse(
+            $model,
+            $relation->name(),
+            $data,
+        );
     }
 }

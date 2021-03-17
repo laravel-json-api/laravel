@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
-            ->includePaths('author')
+            ->includePaths('author', 'tags')
             ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected);

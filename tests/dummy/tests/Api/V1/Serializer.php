@@ -19,14 +19,40 @@ declare(strict_types=1);
 
 namespace App\Tests\Api\V1;
 
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\Video;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
 
 class Serializer
 {
+
+    /**
+     * Get the expected resource for an image model.
+     *
+     * @param Image $image
+     * @return ResourceObject
+     */
+    public function image(Image $image): ResourceObject
+    {
+        $self = url('/api/v1/images', $image);
+
+        return ResourceObject::fromArray([
+            'type' => 'images',
+            'id' => (string) $image->getRouteKey(),
+            'attributes' => [
+                'createdAt' => $image->created_at->jsonSerialize(),
+                'updatedAt' => $image->updated_at->jsonSerialize(),
+                'url' => $image->url,
+            ],
+            'links' => [
+                'self' => $self,
+            ],
+        ]);
+    }
 
     /**
      * Get the expected post resource.
@@ -115,6 +141,9 @@ class Serializer
                     ],
                 ],
             ],
+            'links' => [
+                'self' => $self,
+            ],
         ]);
     }
 
@@ -135,6 +164,40 @@ class Serializer
                 'createdAt' => $user->created_at->jsonSerialize(),
                 'name' => $user->name,
                 'updatedAt' => $user->updated_at->jsonSerialize(),
+            ],
+            'links' => [
+                'self' => $self,
+            ],
+        ]);
+    }
+
+
+    /**
+     * Get the expected resource for a video model.
+     *
+     * @param Video $video
+     * @return ResourceObject
+     */
+    public function video(Video $video): ResourceObject
+    {
+        $self = url('/api/v1/videos', $video);
+
+        return ResourceObject::fromArray([
+            'type' => 'videos',
+            'id' => (string) $video->getRouteKey(),
+            'attributes' => [
+                'createdAt' => $video->created_at->jsonSerialize(),
+                'title' => $video->title,
+                'updatedAt' => $video->updated_at->jsonSerialize(),
+                'url' => $video->url,
+            ],
+            'relationships' => [
+                'tags' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/tags",
+                        'related' => "{$self}/tags",
+                    ],
+                ],
             ],
             'links' => [
                 'self' => $self,

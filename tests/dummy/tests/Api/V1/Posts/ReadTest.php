@@ -17,6 +17,7 @@
 
 namespace App\Tests\Api\V1\Posts;
 
+use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
@@ -172,6 +173,28 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->sparseFields('posts', ['slug', 'synopsis', 'title'])
+            ->get(url('/api/v1/posts', $post));
+
+        $response->assertFetchedOneExact($expected);
+    }
+
+    public function testWithCount(): void
+    {
+        $post = Post::factory()
+            ->has(Tag::factory()->count(1))
+            ->has(Comment::factory()->count(3))
+            ->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->withRelationshipMeta('tags', ['count' => 1])
+            ->withRelationshipMeta('comments', ['count' => 3])
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->query(['withCount' => 'comments,tags']) // @TODO add test helper
             ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedOneExact($expected);

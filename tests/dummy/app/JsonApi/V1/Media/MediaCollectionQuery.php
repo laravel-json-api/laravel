@@ -56,7 +56,12 @@ class MediaCollectionQuery extends ResourceQuery
             'sort' => [
                 'nullable',
                 'string',
-                JsonApiRule::notSupported(),
+                JsonApiRule::sort(['id']),
+            ],
+            'withCount' => [
+                'nullable',
+                'string',
+                JsonApiRule::countableForPolymorph(),
             ],
         ];
     }

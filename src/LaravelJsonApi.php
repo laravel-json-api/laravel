@@ -20,7 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
+use LaravelJsonApi\Core\Query\Custom\ExtendedQueryParameters;
+use LaravelJsonApi\Eloquent\Resources\Relation;
 
 final class LaravelJsonApi
 {
@@ -52,5 +55,37 @@ final class LaravelJsonApi
         AuthorizerResolver::useDefault($authorizerClass);
 
         return new self();
+    }
+
+    /**
+     * Set the query parameter name for the countable implementation.
+     *
+     * @param string $parameter
+     * @return static
+     */
+    public static function withCountQueryParameter(string $parameter): self
+    {
+        if (!empty($parameter)) {
+            ExtendedQueryParameters::withCount($parameter);
+            return new self();
+        }
+
+        throw new InvalidArgumentException('Expecting a non-empty string for the countable query parameter.');
+    }
+
+    /**
+     * Set the relationship meta key for the countable implementation.
+     *
+     * @param string $key
+     * @return static
+     */
+    public static function withCountMetaKey(string $key): self
+    {
+        if (!empty($key)) {
+            Relation::withCount($key);
+            return new self();
+        }
+
+        throw new InvalidArgumentException('Expecting a non-empty string for the countable meta key.');
     }
 }

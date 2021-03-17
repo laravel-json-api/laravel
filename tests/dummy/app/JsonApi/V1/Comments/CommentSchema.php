@@ -69,7 +69,7 @@ class CommentSchema extends Schema
      */
     public function pagination(): ?Paginator
     {
-        return PagePagination::make()->withoutNestedMeta();
+        return PagePagination::make();
     }
 
 }

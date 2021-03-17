@@ -55,7 +55,35 @@ class ReadCommentsTest extends TestCase
             ->jsonApi('comments')
             ->get(url('/api/v1/posts', [$this->post, 'comments']));
 
-        $response->assertFetchedMany($expected);
+        $response->assertFetchedMany($expected)->assertExactMeta([
+            'count' => 3,
+        ]);
+    }
+
+    public function testPaginated(): void
+    {
+        $comments = Comment::factory()
+            ->count(5)
+            ->create(['post_id' => $this->post]);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('comments')
+            ->page(['number' => '1', 'size' => '3'])
+            ->sort('id')
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
+
+        $response->assertFetchedMany($comments->sortBy('id')->take(3))->assertExactMeta([
+            'count' => 5,
+            'page' => [
+                'currentPage' => 1,
+                'from' => 1,
+                'lastPage' => 2,
+                'perPage' => 3,
+                'to' => 3,
+                'total' => 5,
+            ],
+        ]);
     }
 
     public function testFilter(): void
