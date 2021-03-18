@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Console;
 
+use Illuminate\Support\Str;
+use LaravelJsonApi\Core\Query\Custom\ExtendedQueryParameters;
 use Symfony\Component\Console\Input\InputOption;
 
 class MakeQuery extends GeneratorCommand
@@ -80,6 +82,36 @@ class MakeQuery extends GeneratorCommand
         }
 
         return 'Query';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        return $this->replaceAdditional($stub);
+    }
+
+    /**
+     * Replace additional placeholders.
+     *
+     * @param string $stub
+     * @return string
+     */
+    protected function replaceAdditional(string $stub): string
+    {
+        $withCount = ExtendedQueryParameters::withCount();
+
+        $replace = [
+            '{{ withCount }}' => $withCount,
+            '{{withCount}}' => $withCount,
+        ];
+
+        return str_replace(
+            array_keys($replace), array_values($replace), $stub
+        );
     }
 
     /**

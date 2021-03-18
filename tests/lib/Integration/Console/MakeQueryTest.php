@@ -158,6 +158,7 @@ class MakeQueryTest extends TestCase
             'class PostQuery extends ResourceQuery',
             "'page' => JsonApiRule::notSupported(),",
             "'sort' => JsonApiRule::notSupported(),",
+            "'withCount' =>",
         ];
 
         foreach ($tests as $expected) {
@@ -180,6 +181,7 @@ class MakeQueryTest extends TestCase
             'class PostCollectionQuery extends ResourceQuery',
             'JsonApiRule::page(),',
             'JsonApiRule::sort(),',
+            "'withCount' =>",
         ];
 
         foreach ($tests as $expected) {
