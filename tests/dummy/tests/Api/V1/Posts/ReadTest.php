@@ -37,7 +37,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -48,15 +48,14 @@ class ReadTest extends TestCase
             ->has(Tag::factory()->count(2))
             ->create();
 
-        $tags = $post->tags()->get();
-
-        $identifiers = $tags->map(
-            fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()]
-        )->all();
+        $identifiers = $this->hashIdentifiers(
+            'tags',
+            $tags = $post->tags()->get(),
+        );
 
         $expected = $this->serializer
             ->post($post)
-            ->replace('author', $author = ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
+            ->replace('author', $author = ['type' => 'users', 'id' => $this->hashId($post->author)])
             ->replace('tags', $identifiers)
             ->jsonSerialize();
 
@@ -64,7 +63,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('author', 'tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected)->assertIncluded([
             $author,
@@ -93,7 +92,7 @@ class ReadTest extends TestCase
         ])->all();
 
         $included = $ids;
-        $included[] = ['type' => 'tags', 'id' => (string) $tag->getRouteKey()];
+        $included[] = ['type' => 'tags', 'id' => $this->hashId($tag)];
 
         $expected = $this->serializer
             ->post($post)
@@ -104,7 +103,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('media.tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected)->assertIncluded($included);
     }
@@ -128,7 +127,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -142,7 +141,7 @@ class ReadTest extends TestCase
             ->jsonApi()
             ->expects('posts')
             ->filter(['slug' => $post->slug])
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -155,7 +154,7 @@ class ReadTest extends TestCase
             ->jsonApi()
             ->expects('posts')
             ->filter(['slug' => 'baz-bat'])
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $this->hashId($post)));
 
         $response->assertFetchedNull();
     }
@@ -173,7 +172,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->sparseFields('posts', ['slug', 'synopsis', 'title'])
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -194,8 +193,8 @@ class ReadTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('posts')
-            ->query(['withCount' => 'comments,tags']) // @TODO add test helper
-            ->get(url('/api/v1/posts', $post));
+            ->query(['withCount' => 'comments,tags'])
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -211,7 +210,7 @@ class ReadTest extends TestCase
 
         $response = $this
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $this->hashId($post)));
 
         $response->assertStatus(404);
     }
@@ -228,7 +227,7 @@ class ReadTest extends TestCase
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $this->hashId($post)));
 
         $response->assertStatus(404);
     }
@@ -244,7 +243,7 @@ class ReadTest extends TestCase
         $response = $this
             ->actingAs($post->author)
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOne($expected);
     }
@@ -256,7 +255,7 @@ class ReadTest extends TestCase
         $response = $this
             ->jsonApi('posts')
             ->includePaths('foo')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $this->hashId($post)));
 
         $response->assertExactErrorStatus([
             'detail' => 'Include path foo is not allowed.',
@@ -272,7 +271,7 @@ class ReadTest extends TestCase
 
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', $post))
+            ->get(url('/api/v1/posts', $this->hashId($post)))
             ->assertStatus(406);
     }
 }

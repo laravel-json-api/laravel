@@ -32,7 +32,7 @@ class CreateTest extends TestCase
     public function test(): void
     {
         $tags = Tag::factory()->count(3)->create()->take(2);
-        $tagIds = $tags->map(fn(Tag $tag) => ['type' => 'tags', 'id' => $tag])->all();
+        $tagIds = $this->hashIdentifiers('tags', $tags);
 
         $images = Image::factory()->count(2)->create()->take(1);
         $videos = Video::factory()->count(2)->create()->take(1);
@@ -51,7 +51,7 @@ class CreateTest extends TestCase
 
         $expected = $data
             ->forget('createdAt', 'updatedAt')
-            ->replace('author', ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
+            ->replace('author', ['type' => 'users', 'id' => $this->hashId($post->author)])
             ->jsonSerialize();
 
         $response = $this
@@ -65,6 +65,8 @@ class CreateTest extends TestCase
         $id = $response
             ->assertCreatedWithServerId(url('/api/v1/posts'), $expected)
             ->id();
+
+        $id = $this->hashIds->decode($id);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $post->author->getKey(),

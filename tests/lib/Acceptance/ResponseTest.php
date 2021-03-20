@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LaravelJsonApi\Core\Responses\MetaResponse;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ResponseTest extends TestCase
 {
@@ -42,12 +43,20 @@ class ResponseTest extends TestCase
             ->jsonApi('posts')
             ->get('/test');
 
-        $response->assertFetchedOne($post);
+        $response->assertFetchedOne([
+            'type' => 'posts',
+            'id' => Hashids::encode($post->getRouteKey()),
+        ]);
     }
 
     public function testResources(): void
     {
         $posts = Post::factory()->count(2)->create();
+
+        $expected = $posts->toBase()->map(fn(Post $post) => [
+            'type' => 'posts',
+            'id' => Hashids::encode($post->getRouteKey()),
+        ])->all();
 
         Route::get('/test', fn() => DataResponse::make($posts)->withServer('v1'));
 
@@ -56,7 +65,7 @@ class ResponseTest extends TestCase
             ->jsonApi('posts')
             ->get('/test');
 
-        $response->assertFetchedMany($posts);
+        $response->assertFetchedMany($expected);
     }
 
     public function testMeta(): void

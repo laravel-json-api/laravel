@@ -23,6 +23,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Vinkla\Hashids\HashidsServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -41,6 +42,16 @@ class TestCase extends BaseTestCase
         $this->loadMigrationsFrom(__DIR__ . '/../../dummy/database/migrations');
 
         config()->set('jsonapi', require __DIR__ . '/../../dummy/config/jsonapi.php');
+
+        config()->set('hashids', [
+            'default' => 'main',
+            'connections' => [
+                'main' => [
+                    'salt' => 'Z3wxm8m6fxPMRtjX',
+                    'length' => 10,
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -52,6 +63,7 @@ class TestCase extends BaseTestCase
             \LaravelJsonApi\Spec\ServiceProvider::class,
             \LaravelJsonApi\Validation\ServiceProvider::class,
             \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
+            HashidsServiceProvider::class,
             ServiceProvider::class,
         ];
     }

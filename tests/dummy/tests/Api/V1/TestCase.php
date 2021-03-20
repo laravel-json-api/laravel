@@ -20,6 +20,8 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1;
 
 use App\Tests\TestCase as BaseTestCase;
+use Hashids\Hashids;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class TestCase extends BaseTestCase
@@ -33,11 +35,55 @@ class TestCase extends BaseTestCase
     protected Serializer $serializer;
 
     /**
+     * @var Hashids
+     */
+    protected Hashids $hashIds;
+
+    /**
      * @return void
      */
     protected function setUp(): void
     {
         parent::setUp();
-        $this->serializer = new Serializer();
+        $this->hashIds = \Vinkla\Hashids\Facades\Hashids::connection();
+        $this->serializer = new Serializer($this->hashIds);
+    }
+
+    /**
+     * @param $modelOrResourdId
+     * @return string
+     */
+    protected function hashId($modelOrResourdId): string
+    {
+        if ($modelOrResourdId instanceof UrlRoutable) {
+            $modelOrResourdId = $modelOrResourdId->getRouteKey();
+        }
+
+        return $this->hashIds->encode($modelOrResourdId);
+    }
+
+    /**
+     * @param $modelsOrResourceIds
+     * @return array
+     */
+    protected function hashIds($modelsOrResourceIds): array
+    {
+        return collect($modelsOrResourceIds)
+            ->map(fn($modelOrResourceId) => $this->hashId($modelOrResourceId))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param string $type
+     * @param $modelsOrResourceIds
+     * @return array
+     */
+    protected function hashIdentifiers(string $type, $modelsOrResourceIds): array
+    {
+        return collect($modelsOrResourceIds)->map(fn($modelOrResourceId) => [
+            'type' => $type,
+            'id' => $this->hashId($modelOrResourceId),
+        ])->values()->all();
     }
 }

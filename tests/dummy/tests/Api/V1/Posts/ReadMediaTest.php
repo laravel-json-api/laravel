@@ -58,7 +58,7 @@ class ReadMediaTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('videos') // @TODO the test assertion should work without having to do this.
-            ->get(url('/api/v1/posts', [$this->post, 'media']));
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']));
 
         $response->assertFetchedMany($expected);
     }
@@ -83,10 +83,10 @@ class ReadMediaTest extends TestCase
         $response = $this
             ->jsonApi('videos') // @TODO should be able to remove this
             ->includePaths('tags')
-            ->get(url('/api/v1/posts', [$this->post, 'media']));
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']));
 
         $response->assertFetchedMany($expected)->assertIncluded([
-            ['type' => 'tags', 'id' => $tag],
+            ['type' => 'tags', 'id' => $this->hashId($tag)],
         ]);
     }
 
@@ -105,7 +105,7 @@ class ReadMediaTest extends TestCase
         $response = $this
             ->jsonApi('videos')
             ->filter(['id' => $ids])
-            ->get(url('/api/v1/posts', [$this->post, 'media']));
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']));
 
         $response->assertFetchedMany($expected->map(fn ($model) => [
             'type' => ($model instanceof Image) ? 'images' : 'videos',
@@ -128,7 +128,7 @@ class ReadMediaTest extends TestCase
         $response = $this
             ->jsonApi('videos')
             ->filter(['id' => $ids])
-            ->get(url('/api/v1/posts', [$this->post, 'media']));
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']));
 
         $response->assertFetchedMany($expected->map(fn (Image $model) => [
             'type' => 'images',
@@ -165,7 +165,7 @@ class ReadMediaTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('videos') // @TODO the test assertion should work without having to do this.
             ->query(['withCount' => 'tags'])
-            ->get(url('/api/v1/posts', [$this->post, 'media']));
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']));
 
         $response->assertFetchedManyExact($expected);
     }
@@ -174,7 +174,7 @@ class ReadMediaTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->post, 'media']))
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'media']))
             ->assertStatus(406);
     }
 }

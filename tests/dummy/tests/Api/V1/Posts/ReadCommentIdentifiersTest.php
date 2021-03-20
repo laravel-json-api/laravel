@@ -53,20 +53,17 @@ class ReadCommentIdentifiersTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
 
         $response->assertExactJson([
             'links' => [
                 'self' => $self,
-                'related' => url('/api/v1/posts', [$this->post, 'comments']),
+                'related' => url('/api/v1/posts', [$this->hashId($this->post), 'comments']),
             ],
             'meta' => [
                 'count' => 3,
             ],
-            'data' => $expected->map(fn(Comment $comment) => [
-                'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
-            ])->all(),
+            'data' => $this->hashIdentifiers('comments', $expected),
             'jsonapi' => [
                 'version' => '1.0',
             ],
@@ -79,7 +76,10 @@ class ReadCommentIdentifiersTest extends TestCase
             ->count(5)
             ->create(['post_id' => $this->post]);
 
-        $expected = $comments->toBase()->sortBy('id')->take(3);
+        $expected = $this->hashIdentifiers(
+            'comments',
+            $comments->toBase()->sortBy('id')->take(3)
+        );
 
         Comment::factory()
             ->for(Post::factory())
@@ -90,7 +90,7 @@ class ReadCommentIdentifiersTest extends TestCase
             ->jsonApi('comments')
             ->page(['number' => '1', 'size' => '3'])
             ->sort('id')
-            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
 
         $response->assertFetchedToManyInOrder($expected)->assertExactMeta([
             'count' => 5,
@@ -112,22 +112,23 @@ class ReadCommentIdentifiersTest extends TestCase
             ->create(['post_id' => $this->post]);
 
         $expected = $comments->take(2);
-        $ids = $expected->map(fn(Comment $comment) => $comment->getRouteKey())->all();
 
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->filter(['id' => $ids])
-            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+            ->filter(['id' => $this->hashIds($expected)])
+            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
 
-        $response->assertFetchedToMany($expected);
+        $response->assertFetchedToMany(
+            $this->hashIdentifiers('comments', $expected)
+        );
     }
 
     public function testInvalidMediaType(): void
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'comments']))
+            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']))
             ->assertStatus(406);
     }
 }

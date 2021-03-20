@@ -47,7 +47,7 @@ class DeleteTest extends TestCase
             ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi()
-            ->delete(url('api/v1/posts', $this->post));
+            ->delete(url('api/v1/posts', $this->hashId($this->post)));
 
         $response->assertDeleted();
 
@@ -63,7 +63,7 @@ class DeleteTest extends TestCase
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi()
-            ->delete(url('api/v1/posts', $this->post));
+            ->delete(url('api/v1/posts', $this->hashId($this->post)));
 
         $response->assertExactErrorStatus([
             'detail' => 'Cannot delete a post with comments.',
@@ -80,7 +80,7 @@ class DeleteTest extends TestCase
     {
         $response = $this
             ->jsonApi()
-            ->delete(url('api/v1/posts', $this->post));
+            ->delete(url('api/v1/posts', $this->hashId($this->post)));
 
         $response->assertStatus(401);
 
@@ -94,7 +94,7 @@ class DeleteTest extends TestCase
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi()
-            ->delete(url('api/v1/posts', $this->post));
+            ->delete(url('api/v1/posts', $this->hashId($this->post)));
 
         $response->assertStatus(403);
 

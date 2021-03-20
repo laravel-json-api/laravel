@@ -176,10 +176,7 @@ class CreateTest extends TestCase
             ],
             'relationships' => [
                 'tags' => [
-                    'data' => $this->tags->take(2)->map(fn(Tag $tag) => [
-                        'type' => 'tags',
-                        'id' => (string) $tag->getRouteKey(),
-                    ])->all(),
+                    'data' => $this->hashIdentifiers('tags', $this->tags->take(2)),
                 ],
             ],
         ]);

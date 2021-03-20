@@ -53,6 +53,8 @@ class IndexTest extends TestCase
         $user = User::factory()->create();
         $posts = Post::factory()->count(3)->create();
 
+        $expected = $this->hashIdentifiers('posts', $posts);
+
         /** Draft for this user should appear. */
         Post::factory()->create([
             'author_id' => $user,
@@ -68,12 +70,14 @@ class IndexTest extends TestCase
             ->expects('posts')
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($posts);
+        $response->assertFetchedMany($expected);
     }
 
     public function testPaginated(): void
     {
         $posts = Post::factory()->count(5)->create();
+
+        $expected = $this->hashIdentifiers('posts', $posts->take(3));
 
         $meta = [
             'currentPage' => 1,
@@ -97,7 +101,7 @@ class IndexTest extends TestCase
             ->page(['number' => 1, 'size' => 3])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($posts->take(3))
+        $response->assertFetchedMany($expected)
             ->assertMeta($meta)
             ->assertLinks($links);
     }
@@ -109,13 +113,13 @@ class IndexTest extends TestCase
         $expected1 = $this->serializer->post($posts[0])->jsonSerialize();
         $expected1['relationships']['author']['data'] = $user1 = [
             'type' => 'users',
-            'id' => (string) $posts[0]->author->getRouteKey(),
+            'id' => $this->hashId($posts[0]->author),
         ];
 
         $expected2 = $this->serializer->post($posts[1])->jsonSerialize();
         $expected2['relationships']['author']['data'] = $user2 = [
             'type' => 'users',
-            'id' => (string) $posts[1]->author->getRouteKey(),
+            'id' => $this->hashId($posts[1]->author),
         ];
 
         $response = $this
@@ -137,12 +141,15 @@ class IndexTest extends TestCase
         $expected = $posts->take(2);
 
         $response = $this
+            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->filter(['id' => $expected->map(fn(Post $post) => $post->getRouteKey())])
+            ->filter(['id' => $this->hashIds($expected)])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($expected);
+        $response->assertFetchedMany(
+            $this->hashIdentifiers('posts', $expected)
+        );
     }
 
     public function testSlugFilter(): void
@@ -164,6 +171,8 @@ class IndexTest extends TestCase
     {
         $published = Post::factory()->count(5)->create(['published_at' => now()]);
         Post::factory()->count(2)->create(['published_at' => null]);
+
+        $expected = $this->hashIdentifiers('posts', $published);
 
         $meta = [
             'currentPage' => 1,
@@ -193,7 +202,7 @@ class IndexTest extends TestCase
             ->page(['number' => 1, 'size' => 10])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($published)
+        $response->assertFetchedMany($expected)
             ->assertMeta($meta)
             ->assertLinks($links);
     }

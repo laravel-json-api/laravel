@@ -24,11 +24,27 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Video;
+use Hashids\Hashids;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
 
 class Serializer
 {
+
+    /**
+     * @var Hashids
+     */
+    private Hashids $hashIds;
+
+    /**
+     * Serializer constructor.
+     *
+     * @param Hashids $hashIds
+     */
+    public function __construct(Hashids $hashIds)
+    {
+        $this->hashIds = $hashIds;
+    }
 
     /**
      * Get the expected resource for an image model.
@@ -62,11 +78,14 @@ class Serializer
      */
     public function post(Post $post): ResourceObject
     {
-        $self = url('/api/v1/posts', $post);
+        $self = url(
+            '/api/v1/posts',
+            $id = $this->hashIds->encode($post->getRouteKey()),
+        );
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => (string) $post->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'content' => $post->content,
                 'createdAt' => optional($post->created_at)->jsonSerialize(),
@@ -117,11 +136,14 @@ class Serializer
      */
     public function tag(Tag $tag): ResourceObject
     {
-        $self = url('/api/v1/tags', $tag);
+        $self = url(
+            '/api/v1/tags',
+            $id = $this->hashIds->encode($tag->getRouteKey()),
+        );
 
         return ResourceObject::fromArray([
             'type' => 'tags',
-            'id' => (string) $tag->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'createdAt' => $tag->created_at->jsonSerialize(),
                 'name' => $tag->name,
@@ -155,11 +177,14 @@ class Serializer
      */
     public function user(User $user): ResourceObject
     {
-        $self = url('/api/v1/users', $user);
+        $self = url(
+            '/api/v1/users',
+            $id = $this->hashIds->encode($user->getRouteKey()),
+        );
 
         return ResourceObject::fromArray([
             'type' => 'users',
-            'id' => (string) $user->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'createdAt' => $user->created_at->jsonSerialize(),
                 'name' => $user->name,
