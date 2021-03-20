@@ -210,11 +210,41 @@ class Route implements RouteContract
      */
     public function substituteBindings(): void
     {
+        if ($this->hasSubstitutedBindings()) {
+            $this->checkModel();
+            return;
+        }
+
         if ($this->hasResourceId()) {
             $this->setModel($this->schema()->repository()->find(
                 $this->resourceId()
             ));
         }
+    }
+
+    /**
+     * Has the model binding already been substituted?
+     *
+     * In a normal Laravel application setup, the `api` middleware group will
+     * include Laravel's binding substitution middleware. This means that
+     * typically the boot JSON:API middleware will run *after* bindings have been
+     * substituted.
+     *
+     * If the route that is being executed has type-hinted the model, this means
+     * the model will already be substituted into the route. For example, this
+     * can occur if the developer has written their own controller action, or
+     * for custom actions.
+     *
+     * @return bool
+     */
+    private function hasSubstitutedBindings(): bool
+    {
+        if ($name = $this->resourceIdName()) {
+            $expected = $this->schema()->model();
+            return $this->route->parameter($name) instanceof $expected;
+        }
+
+        return false;
     }
 
     /**
@@ -233,6 +263,22 @@ class Route implements RouteContract
         }
 
         throw new NotFoundHttpException();
+    }
+
+    /**
+     * Check the model that has already been substituted.
+     *
+     * @return void
+     */
+    private function checkModel(): void
+    {
+        $resourceId = $this->server->resources()->create(
+            $this->model()
+        )->id();
+
+        if (!$this->schema()->repository()->exists($resourceId)) {
+            throw new NotFoundHttpException();
+        }
     }
 
     /**

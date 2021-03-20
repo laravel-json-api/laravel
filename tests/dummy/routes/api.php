@@ -2,20 +2,24 @@
 
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
-JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\V1')->resources(function ($server) {
-    /** Posts */
-    $server->resource('posts')->relationships(function ($relationships) {
-        $relationships->hasOne('author')->readOnly();
-        $relationships->hasMany('comments')->readOnly();
-        $relationships->hasMany('media');
-        $relationships->hasMany('tags');
-    })->actions('-actions', function ($actions) {
-        $actions->delete('purge');
-        $actions->withId()->post('publish');
-    });
+JsonApiRoute::server('v1')
+    ->prefix('v1')
+    ->namespace('Api\V1')
+    ->withoutMiddleware(\Illuminate\Routing\Middleware\SubstituteBindings::class)
+    ->resources(function ($server) {
+        /** Posts */
+        $server->resource('posts')->relationships(function ($relationships) {
+            $relationships->hasOne('author')->readOnly();
+            $relationships->hasMany('comments')->readOnly();
+            $relationships->hasMany('media');
+            $relationships->hasMany('tags');
+        })->actions('-actions', function ($actions) {
+            $actions->delete('purge');
+            $actions->withId()->post('publish');
+        });
 
-    /** Videos */
-    $server->resource('videos')->relationships(function ($relationships) {
-        $relationships->hasMany('tags');
+        /** Videos */
+        $server->resource('videos')->relationships(function ($relationships) {
+            $relationships->hasMany('tags');
+        });
     });
-});
