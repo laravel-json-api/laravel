@@ -10,6 +10,11 @@ All notable changes to this project will be documented in this file. This projec
 - [#18](https://github.com/laravel-json-api/laravel/issues/18) Added a `withCount` query parameter. For Eloquent
   resources, this allows a client to request the relationship count for the primary data's relationships. Refer to
   documentation for implementation details.
+- [#55](https://github.com/laravel-json-api/laravel/pull/55) Encoding and decoding of resource IDs is now supported.
+  The `ID` field needs to implement the `LaravelJsonApi\Contracts\Schema\IdEncoder` interface for this to work.
+- [#41](https://github.com/laravel-json-api/laravel/issues/41) Hash IDs are now supported by installing the
+  `laravel-json-api/hashids` package and using the `HashId` field instead of the standard Eloquent `ID` field. Refer to
+  documentation for details.
 - There is now a `Core\Reponses\RelatedResponse` class for returning the result for a related resources endpoint. For
   example, the `/api/v1/posts/1/comments` endpoint. Previously the `DataResponse` class was used. While this class can
   still be used, the new `RelatedResponse` class merges relationship meta into the top-level `meta` member of the
