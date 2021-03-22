@@ -62,7 +62,7 @@ class PostSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyEncoded(),
+            HashId::make()->alreadyHashed(),
             BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->readOnly(),
             Str::make('content'),

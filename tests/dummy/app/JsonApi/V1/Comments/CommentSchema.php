@@ -46,7 +46,7 @@ class CommentSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyEncoded(),
+            HashId::make()->alreadyHashed(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
             BelongsTo::make('post'),
