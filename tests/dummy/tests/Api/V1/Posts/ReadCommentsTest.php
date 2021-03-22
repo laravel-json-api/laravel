@@ -46,7 +46,7 @@ class ReadCommentsTest extends TestCase
             ->count(3)
             ->create(['post_id' => $this->post]);
 
-        $expected = $this->hashIdentifiers('comments', $comments);
+        $expected = $this->identifiersFor('comments', $comments);
 
         Comment::factory()
             ->for(Post::factory())
@@ -55,7 +55,7 @@ class ReadCommentsTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'comments']));
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany($expected)->assertExactMeta([
             'count' => 3,
@@ -68,7 +68,7 @@ class ReadCommentsTest extends TestCase
             ->count(5)
             ->create(['post_id' => $this->post]);
 
-        $expected = $this->hashIdentifiers(
+        $expected = $this->identifiersFor(
             'comments',
             $comments->sortBy('id')->take(3)
         );
@@ -78,7 +78,7 @@ class ReadCommentsTest extends TestCase
             ->jsonApi('comments')
             ->page(['number' => '1', 'size' => '3'])
             ->sort('id')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'comments']));
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany($expected)->assertExactMeta([
             'count' => 5,
@@ -101,14 +101,18 @@ class ReadCommentsTest extends TestCase
 
         $expected = $comments->take(2);
 
+        $ids = $expected
+            ->map(fn(Comment $comment) => $comment->getRouteKey())
+            ->all();
+
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->filter(['id' => $this->hashIds($expected)])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'comments']));
+            ->filter(['id' => $ids])
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany(
-            $this->hashIdentifiers('comments', $expected)
+            $this->identifiersFor('comments', $expected)
         );
     }
 
@@ -118,15 +122,15 @@ class ReadCommentsTest extends TestCase
             ->count(2)
             ->create(['post_id' => $this->post]);
 
-        $expected = $this->hashIdentifiers('comments', $comments);
+        $expected = $this->identifiersFor('comments', $comments);
 
         $response = $this
             ->jsonApi('comments')
             ->includePaths('user')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'comments']));
+            ->get(url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany($expected)->assertIncluded(
-            $this->hashIdentifiers('users', $comments->pluck('user')->all())
+            $this->identifiersFor('users', $comments->pluck('user')->all())
         );
     }
 
@@ -134,7 +138,7 @@ class ReadCommentsTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'comments']))
+            ->get(url('/api/v1/posts', [$this->post, 'comments']))
             ->assertStatus(406);
     }
 }

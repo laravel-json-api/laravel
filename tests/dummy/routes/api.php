@@ -5,7 +5,6 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 JsonApiRoute::server('v1')
     ->prefix('v1')
     ->namespace('Api\V1')
-    ->withoutMiddleware(\Illuminate\Routing\Middleware\SubstituteBindings::class)
     ->resources(function ($server) {
         /** Posts */
         $server->resource('posts')->relationships(function ($relationships) {

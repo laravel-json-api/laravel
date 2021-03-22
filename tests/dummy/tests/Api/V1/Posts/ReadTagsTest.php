@@ -51,7 +51,7 @@ class ReadTagsTest extends TestCase
 
         $response = $this
             ->jsonApi('tags')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
         $response->assertFetchedMany($expected)->assertExactMeta([
             'count' => count($expected)
@@ -66,12 +66,12 @@ class ReadTagsTest extends TestCase
 
         $this->post->tags()->attach($tags);
 
-        $expected = $this->hashIdentifiers('tags', $tags->sortByDesc('name'));
+        $expected = $this->identifiersFor('tags', $tags->sortByDesc('name'));
 
         $response = $this
             ->jsonApi('tags')
             ->sort('-name')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
         $response->assertFetchedManyInOrder($expected);
     }
@@ -90,7 +90,7 @@ class ReadTagsTest extends TestCase
         $response = $this
             ->jsonApi('tags')
             ->query(['withCount' => 'posts'])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
         $response->assertFetchedManyExact($expected);
     }
@@ -100,7 +100,7 @@ class ReadTagsTest extends TestCase
         $response = $this
             ->jsonApi('tags')
             ->sort('-name', 'foo')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
         $response->assertExactErrorStatus([
             'detail' => 'Sort parameter foo is not allowed.',
@@ -114,7 +114,7 @@ class ReadTagsTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'tags']))
+            ->get(url('/api/v1/posts', [$this->post, 'tags']))
             ->assertStatus(406);
     }
 }

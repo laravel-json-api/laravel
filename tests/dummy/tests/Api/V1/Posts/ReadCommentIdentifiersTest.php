@@ -53,17 +53,17 @@ class ReadCommentIdentifiersTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
 
         $response->assertExactJson([
             'links' => [
                 'self' => $self,
-                'related' => url('/api/v1/posts', [$this->hashId($this->post), 'comments']),
+                'related' => url('/api/v1/posts', [$this->post, 'comments']),
             ],
             'meta' => [
                 'count' => 3,
             ],
-            'data' => $this->hashIdentifiers('comments', $expected),
+            'data' => $this->identifiersFor('comments', $expected),
             'jsonapi' => [
                 'version' => '1.0',
             ],
@@ -76,7 +76,7 @@ class ReadCommentIdentifiersTest extends TestCase
             ->count(5)
             ->create(['post_id' => $this->post]);
 
-        $expected = $this->hashIdentifiers(
+        $expected = $this->identifiersFor(
             'comments',
             $comments->toBase()->sortBy('id')->take(3)
         );
@@ -90,7 +90,7 @@ class ReadCommentIdentifiersTest extends TestCase
             ->jsonApi('comments')
             ->page(['number' => '1', 'size' => '3'])
             ->sort('id')
-            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
 
         $response->assertFetchedToManyInOrder($expected)->assertExactMeta([
             'count' => 5,
@@ -113,14 +113,18 @@ class ReadCommentIdentifiersTest extends TestCase
 
         $expected = $comments->take(2);
 
+        $ids = $expected
+            ->map(fn(Comment $comment) => $comment->getRouteKey())
+            ->all();
+
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->filter(['id' => $this->hashIds($expected)])
-            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']));
+            ->filter(['id' => $ids])
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
 
         $response->assertFetchedToMany(
-            $this->hashIdentifiers('comments', $expected)
+            $this->identifiersFor('comments', $expected)
         );
     }
 
@@ -128,7 +132,7 @@ class ReadCommentIdentifiersTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'comments']))
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'comments']))
             ->assertStatus(406);
     }
 }

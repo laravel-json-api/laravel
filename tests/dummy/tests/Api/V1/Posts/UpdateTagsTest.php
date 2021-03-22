@@ -52,13 +52,13 @@ class UpdateTagsTest extends TestCase
         $tags = Tag::factory()->count(2)->create();
         $tags->push($existing[1]);
 
-        $ids = $this->hashIdentifiers('tags', $tags);
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($ids)
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertFetchedToMany($ids);
 
@@ -83,7 +83,7 @@ class UpdateTagsTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertFetchedNone();
 
@@ -100,7 +100,7 @@ class UpdateTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => $this->hashId($comment),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 
@@ -108,7 +108,7 @@ class UpdateTagsTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($data)
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertExactErrorStatus([
             'detail' => 'The tags field must be a to-many relationship containing tags resources.',
@@ -126,7 +126,7 @@ class UpdateTagsTest extends TestCase
         $response = $this
             ->jsonApi('tags')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(401);
 
@@ -142,7 +142,7 @@ class UpdateTagsTest extends TestCase
             ->actingAs(User::factory()->create())
             ->jsonApi('tags')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(403);
 
@@ -156,7 +156,7 @@ class UpdateTagsTest extends TestCase
             ->jsonApi('posts')
             ->accept('text/html')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(406);
     }
@@ -168,7 +168,7 @@ class UpdateTagsTest extends TestCase
             ->jsonApi('posts')
             ->contentType('application/json')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(415);
     }

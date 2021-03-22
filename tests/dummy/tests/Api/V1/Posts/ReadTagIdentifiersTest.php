@@ -48,11 +48,11 @@ class ReadTagIdentifiersTest extends TestCase
 
         $this->post->tags()->attach($tags);
 
-        $expected = $this->hashIdentifiers('tags', $tags);
+        $expected = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->jsonApi('tags')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertFetchedToMany($expected)->assertExactMeta([
             'count' => 3,
@@ -67,12 +67,12 @@ class ReadTagIdentifiersTest extends TestCase
 
         $this->post->tags()->attach($tags);
 
-        $expected = $this->hashIdentifiers('tags', $tags->sortByDesc('name'));
+        $expected = $this->identifiersFor('tags', $tags->sortByDesc('name'));
 
         $response = $this
             ->jsonApi('tags')
             ->sort('-name')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertFetchedToManyInOrder($expected);
     }
@@ -81,7 +81,7 @@ class ReadTagIdentifiersTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']))
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']))
             ->assertStatus(406);
     }
 }

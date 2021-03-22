@@ -69,7 +69,7 @@ class UpdateMediaTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('videos') // @TODO assertions should work without this.
             ->withData($ids)
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertFetchedToMany($ids);
 
@@ -103,7 +103,7 @@ class UpdateMediaTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('videos')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertFetchedNone();
 
@@ -126,7 +126,7 @@ class UpdateMediaTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('videos')
             ->withData($data)
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertExactErrorStatus([
             'detail' => 'The media field must be a to-many relationship containing images, videos resources.',
@@ -147,7 +147,7 @@ class UpdateMediaTest extends TestCase
         $response = $this
             ->jsonApi('videos')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertStatus(401);
 
@@ -167,7 +167,7 @@ class UpdateMediaTest extends TestCase
             ->actingAs(User::factory()->create())
             ->jsonApi('videos')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertStatus(403);
 
@@ -182,7 +182,7 @@ class UpdateMediaTest extends TestCase
             ->jsonApi('posts')
             ->accept('text/html')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertStatus(406);
     }
@@ -194,7 +194,7 @@ class UpdateMediaTest extends TestCase
             ->jsonApi('posts')
             ->contentType('application/json')
             ->withData([])
-            ->patch(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'media']));
+            ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
         $response->assertStatus(415);
     }

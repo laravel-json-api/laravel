@@ -47,16 +47,16 @@ class ReadAuthorIdentifierTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('users')
-            ->get($self = url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertExactJson([
             'links' => [
                 'self' => $self,
-                'related' => url('/api/v1/posts', [$this->hashId($this->post), 'author']),
+                'related' => url('/api/v1/posts', [$this->post, 'author']),
             ],
             'data' => [
                 'type' => 'users',
-                'id' => $this->hashId($this->post->author),
+                'id' => $this->post->author->getRouteKey(),
             ],
             'jsonapi' => [
                 'version' => '1.0',
@@ -69,10 +69,10 @@ class ReadAuthorIdentifierTest extends TestCase
         $response = $this
             ->jsonApi('users')
             ->filter(['email' => $this->post->author->email])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertFetchedToOne(
-            $this->hashId($this->post->author)
+            $this->post->author
         );
     }
 
@@ -81,7 +81,7 @@ class ReadAuthorIdentifierTest extends TestCase
         $response = $this
             ->jsonApi('users')
             ->filter(['email' => 'foo@bar.com'])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertFetchedNull();
     }
@@ -98,7 +98,7 @@ class ReadAuthorIdentifierTest extends TestCase
 
         $response = $this
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertStatus(404);
     }
@@ -115,7 +115,7 @@ class ReadAuthorIdentifierTest extends TestCase
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertStatus(404);
     }
@@ -130,10 +130,10 @@ class ReadAuthorIdentifierTest extends TestCase
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
         $response->assertFetchedToOne(
-            $this->hashId($this->post->author)
+            $this->post->author
         );
     }
 
@@ -141,7 +141,7 @@ class ReadAuthorIdentifierTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'author']))
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']))
             ->assertStatus(406);
     }
 }

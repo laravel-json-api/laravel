@@ -48,14 +48,14 @@ class ReadTest extends TestCase
             ->has(Tag::factory()->count(2))
             ->create();
 
-        $identifiers = $this->hashIdentifiers(
+        $identifiers = $this->identifiersFor(
             'tags',
             $tags = $post->tags()->get(),
         );
 
         $expected = $this->serializer
             ->post($post)
-            ->replace('author', $author = ['type' => 'users', 'id' => $this->hashId($post->author)])
+            ->replace('author', $author = ['type' => 'users', 'id' => $post->author])
             ->replace('tags', $identifiers)
             ->jsonSerialize();
 
@@ -92,7 +92,7 @@ class ReadTest extends TestCase
         ])->all();
 
         $included = $ids;
-        $included[] = ['type' => 'tags', 'id' => $this->hashId($tag)];
+        $included[] = ['type' => 'tags', 'id' => $tag->getRouteKey()];
 
         $expected = $this->serializer
             ->post($post)
@@ -154,7 +154,7 @@ class ReadTest extends TestCase
             ->jsonApi()
             ->expects('posts')
             ->filter(['slug' => 'baz-bat'])
-            ->get(url('/api/v1/posts', $this->hashId($post)));
+            ->get(url('/api/v1/posts', $post));
 
         $response->assertFetchedNull();
     }
@@ -210,7 +210,7 @@ class ReadTest extends TestCase
 
         $response = $this
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $this->hashId($post)));
+            ->get(url('/api/v1/posts', $post));
 
         $response->assertStatus(404);
     }
@@ -227,7 +227,7 @@ class ReadTest extends TestCase
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $this->hashId($post)));
+            ->get(url('/api/v1/posts', $post));
 
         $response->assertStatus(404);
     }
@@ -255,7 +255,7 @@ class ReadTest extends TestCase
         $response = $this
             ->jsonApi('posts')
             ->includePaths('foo')
-            ->get(url('/api/v1/posts', $this->hashId($post)));
+            ->get(url('/api/v1/posts', $post));
 
         $response->assertExactErrorStatus([
             'detail' => 'Include path foo is not allowed.',
@@ -271,7 +271,7 @@ class ReadTest extends TestCase
 
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', $this->hashId($post)))
+            ->get(url('/api/v1/posts', $post))
             ->assertStatus(406);
     }
 }

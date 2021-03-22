@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
             ->jsonApi('posts')
             ->withData($data)
             ->includePaths('author', 'tags')
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected);
 
@@ -102,7 +102,7 @@ class UpdateTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected->jsonSerialize());
 
@@ -141,7 +141,7 @@ class UpdateTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected->jsonSerialize());
 
@@ -173,7 +173,7 @@ class UpdateTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected->jsonSerialize());
 
@@ -195,7 +195,7 @@ class UpdateTest extends TestCase
             ->jsonApi('posts')
             ->withData($data)
             ->includePaths('author')
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertExactErrorStatus([
             'detail' => 'The slug has already been taken.',
@@ -211,7 +211,7 @@ class UpdateTest extends TestCase
             ->jsonApi('posts')
             ->withData($this->serialize())
             ->includePaths('author')
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertStatus(401);
     }
@@ -223,7 +223,7 @@ class UpdateTest extends TestCase
             ->jsonApi('posts')
             ->withData($this->serialize())
             ->includePaths('author')
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertStatus(403);
     }
@@ -237,7 +237,7 @@ class UpdateTest extends TestCase
             ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertStatus(406);
         $this->assertDatabaseHas('posts', $this->post->getAttributes());
@@ -253,7 +253,7 @@ class UpdateTest extends TestCase
             ->expects('posts')
             ->contentType('application/json')
             ->withData($data)
-            ->patch(url('/api/v1/posts', $this->hashId($this->post)));
+            ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertStatus(415);
         $this->assertDatabaseHas('posts', $this->post->getAttributes());
@@ -270,7 +270,7 @@ class UpdateTest extends TestCase
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => $this->hashId($this->post),
+            'id' => $this->post->getRouteKey(),
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
@@ -284,11 +284,11 @@ class UpdateTest extends TestCase
                 'author' => [
                     'data' => [
                         'type' => 'users',
-                        'id' => $this->hashId($this->post->author),
+                        'id' => $this->post->author->getRouteKey(),
                     ],
                 ],
                 'tags' => [
-                    'data' => $this->hashIdentifiers('tags', $this->post->tags),
+                    'data' => $this->identifiersFor('tags', $this->post->tags),
                 ],
             ],
         ]);

@@ -51,14 +51,14 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $this->hashIdentifiers('tags', $tags);
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->withoutExceptionHandling()
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($ids)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertNoContent();
 
@@ -81,7 +81,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => $this->hashId($comment),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 
@@ -89,7 +89,7 @@ class AttachTagsTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($data)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertExactErrorStatus([
             'detail' => 'The tags field must be a to-many relationship containing tags resources.',
@@ -107,12 +107,12 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $this->hashIdentifiers('tags', $tags);
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->jsonApi('tags')
             ->withData($ids)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(401);
 
@@ -127,13 +127,13 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $this->hashIdentifiers('tags', $tags);
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('tags')
             ->withData($ids)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(403);
 
@@ -147,7 +147,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => $this->hashId($tag),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -156,7 +156,7 @@ class AttachTagsTest extends TestCase
             ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(406);
     }
@@ -168,7 +168,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => $this->hashId($tag),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -177,7 +177,7 @@ class AttachTagsTest extends TestCase
             ->jsonApi('posts')
             ->contentType('application/json')
             ->withData($data)
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(415);
     }

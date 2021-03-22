@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 use App\Models\Post;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
-use Vinkla\Hashids\Facades\Hashids;
 
 class RequestBodyContentTest extends TestCase
 {
@@ -71,9 +70,7 @@ class RequestBodyContentTest extends TestCase
             'Content-Type' => 'application/vnd.api+json',
         ]);
 
-        $id = Hashids::encode($post->getRouteKey());
-
-        $response = $this->call('PATCH', "/api/v1/posts/{$id}", [], [], [], $headers);
+        $response = $this->call('PATCH', "/api/v1/posts/{$post->getRouteKey()}", [], [], [], $headers);
 
         $response->assertStatus(400)->assertExactJson([
             'jsonapi' => [
@@ -113,7 +110,7 @@ class RequestBodyContentTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->actingAs($post->author)
-            ->delete('/api/v1/posts/' . Hashids::encode($post->getRouteKey()));
+            ->delete('/api/v1/posts/' . $post->getRouteKey());
 
         $response->assertNoContent();
     }

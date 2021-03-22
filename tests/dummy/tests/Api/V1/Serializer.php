@@ -24,27 +24,11 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Video;
-use Hashids\Hashids;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use function url;
 
 class Serializer
 {
-
-    /**
-     * @var Hashids
-     */
-    private Hashids $hashIds;
-
-    /**
-     * Serializer constructor.
-     *
-     * @param Hashids $hashIds
-     */
-    public function __construct(Hashids $hashIds)
-    {
-        $this->hashIds = $hashIds;
-    }
 
     /**
      * Get the expected resource for an image model.
@@ -80,7 +64,7 @@ class Serializer
     {
         $self = url(
             '/api/v1/posts',
-            $id = $this->hashIds->encode($post->getRouteKey()),
+            $id = $post->getRouteKey(),
         );
 
         return ResourceObject::fromArray([
@@ -138,7 +122,7 @@ class Serializer
     {
         $self = url(
             '/api/v1/tags',
-            $id = $this->hashIds->encode($tag->getRouteKey()),
+            $id = $tag->getRouteKey(),
         );
 
         return ResourceObject::fromArray([
@@ -179,7 +163,7 @@ class Serializer
     {
         $self = url(
             '/api/v1/users',
-            $id = $this->hashIds->encode($user->getRouteKey()),
+            $id = $user->getRouteKey()
         );
 
         return ResourceObject::fromArray([

@@ -45,7 +45,7 @@ class TagSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make(),
+            HashId::make()->alreadyEncoded(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('name')->sortable(),
             BelongsToMany::make('posts')

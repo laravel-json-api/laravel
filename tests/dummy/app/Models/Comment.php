@@ -27,6 +27,7 @@ class Comment extends Model
 {
 
     use HasFactory;
+    use Concerns\HashRouteKey;
 
     /**
      * @var string[]

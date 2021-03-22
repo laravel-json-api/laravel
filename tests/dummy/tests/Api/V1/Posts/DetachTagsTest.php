@@ -52,13 +52,13 @@ class DetachTagsTest extends TestCase
         $detach = $existing->take(2);
         $keep = $existing->diff($detach);
 
-        $ids = $this->hashIdentifiers('tags', $detach);
+        $ids = $this->identifiersFor('tags', $detach);
 
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($ids)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertNoContent();
 
@@ -90,7 +90,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => $this->hashId($comment),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 
@@ -98,7 +98,7 @@ class DetachTagsTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('tags')
             ->withData($data)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertExactErrorStatus([
             'detail' => 'The tags field must be a to-many relationship containing tags resources.',
@@ -113,12 +113,12 @@ class DetachTagsTest extends TestCase
         $existing = Tag::factory()->count(2)->create();
         $this->post->tags()->attach($existing);
 
-        $ids = $this->hashIdentifiers('tags', $existing);
+        $ids = $this->identifiersFor('tags', $existing);
 
         $response = $this
             ->jsonApi('tags')
             ->withData($ids)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(401);
 
@@ -130,13 +130,13 @@ class DetachTagsTest extends TestCase
         $existing = Tag::factory()->count(2)->create();
         $this->post->tags()->attach($existing);
 
-        $ids = $this->hashIdentifiers('tags', $existing);
+        $ids = $this->identifiersFor('tags', $existing);
 
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('tags')
             ->withData($ids)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(403);
 
@@ -150,7 +150,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => $this->hashId($tag),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -159,7 +159,7 @@ class DetachTagsTest extends TestCase
             ->jsonApi('posts')
             ->accept('text/html')
             ->withData($data)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(406);
     }
@@ -171,7 +171,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => $this->hashId($tag),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -180,7 +180,7 @@ class DetachTagsTest extends TestCase
             ->jsonApi('posts')
             ->contentType('application/json')
             ->withData($data)
-            ->delete(url('/api/v1/posts', [$this->hashId($this->post), 'relationships', 'tags']));
+            ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
         $response->assertStatus(415);
     }

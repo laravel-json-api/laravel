@@ -51,7 +51,7 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -65,7 +65,7 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->jsonApi('users')
             ->filter(['email' => $this->post->author->email])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -75,7 +75,7 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->jsonApi('users')
             ->filter(['email' => 'foo@bar.com'])
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertFetchedNull();
     }
@@ -91,7 +91,7 @@ class ReadAuthorTest extends TestCase
 
         $response = $this
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertStatus(404);
     }
@@ -108,7 +108,7 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->actingAs(User::factory()->create())
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertStatus(404);
     }
@@ -127,7 +127,7 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']));
+            ->get(url('/api/v1/posts', [$this->post, 'author']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -136,7 +136,7 @@ class ReadAuthorTest extends TestCase
     {
         $this->jsonApi()
             ->accept('text/html')
-            ->get(url('/api/v1/posts', [$this->hashId($this->post), 'author']))
+            ->get(url('/api/v1/posts', [$this->post, 'author']))
             ->assertStatus(406);
     }
 }

@@ -47,7 +47,7 @@ class PublishTest extends TestCase
         $expected = $this->serializer
             ->post($this->post)
             ->replace('publishedAt', $date->jsonSerialize())
-            ->replace('author', ['type' => 'users', 'id' => $this->hashId($this->post->author)]);
+            ->replace('author', ['type' => 'users', 'id' => $this->post->author]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -55,7 +55,7 @@ class PublishTest extends TestCase
             ->jsonApi('posts')
             ->contentType('application/json')
             ->includePaths('author')
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), '-actions/publish']));
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
         $response->assertFetchedOneExact($expected->jsonSerialize());
         $response->assertIncluded([$expected['author']]);
@@ -74,7 +74,7 @@ class PublishTest extends TestCase
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->contentType('application/json')
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), '-actions/publish']));
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
         $response->assertExactErrorStatus([
             'detail' => 'Post is already published.',
@@ -90,7 +90,7 @@ class PublishTest extends TestCase
         $response = $this
             ->jsonApi('posts')
             ->contentType('application/json')
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), '-actions/publish']));
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
         $response->assertNotFound();
 
@@ -103,7 +103,7 @@ class PublishTest extends TestCase
             ->actingAs(User::factory()->create())
             ->jsonApi('posts')
             ->contentType('application/json')
-            ->post(url('/api/v1/posts', [$this->hashId($this->post), '-actions/publish']));
+            ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
         $response->assertNotFound();
 

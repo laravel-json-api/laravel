@@ -176,7 +176,7 @@ class CreateTest extends TestCase
             ],
             'relationships' => [
                 'tags' => [
-                    'data' => $this->hashIdentifiers('tags', $this->tags->take(2)),
+                    'data' => $this->identifiersFor('tags', $this->tags->take(2)),
                 ],
             ],
         ]);

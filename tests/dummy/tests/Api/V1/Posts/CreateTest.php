@@ -25,6 +25,7 @@ use App\Models\Tag;
 use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
+use Vinkla\Hashids\Facades\Hashids;
 
 class CreateTest extends TestCase
 {
@@ -32,7 +33,7 @@ class CreateTest extends TestCase
     public function test(): void
     {
         $tags = Tag::factory()->count(3)->create()->take(2);
-        $tagIds = $this->hashIdentifiers('tags', $tags);
+        $tagIds = $this->identifiersFor('tags', $tags);
 
         $images = Image::factory()->count(2)->create()->take(1);
         $videos = Video::factory()->count(2)->create()->take(1);
@@ -51,7 +52,7 @@ class CreateTest extends TestCase
 
         $expected = $data
             ->forget('createdAt', 'updatedAt')
-            ->replace('author', ['type' => 'users', 'id' => $this->hashId($post->author)])
+            ->replace('author', ['type' => 'users', 'id' => $post->author])
             ->jsonSerialize();
 
         $response = $this
@@ -66,7 +67,7 @@ class CreateTest extends TestCase
             ->assertCreatedWithServerId(url('/api/v1/posts'), $expected)
             ->id();
 
-        $id = $this->hashIds->decode($id);
+        $id = Hashids::decode($id);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $post->author->getKey(),
