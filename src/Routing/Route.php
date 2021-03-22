@@ -211,7 +211,7 @@ class Route implements RouteContract
     public function substituteBindings(): void
     {
         if ($this->hasSubstitutedBindings()) {
-            $this->checkModel();
+            $this->checkBinding();
             return;
         }
 
@@ -268,12 +268,20 @@ class Route implements RouteContract
     /**
      * Check the model that has already been substituted.
      *
+     * If Laravel has substituted bindings before the JSON:API binding substitution
+     * is triggered, we need to check that the model that has been set on the route
+     * by Laravel does exist in our API. This is because the API's existence logic
+     * may not match the route binding query that Laravel executed to substitute
+     * the binding. E.g. if the developer has applied global scopes in the Server's
+     * `serving()` method, these global scopes may have been applied *after* the
+     * binding was substituted.
+     *
      * @return void
      */
-    private function checkModel(): void
+    private function checkBinding(): void
     {
         $resourceId = $this->server->resources()->create(
-            $this->model()
+            $this->model(),
         )->id();
 
         if (!$this->schema()->repository()->exists($resourceId)) {
