@@ -86,7 +86,7 @@ class ReadMediaTest extends TestCase
             ->get(url('/api/v1/posts', [$this->post, 'media']));
 
         $response->assertFetchedMany($expected)->assertIncluded([
-            ['type' => 'tags', 'id' => $tag],
+            ['type' => 'tags', 'id' => $tag->getRouteKey()],
         ]);
     }
 

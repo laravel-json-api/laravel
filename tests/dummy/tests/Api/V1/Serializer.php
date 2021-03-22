@@ -62,11 +62,14 @@ class Serializer
      */
     public function post(Post $post): ResourceObject
     {
-        $self = url('/api/v1/posts', $post);
+        $self = url(
+            '/api/v1/posts',
+            $id = $post->getRouteKey(),
+        );
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => (string) $post->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'content' => $post->content,
                 'createdAt' => optional($post->created_at)->jsonSerialize(),
@@ -117,11 +120,14 @@ class Serializer
      */
     public function tag(Tag $tag): ResourceObject
     {
-        $self = url('/api/v1/tags', $tag);
+        $self = url(
+            '/api/v1/tags',
+            $id = $tag->getRouteKey(),
+        );
 
         return ResourceObject::fromArray([
             'type' => 'tags',
-            'id' => (string) $tag->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'createdAt' => $tag->created_at->jsonSerialize(),
                 'name' => $tag->name,
@@ -155,11 +161,14 @@ class Serializer
      */
     public function user(User $user): ResourceObject
     {
-        $self = url('/api/v1/users', $user);
+        $self = url(
+            '/api/v1/users',
+            $id = $user->getRouteKey()
+        );
 
         return ResourceObject::fromArray([
             'type' => 'users',
-            'id' => (string) $user->getRouteKey(),
+            'id' => $id,
             'attributes' => [
                 'createdAt' => $user->created_at->jsonSerialize(),
                 'name' => $user->name,

@@ -270,7 +270,7 @@ class UpdateTest extends TestCase
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => (string) $this->post->getRouteKey(),
+            'id' => $this->post->getRouteKey(),
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
@@ -284,14 +284,11 @@ class UpdateTest extends TestCase
                 'author' => [
                     'data' => [
                         'type' => 'users',
-                        'id' => (string) $this->post->author->getRouteKey(),
+                        'id' => $this->post->author->getRouteKey(),
                     ],
                 ],
                 'tags' => [
-                    'data' => $this->post->tags->map(fn(Tag $tag) => [
-                        'type' => 'tags',
-                        'id' => (string) $tag->getRouteKey(),
-                    ])->all(),
+                    'data' => $this->identifiersFor('tags', $this->post->tags),
                 ],
             ],
         ]);

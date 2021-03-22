@@ -66,14 +66,14 @@ class ReadTagsTest extends TestCase
 
         $this->post->tags()->attach($tags);
 
+        $expected = $this->identifiersFor('tags', $tags->sortByDesc('name'));
+
         $response = $this
             ->jsonApi('tags')
             ->sort('-name')
             ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
-        $response->assertFetchedManyInOrder(
-            $tags->sortByDesc('name')
-        );
+        $response->assertFetchedManyInOrder($expected);
     }
 
     public function testWithCount(): void

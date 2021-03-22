@@ -63,10 +63,7 @@ class ReadCommentIdentifiersTest extends TestCase
             'meta' => [
                 'count' => 3,
             ],
-            'data' => $expected->map(fn(Comment $comment) => [
-                'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
-            ])->all(),
+            'data' => $this->identifiersFor('comments', $expected),
             'jsonapi' => [
                 'version' => '1.0',
             ],
@@ -79,7 +76,10 @@ class ReadCommentIdentifiersTest extends TestCase
             ->count(5)
             ->create(['post_id' => $this->post]);
 
-        $expected = $comments->toBase()->sortBy('id')->take(3);
+        $expected = $this->identifiersFor(
+            'comments',
+            $comments->toBase()->sortBy('id')->take(3)
+        );
 
         Comment::factory()
             ->for(Post::factory())
@@ -112,7 +112,10 @@ class ReadCommentIdentifiersTest extends TestCase
             ->create(['post_id' => $this->post]);
 
         $expected = $comments->take(2);
-        $ids = $expected->map(fn(Comment $comment) => $comment->getRouteKey())->all();
+
+        $ids = $expected
+            ->map(fn(Comment $comment) => $comment->getRouteKey())
+            ->all();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -120,7 +123,9 @@ class ReadCommentIdentifiersTest extends TestCase
             ->filter(['id' => $ids])
             ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
 
-        $response->assertFetchedToMany($expected);
+        $response->assertFetchedToMany(
+            $this->identifiersFor('comments', $expected)
+        );
     }
 
     public function testInvalidMediaType(): void
