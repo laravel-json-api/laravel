@@ -75,7 +75,7 @@ class PostSchema extends Schema
             DateTime::make('publishedAt')->sortable(),
             Str::make('slug'),
             Str::make('synopsis'),
-            BelongsToMany::make('tags'),
+            BelongsToMany::make('tags')->mustValidate(),
             Str::make('title')->sortable(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
         ];

@@ -45,10 +45,16 @@ class UpdateTest extends TestCase
 
     public function test(): void
     {
-        $tag = Tag::factory()->create();
-        $this->post->tags()->attach($tag);
+        $this->post->tags()->saveMany(
+            Tag::factory()->count(2)->create()
+        );
 
-        $data = $this->serialize();
+        $tags = Tag::factory()->count(1)->create();
+
+        $data = $this
+            ->serialize()
+            ->replace('tags', $this->identifiersFor('tags', $tags));
+
         $expected = $data->forget('updatedAt')->jsonSerialize();
 
         $response = $this
@@ -69,6 +75,16 @@ class UpdateTest extends TestCase
             'synopsis' => $data['synopsis'],
             'title' => $data['title'],
         ]);
+
+        $this->assertDatabaseCount('taggables', count($tags));
+
+        foreach ($tags as $tag) {
+            $this->assertDatabaseHas('taggables', [
+                'tag_id' => $tag->getKey(),
+                'taggable_type' => Post::class,
+                'taggable_id' => $this->post->getKey(),
+            ]);
+        }
     }
 
     /**
