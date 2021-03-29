@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Videos;
 
 use App\Models\Video;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
@@ -67,7 +66,7 @@ class VideoSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }

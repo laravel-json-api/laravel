@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Images;
 
 use App\Models\Image;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;
@@ -64,7 +63,7 @@ class ImageSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }

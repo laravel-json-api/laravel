@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Users;
 
 use App\Models\User;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\Where;
@@ -66,7 +65,7 @@ class UserSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make();
     }

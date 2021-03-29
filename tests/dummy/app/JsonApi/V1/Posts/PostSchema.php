@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Posts;
 
 use App\Models\Post;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
@@ -97,7 +96,7 @@ class PostSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }

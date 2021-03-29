@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Tags;
 
 use App\Models\Tag;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
@@ -71,7 +70,7 @@ class TagSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }
