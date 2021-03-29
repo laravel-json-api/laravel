@@ -1,0 +1,46 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use LaravelJsonApi\Core\Schema\Schema;
+use LaravelJsonApi\NonEloquent\Fields\Attribute;
+use LaravelJsonApi\NonEloquent\Fields\ID;
+use LaravelJsonApi\NonEloquent\Filters\Filter;
+
+class {{ class }} extends Schema
+{
+
+    /**
+     * The model the schema corresponds to.
+     *
+     * @var string
+     */
+    public static string $model = {{ model }}::class;
+
+    /**
+     * Get the resource fields.
+     *
+     * @return array
+     */
+    public function fields(): array
+    {
+        return [
+            ID::make(),
+            // Attribute::make('name'),
+        ];
+    }
+
+    /**
+     * Get the resource filters.
+     *
+     * @return array
+     */
+    public function filters(): array
+    {
+        return [
+            // Filter::make('id'),
+        ];
+    }
+
+}

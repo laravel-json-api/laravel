@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file. This projec
   still be used, the new `RelatedResponse` class merges relationship meta into the top-level `meta` member of the
   response document. For *to-many* relationships that are countable, this will mean the top-level `meta` member will
   contain the count of the relationship.
+- The schema generator Artisan command now has a `--non-eloquent` option to generate a schema for a non-Eloquent
+  resource.
 
 ### Changed
 
