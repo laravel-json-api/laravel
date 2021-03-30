@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file. This projec
 - [#41](https://github.com/laravel-json-api/laravel/issues/41) Hash IDs are now supported by installing the
   `laravel-json-api/hashids` package and using the `HashId` field instead of the standard Eloquent `ID` field. Refer to
   documentation for details.
+- [#30](https://github.com/laravel-json-api/laravel/issues/30) Non-Eloquent resources are no supported via the
+  `laravel-json-api/non-eloquent` package. Refer to documentation for implementation details.
 - There is now a `Core\Reponses\RelatedResponse` class for returning the result for a related resources endpoint. For
   example, the `/api/v1/posts/1/comments` endpoint. Previously the `DataResponse` class was used. While this class can
   still be used, the new `RelatedResponse` class merges relationship meta into the top-level `meta` member of the
