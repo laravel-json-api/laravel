@@ -20,9 +20,7 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Posts;
 
 use App\Models\Post;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
-use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
@@ -32,10 +30,11 @@ use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\OnlyTrashed;
 use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
-use LaravelJsonApi\Eloquent\Filters\WhereIn;
+use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
+use LaravelJsonApi\HashIds\HashId;
 
 class PostSchema extends Schema
 {
@@ -62,7 +61,7 @@ class PostSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make(),
+            HashId::make()->alreadyHashed(),
             BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->readOnly(),
             Str::make('content'),
@@ -75,7 +74,7 @@ class PostSchema extends Schema
             DateTime::make('publishedAt')->sortable(),
             Str::make('slug'),
             Str::make('synopsis'),
-            BelongsToMany::make('tags'),
+            BelongsToMany::make('tags')->mustValidate(),
             Str::make('title')->sortable(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
         ];
@@ -87,7 +86,7 @@ class PostSchema extends Schema
     public function filters(): array
     {
         return [
-            WhereIn::make('id', $this->idColumn())->delimiter(','),
+            WhereIdIn::make($this)->delimiter(','),
             Scope::make('published', 'wherePublished')->asBoolean(),
             Where::make('slug')->singular(),
             OnlyTrashed::make('trashed'),
@@ -97,7 +96,7 @@ class PostSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }

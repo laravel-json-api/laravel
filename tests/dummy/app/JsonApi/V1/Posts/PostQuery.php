@@ -51,6 +51,11 @@ class PostQuery extends ResourceQuery
             ],
             'page' => JsonApiRule::notSupported(),
             'sort' => JsonApiRule::notSupported(),
+            'withCount' => [
+                'nullable',
+                'string',
+                JsonApiRule::countable(),
+            ],
         ];
     }
 }

@@ -56,7 +56,7 @@ class ReadAuthorIdentifierTest extends TestCase
             ],
             'data' => [
                 'type' => 'users',
-                'id' => (string) $this->post->author->getRouteKey(),
+                'id' => $this->post->author->getRouteKey(),
             ],
             'jsonapi' => [
                 'version' => '1.0',
@@ -71,7 +71,9 @@ class ReadAuthorIdentifierTest extends TestCase
             ->filter(['email' => $this->post->author->email])
             ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
-        $response->assertFetchedToOne($this->post->author);
+        $response->assertFetchedToOne(
+            $this->post->author
+        );
     }
 
     public function testFilterDoesntMatch(): void
@@ -130,7 +132,9 @@ class ReadAuthorIdentifierTest extends TestCase
             ->jsonApi('users')
             ->get(url('/api/v1/posts', [$this->post, 'relationships', 'author']));
 
-        $response->assertFetchedToOne($this->post->author);
+        $response->assertFetchedToOne(
+            $this->post->author
+        );
     }
 
     public function testInvalidMediaType(): void

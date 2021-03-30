@@ -51,9 +51,7 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $tags
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -83,7 +81,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 
@@ -109,9 +107,7 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $tags
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->jsonApi('tags')
@@ -131,9 +127,7 @@ class AttachTagsTest extends TestCase
         /** @var Collection $tags */
         $tags = Tag::factory()->count(2)->create();
 
-        $ids = $tags
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->actingAs(User::factory()->create())
@@ -153,7 +147,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => (string) $tag->getRouteKey(),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -174,7 +168,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => (string) $tag->getRouteKey(),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 

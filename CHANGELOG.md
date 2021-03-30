@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.1] - 2021-03-30
+
+### Added
+
+- [#18](https://github.com/laravel-json-api/laravel/issues/18) Added a `withCount` query parameter. For Eloquent
+  resources, this allows a client to request the relationship count for the primary data's relationships. Refer to
+  documentation for implementation details.
+- [#55](https://github.com/laravel-json-api/laravel/pull/55) Encoding and decoding of resource IDs is now supported.
+  The `ID` field needs to implement the `LaravelJsonApi\Contracts\Schema\IdEncoder` interface for this to work.
+- [#41](https://github.com/laravel-json-api/laravel/issues/41) Hash IDs are now supported by installing the
+  `laravel-json-api/hashids` package and using the `HashId` field instead of the standard Eloquent `ID` field. Refer to
+  documentation for details.
+- [#30](https://github.com/laravel-json-api/laravel/issues/30) Non-Eloquent resources are no supported via the
+  `laravel-json-api/non-eloquent` package. Refer to documentation for implementation details.
+- There is now a `Core\Reponses\RelatedResponse` class for returning the result for a related resources endpoint. For
+  example, the `/api/v1/posts/1/comments` endpoint. Previously the `DataResponse` class was used. While this class can
+  still be used, the new `RelatedResponse` class merges relationship meta into the top-level `meta` member of the
+  response document. For *to-many* relationships that are countable, this will mean the top-level `meta` member will
+  contain the count of the relationship.
+- The schema generator Artisan command now has a `--non-eloquent` option to generate a schema for a non-Eloquent
+  resource.
+
+### Changed
+
+- The `LaravelJsonApi::registerQuery()`, `LaravelJsonApi::registerCollectionQuery()` and
+  `LaravelJsonApi::registerRequest()` methods must now be used to register custom HTTP request classes for specified
+  resource types. Previously methods could be called on the `RequestResolver` classes, but these have now been removed.
+
+### Fixed
+
+- Relationship endpoints that return resource identifiers now correctly include page meta in the top-level meta member
+  of the document, if the results are paginated. Previously the page meta was incorrectly omitted.
+
 ## [1.0.0-alpha.5] - 2021-03-12
 
 ### Added

@@ -52,9 +52,7 @@ class UpdateTagsTest extends TestCase
         $tags = Tag::factory()->count(2)->create();
         $tags->push($existing[1]);
 
-        $ids = $tags
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->actingAs($this->post->author)
@@ -62,7 +60,7 @@ class UpdateTagsTest extends TestCase
             ->withData($ids)
             ->patch(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertFetchedToMany($tags);
+        $response->assertFetchedToMany($ids);
 
         $this->assertSame(3, $this->post->tags()->count());
 
@@ -102,7 +100,7 @@ class UpdateTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 

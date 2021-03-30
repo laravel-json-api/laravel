@@ -17,6 +17,7 @@
 
 namespace App\Tests\Api\V1\Posts;
 
+use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
@@ -36,7 +37,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -47,15 +48,14 @@ class ReadTest extends TestCase
             ->has(Tag::factory()->count(2))
             ->create();
 
-        $tags = $post->tags()->get();
-
-        $identifiers = $tags->map(
-            fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()]
-        )->all();
+        $identifiers = $this->identifiersFor(
+            'tags',
+            $tags = $post->tags()->get(),
+        );
 
         $expected = $this->serializer
             ->post($post)
-            ->replace('author', $author = ['type' => 'users', 'id' => (string) $post->author->getRouteKey()])
+            ->replace('author', $author = ['type' => 'users', 'id' => $post->author])
             ->replace('tags', $identifiers)
             ->jsonSerialize();
 
@@ -63,7 +63,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('author', 'tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected)->assertIncluded([
             $author,
@@ -92,7 +92,7 @@ class ReadTest extends TestCase
         ])->all();
 
         $included = $ids;
-        $included[] = ['type' => 'tags', 'id' => (string) $tag->getRouteKey()];
+        $included[] = ['type' => 'tags', 'id' => $tag->getRouteKey()];
 
         $expected = $this->serializer
             ->post($post)
@@ -103,7 +103,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('media.tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected)->assertIncluded($included);
     }
@@ -127,7 +127,7 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->includePaths('tags')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -141,7 +141,7 @@ class ReadTest extends TestCase
             ->jsonApi()
             ->expects('posts')
             ->filter(['slug' => $post->slug])
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -172,7 +172,29 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi('posts')
             ->sparseFields('posts', ['slug', 'synopsis', 'title'])
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
+
+        $response->assertFetchedOneExact($expected);
+    }
+
+    public function testWithCount(): void
+    {
+        $post = Post::factory()
+            ->has(Tag::factory()->count(1))
+            ->has(Comment::factory()->count(3))
+            ->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->withRelationshipMeta('tags', ['count' => 1])
+            ->withRelationshipMeta('comments', ['count' => 3])
+            ->jsonSerialize();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->query(['withCount' => 'comments,tags'])
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOneExact($expected);
     }
@@ -221,7 +243,7 @@ class ReadTest extends TestCase
         $response = $this
             ->actingAs($post->author)
             ->jsonApi('posts')
-            ->get(url('/api/v1/posts', $post));
+            ->get(url('/api/v1/posts', $expected['id']));
 
         $response->assertFetchedOne($expected);
     }

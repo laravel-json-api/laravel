@@ -58,6 +58,11 @@ class PostCollectionQuery extends ResourceQuery
                 'string',
                 JsonApiRule::sort(),
             ],
+            'withCount' => [
+                'nullable',
+                'string',
+                JsonApiRule::countable(),
+            ],
         ];
     }
 }

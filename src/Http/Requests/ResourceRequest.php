@@ -69,7 +69,7 @@ class ResourceRequest extends FormRequest
      */
     public static function forResource(string $resourceType): ResourceRequest
     {
-        $resolver = self::$requestResolver ?: new RequestResolver('Request');
+        $resolver = self::$requestResolver ?: new RequestResolver(RequestResolver::REQUEST);
 
         return $resolver($resourceType);
     }
@@ -82,7 +82,7 @@ class ResourceRequest extends FormRequest
      */
     public static function forResourceIfExists(string $resourceType): ?ResourceRequest
     {
-        $resolver = self::$requestResolver ?: new RequestResolver('Request');
+        $resolver = self::$requestResolver ?: new RequestResolver(RequestResolver::REQUEST);
 
         return $resolver($resourceType, true);
     }

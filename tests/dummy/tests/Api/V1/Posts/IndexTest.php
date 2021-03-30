@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1\Posts;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use Illuminate\Support\Arr;
@@ -31,6 +32,10 @@ class IndexTest extends TestCase
     {
         $posts = Post::factory()->count(3)->create();
 
+        $expected = collect($posts)
+            ->map(fn($post) => $this->serializer->post($post)->jsonSerialize())
+            ->all();
+
         /** Draft post should not appear. */
         Post::factory()->create(['published_at' => null]);
 
@@ -40,13 +45,15 @@ class IndexTest extends TestCase
             ->expects('posts')
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($posts);
+        $response->assertFetchedManyExact($expected);
     }
 
     public function testWithUser(): void
     {
         $user = User::factory()->create();
         $posts = Post::factory()->count(3)->create();
+
+        $expected = $this->identifiersFor('posts', $posts);
 
         /** Draft for this user should appear. */
         Post::factory()->create([
@@ -63,12 +70,14 @@ class IndexTest extends TestCase
             ->expects('posts')
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($posts);
+        $response->assertFetchedMany($expected);
     }
 
     public function testPaginated(): void
     {
         $posts = Post::factory()->count(5)->create();
+
+        $expected = $this->identifiersFor('posts', $posts->take(3));
 
         $meta = [
             'currentPage' => 1,
@@ -92,7 +101,7 @@ class IndexTest extends TestCase
             ->page(['number' => 1, 'size' => 3])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($posts->take(3))
+        $response->assertFetchedMany($expected)
             ->assertMeta($meta)
             ->assertLinks($links);
     }
@@ -104,13 +113,13 @@ class IndexTest extends TestCase
         $expected1 = $this->serializer->post($posts[0])->jsonSerialize();
         $expected1['relationships']['author']['data'] = $user1 = [
             'type' => 'users',
-            'id' => (string) $posts[0]->author->getRouteKey(),
+            'id' => $posts[0]->author->getRouteKey(),
         ];
 
         $expected2 = $this->serializer->post($posts[1])->jsonSerialize();
         $expected2['relationships']['author']['data'] = $user2 = [
             'type' => 'users',
-            'id' => (string) $posts[1]->author->getRouteKey(),
+            'id' => $posts[1]->author->getRouteKey(),
         ];
 
         $response = $this
@@ -131,13 +140,20 @@ class IndexTest extends TestCase
         $posts = Post::factory()->count(4)->create();
         $expected = $posts->take(2);
 
+        $ids = $expected
+            ->map(fn (Post $post) => $post->getRouteKey())
+            ->all();
+
         $response = $this
+            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->filter(['id' => $expected->map(fn(Post $post) => $post->getRouteKey())])
+            ->filter(['id' => $ids])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($expected);
+        $response->assertFetchedMany(
+            $this->identifiersFor('posts', $expected)
+        );
     }
 
     public function testSlugFilter(): void
@@ -159,6 +175,8 @@ class IndexTest extends TestCase
     {
         $published = Post::factory()->count(5)->create(['published_at' => now()]);
         Post::factory()->count(2)->create(['published_at' => null]);
+
+        $expected = $this->identifiersFor('posts', $published);
 
         $meta = [
             'currentPage' => 1,
@@ -188,9 +206,35 @@ class IndexTest extends TestCase
             ->page(['number' => 1, 'size' => 10])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($published)
+        $response->assertFetchedMany($expected)
             ->assertMeta($meta)
             ->assertLinks($links);
+    }
+
+    public function testWithCount(): void
+    {
+        $posts = Post::factory()
+            ->has(Tag::factory()->count(1))
+            ->count(3)
+            ->create();
+
+        $expected = collect($posts)->map(fn($post) => $this->serializer
+            ->post($post)
+            ->withRelationshipMeta('tags', ['count' => 1])
+            ->jsonSerialize()
+        )->all();
+
+        /** Draft post should not appear. */
+        Post::factory()->create(['published_at' => null]);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->expects('posts')
+            ->query(['withCount' => 'tags'])
+            ->get('/api/v1/posts');
+
+        $response->assertFetchedManyExact($expected);
     }
 
     public function testInvalidMediaType(): void

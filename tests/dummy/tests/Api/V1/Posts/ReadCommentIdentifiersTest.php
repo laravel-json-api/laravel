@@ -60,12 +60,47 @@ class ReadCommentIdentifiersTest extends TestCase
                 'self' => $self,
                 'related' => url('/api/v1/posts', [$this->post, 'comments']),
             ],
-            'data' => $expected->map(fn(Comment $comment) => [
-                'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
-            ])->all(),
+            'meta' => [
+                'count' => 3,
+            ],
+            'data' => $this->identifiersFor('comments', $expected),
             'jsonapi' => [
                 'version' => '1.0',
+            ],
+        ]);
+    }
+
+    public function testPaginated(): void
+    {
+        $comments = Comment::factory()
+            ->count(5)
+            ->create(['post_id' => $this->post]);
+
+        $expected = $this->identifiersFor(
+            'comments',
+            $comments->toBase()->sortBy('id')->take(3)
+        );
+
+        Comment::factory()
+            ->for(Post::factory())
+            ->create();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('comments')
+            ->page(['number' => '1', 'size' => '3'])
+            ->sort('id')
+            ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
+
+        $response->assertFetchedToManyInOrder($expected)->assertExactMeta([
+            'count' => 5,
+            'page' => [
+                'currentPage' => 1,
+                'from' => 1,
+                'lastPage' => 2,
+                'perPage' => 3,
+                'to' => 3,
+                'total' => 5,
             ],
         ]);
     }
@@ -77,7 +112,10 @@ class ReadCommentIdentifiersTest extends TestCase
             ->create(['post_id' => $this->post]);
 
         $expected = $comments->take(2);
-        $ids = $expected->map(fn(Comment $comment) => $comment->getRouteKey())->all();
+
+        $ids = $expected
+            ->map(fn(Comment $comment) => $comment->getRouteKey())
+            ->all();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -85,7 +123,9 @@ class ReadCommentIdentifiersTest extends TestCase
             ->filter(['id' => $ids])
             ->get($self = url('/api/v1/posts', [$this->post, 'relationships', 'comments']));
 
-        $response->assertFetchedToMany($expected);
+        $response->assertFetchedToMany(
+            $this->identifiersFor('comments', $expected)
+        );
     }
 
     public function testInvalidMediaType(): void

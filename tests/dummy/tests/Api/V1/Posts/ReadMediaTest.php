@@ -86,7 +86,7 @@ class ReadMediaTest extends TestCase
             ->get(url('/api/v1/posts', [$this->post, 'media']));
 
         $response->assertFetchedMany($expected)->assertIncluded([
-            ['type' => 'tags', 'id' => $tag],
+            ['type' => 'tags', 'id' => $tag->getRouteKey()],
         ]);
     }
 
@@ -134,6 +134,40 @@ class ReadMediaTest extends TestCase
             'type' => 'images',
             'id' => (string) $model->getRouteKey(),
         ])->all());
+    }
+
+    public function testWithCount(): void
+    {
+        $images = Image::factory()->count(1)->create();
+
+        $videos = Video::factory()
+            ->has(Tag::factory()->count(1))
+            ->count(1)
+            ->create();
+
+        $this->post->images()->saveMany($images);
+        $this->post->videos()->saveMany($videos);
+
+        $expectedImages = $images->toBase()->map(fn(Image $image) => $this->serializer
+            ->image($image)
+            ->jsonSerialize()
+        )->all();
+
+        $expectedVideos = $videos->toBase()->map(fn(Video $video) => $this->serializer
+            ->video($video)
+            ->withRelationshipMeta('tags', ['count' => 1])
+            ->jsonSerialize()
+        )->all();
+
+        $expected = collect($expectedImages)->merge($expectedVideos)->all();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('videos') // @TODO the test assertion should work without having to do this.
+            ->query(['withCount' => 'tags'])
+            ->get(url('/api/v1/posts', [$this->post, 'media']));
+
+        $response->assertFetchedManyExact($expected);
     }
 
     public function testInvalidMediaType(): void

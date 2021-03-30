@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace App\Tests\Api\V1;
 
 use App\Tests\TestCase as BaseTestCase;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class TestCase extends BaseTestCase
@@ -39,5 +40,20 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->serializer = new Serializer();
+    }
+
+    /**
+     * @param string $type
+     * @param $modelsOrResourceIds
+     * @return array
+     */
+    protected function identifiersFor(string $type, $modelsOrResourceIds): array
+    {
+        return collect($modelsOrResourceIds)->map(fn($modelOrResourceId) => [
+            'type' => $type,
+            'id' => ($modelOrResourceId instanceof UrlRoutable) ?
+                (string) $modelOrResourceId->getRouteKey() :
+                $modelOrResourceId
+        ])->values()->all();
     }
 }

@@ -20,14 +20,13 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Tags;
 
 use App\Models\Tag;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
-use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Filters\WhereIn;
+use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
+use LaravelJsonApi\HashIds\HashId;
 
 class TagSchema extends Schema
 {
@@ -45,7 +44,7 @@ class TagSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make(),
+            HashId::make()->alreadyHashed(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('name')->sortable(),
             BelongsToMany::make('posts')
@@ -64,14 +63,14 @@ class TagSchema extends Schema
     public function filters(): array
     {
         return [
-            WhereIn::make('id', $this->idColumn())->delimiter(','),
+            WhereIdIn::make($this)->delimiter(','),
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
         return PagePagination::make()->withoutNestedMeta();
     }

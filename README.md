@@ -19,6 +19,11 @@ composer require laravel-json-api/laravel
 
 See our documentation for further installation instructions.
 
+## Example Application
+
+To view an example Laravel application that uses this package, see the
+[Dummy Application](https://github.com/laravel-json-api/laravel/tree/main/tests/dummy) within the tests folder.
+
 ## License
 
 Laravel JSON:API is open-sourced software licensed under the [Apache 2.0 License](./LICENSE).

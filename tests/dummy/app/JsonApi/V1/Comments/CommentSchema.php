@@ -20,14 +20,13 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Comments;
 
 use App\Models\Comment;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
-use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Str;
-use LaravelJsonApi\Eloquent\Filters\WhereIn;
+use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
+use LaravelJsonApi\HashIds\HashId;
 
 class CommentSchema extends Schema
 {
@@ -45,7 +44,7 @@ class CommentSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make(),
+            HashId::make()->alreadyHashed(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
             BelongsTo::make('post'),
@@ -60,16 +59,16 @@ class CommentSchema extends Schema
     public function filters(): array
     {
         return [
-            WhereIn::make('id', $this->idColumn())->delimiter(','),
+            WhereIdIn::make($this)->delimiter(','),
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function pagination(): ?Paginator
+    public function pagination(): PagePagination
     {
-        return PagePagination::make()->withoutNestedMeta();
+        return PagePagination::make();
     }
 
 }

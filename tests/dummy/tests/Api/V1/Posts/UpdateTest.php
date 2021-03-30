@@ -45,17 +45,23 @@ class UpdateTest extends TestCase
 
     public function test(): void
     {
-        $tag = Tag::factory()->create();
-        $this->post->tags()->attach($tag);
+        $this->post->tags()->saveMany(
+            Tag::factory()->count(2)->create()
+        );
 
-        $data = $this->serialize();
+        $tags = Tag::factory()->count(1)->create();
+
+        $data = $this
+            ->serialize()
+            ->replace('tags', $this->identifiersFor('tags', $tags));
+
         $expected = $data->forget('updatedAt')->jsonSerialize();
 
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('posts')
             ->withData($data)
-            ->includePaths('author')
+            ->includePaths('author', 'tags')
             ->patch(url('/api/v1/posts', $this->post));
 
         $response->assertUpdated($expected);
@@ -69,6 +75,16 @@ class UpdateTest extends TestCase
             'synopsis' => $data['synopsis'],
             'title' => $data['title'],
         ]);
+
+        $this->assertDatabaseCount('taggables', count($tags));
+
+        foreach ($tags as $tag) {
+            $this->assertDatabaseHas('taggables', [
+                'tag_id' => $tag->getKey(),
+                'taggable_type' => Post::class,
+                'taggable_id' => $this->post->getKey(),
+            ]);
+        }
     }
 
     /**
@@ -270,7 +286,7 @@ class UpdateTest extends TestCase
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => (string) $this->post->getRouteKey(),
+            'id' => $this->post->getRouteKey(),
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
@@ -284,14 +300,11 @@ class UpdateTest extends TestCase
                 'author' => [
                     'data' => [
                         'type' => 'users',
-                        'id' => (string) $this->post->author->getRouteKey(),
+                        'id' => $this->post->author->getRouteKey(),
                     ],
                 ],
                 'tags' => [
-                    'data' => $this->post->tags->map(fn(Tag $tag) => [
-                        'type' => 'tags',
-                        'id' => (string) $tag->getRouteKey(),
-                    ])->all(),
+                    'data' => $this->identifiersFor('tags', $this->post->tags),
                 ],
             ],
         ]);

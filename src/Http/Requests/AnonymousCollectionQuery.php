@@ -17,6 +17,7 @@
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use LaravelJsonApi\Core\Query\Custom\ExtendedQueryParameters;
 use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class AnonymousCollectionQuery extends ResourceQuery
@@ -54,6 +55,11 @@ class AnonymousCollectionQuery extends ResourceQuery
                 'nullable',
                 'string',
                 JsonApiRule::sort(),
+            ],
+            ExtendedQueryParameters::withCount() => [
+                'nullable',
+                'string',
+                JsonApiRule::countable(),
             ],
         ];
     }

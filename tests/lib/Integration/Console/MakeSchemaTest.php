@@ -116,6 +116,22 @@ class MakeSchemaTest extends TestCase
         $this->assertProxySchemaCreated('App\JsonApi\Proxies\UserAccount', 'UserAccount');
     }
 
+    public function testNonEloquent(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:schema', [
+            'name' => 'sites',
+            '--model' => '\App\Entities\Site',
+            '--non-eloquent' => true,
+        ]);
+
+        $this->assertSame(0, $result);
+        $this->assertNonEloquentSchemaCreated('App\Entities\Site', 'Site');
+    }
+
     public function testNoServer(): void
     {
         config()->set('jsonapi.servers', [
@@ -167,6 +183,15 @@ class MakeSchemaTest extends TestCase
         foreach ($tests as $expected) {
             $this->assertStringContainsString($expected, $content);
         }
+
+        $missing = [
+            'LaravelJsonApi\Eloquent\ProxySchema',
+            'LaravelJsonApi\Core\Schema\Schema',
+        ];
+
+        foreach ($missing as $notExpected) {
+            $this->assertStringNotContainsString($notExpected, $content);
+        }
     }
 
     /**
@@ -189,6 +214,46 @@ class MakeSchemaTest extends TestCase
 
         foreach ($tests as $expected) {
             $this->assertStringContainsString($expected, $content);
+        }
+
+        $missing = [
+            'LaravelJsonApi\Eloquent\Schema',
+            'LaravelJsonApi\Core\Schema\Schema',
+        ];
+
+        foreach ($missing as $notExpected) {
+            $this->assertStringNotContainsString($notExpected, $content);
+        }
+    }
+
+    /**
+     * @param string $namespacedModel
+     * @param string $model
+     * @return void
+     */
+    private function assertNonEloquentSchemaCreated(string $namespacedModel, string $model): void
+    {
+        $this->assertFileExists($path = app_path('JsonApi/V1/Sites/SiteSchema.php'));
+        $content = file_get_contents($path);
+
+        $tests = [
+            'namespace App\JsonApi\V1\Sites;',
+            'use LaravelJsonApi\Core\Schema\Schema;',
+            'class SiteSchema extends Schema',
+            "use {$namespacedModel};",
+            "public static string \$model = {$model}::class;",
+        ];
+
+        foreach ($tests as $expected) {
+            $this->assertStringContainsString($expected, $content);
+        }
+
+        $missing = [
+            'LaravelJsonApi\Eloquent',
+        ];
+
+        foreach ($missing as $notExpected) {
+            $this->assertStringNotContainsString($notExpected, $content);
         }
     }
 

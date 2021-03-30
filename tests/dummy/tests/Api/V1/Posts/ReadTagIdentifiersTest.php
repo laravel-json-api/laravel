@@ -42,17 +42,21 @@ class ReadTagIdentifiersTest extends TestCase
 
     public function test(): void
     {
-        $expected = Tag::factory()
+        $tags = Tag::factory()
             ->count(3)
             ->create();
 
-        $this->post->tags()->attach($expected);
+        $this->post->tags()->attach($tags);
+
+        $expected = $this->identifiersFor('tags', $tags);
 
         $response = $this
             ->jsonApi('tags')
             ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertFetchedToMany($expected);
+        $response->assertFetchedToMany($expected)->assertExactMeta([
+            'count' => 3,
+        ]);
     }
 
     public function testSort(): void
@@ -63,14 +67,14 @@ class ReadTagIdentifiersTest extends TestCase
 
         $this->post->tags()->attach($tags);
 
+        $expected = $this->identifiersFor('tags', $tags->sortByDesc('name'));
+
         $response = $this
             ->jsonApi('tags')
             ->sort('-name')
             ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertFetchedToManyInOrder(
-            $tags->sortByDesc('name')
-        );
+        $response->assertFetchedToManyInOrder($expected);
     }
 
     public function testInvalidMediaType(): void

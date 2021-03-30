@@ -52,9 +52,7 @@ class DetachTagsTest extends TestCase
         $detach = $existing->take(2);
         $keep = $existing->diff($detach);
 
-        $ids = $detach
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $detach);
 
         $response = $this
             ->actingAs($this->post->author)
@@ -92,7 +90,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => (string) $comment->getRouteKey(),
+                'id' => $comment->getRouteKey(),
             ],
         ];
 
@@ -115,9 +113,7 @@ class DetachTagsTest extends TestCase
         $existing = Tag::factory()->count(2)->create();
         $this->post->tags()->attach($existing);
 
-        $ids = $existing
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $existing);
 
         $response = $this
             ->jsonApi('tags')
@@ -134,9 +130,7 @@ class DetachTagsTest extends TestCase
         $existing = Tag::factory()->count(2)->create();
         $this->post->tags()->attach($existing);
 
-        $ids = $existing
-            ->map(fn(Tag $tag) => ['type' => 'tags', 'id' => (string) $tag->getRouteKey()])
-            ->all();
+        $ids = $this->identifiersFor('tags', $existing);
 
         $response = $this
             ->actingAs(User::factory()->create())
@@ -156,7 +150,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => (string) $tag->getRouteKey(),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 
@@ -177,7 +171,7 @@ class DetachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => (string) $tag->getRouteKey(),
+                'id' => $tag->getRouteKey(),
             ],
         ];
 

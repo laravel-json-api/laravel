@@ -53,6 +53,10 @@ class MakeSchema extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('non-eloquent')) {
+            return $this->resolveStubPath('non-eloquent-schema.stub');
+        }
+
         return $this->resolveStubPath('schema.stub');
     }
 
@@ -108,6 +112,7 @@ class MakeSchema extends GeneratorCommand
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the schema already exists'],
             ['model', 'm', InputOption::VALUE_REQUIRED, 'The model that the schema applies to.'],
+            ['non-eloquent', null, InputOption::VALUE_NONE, 'Create a schema for a non-Eloquent resource.'],
             ['proxy', 'p', InputOption::VALUE_NONE, 'Create a schema for an Eloquent model proxy.'],
             ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the schema exists in.'],
         ];
