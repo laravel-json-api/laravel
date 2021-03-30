@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Console;
 
-use Illuminate\Support\Str;
 use LaravelJsonApi\Core\Query\Custom\ExtendedQueryParameters;
 use Symfony\Component\Console\Input\InputOption;
 
