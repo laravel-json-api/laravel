@@ -11,8 +11,18 @@ All notable changes to this project will be documented in this file. This projec
   been updated to receive all the validated data as its third argument. This change was made to allow fields to work out
   the value to fill into the model based on other JSON:API field values. If you have written any custom fields, you will
   need to update the `fill()` method on your field class.
+- **BREAKING** Eloquent attributes now support serializing and filling column values on related objects. This is
+  primarily intended for use with the Eloquent `belongsTo`, `hasOne`, `hasOneThrough` and `morphOne` relationships that
+  have a `withDefault()` method. As part of this change, the `mustExist()` method was added to the `Fillable` interface.
+  If you have written any custom fields, you will need to add this method to your field class - it should return `true`
+  if the attribute needs to be filled *after* the primary model has been persisted.
 - [#58](https://github.com/laravel-json-api/laravel/issues/58) Schema model classes can now be a parent class or an
   interface.
+
+### Fixed
+
+- [#69](https://github.com/laravel-json-api/laravel/issues/69) Fixed the parsing of empty `include`, `sort` and
+  `withCount` query parameters.
 
 ## [1.0.0-beta.1] - 2021-03-30
 
