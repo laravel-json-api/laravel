@@ -95,7 +95,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     public static function queryOne(string $resourceType): QueryParameters
     {
-        $resolver = self::$queryManyResolver ?: new RequestResolver(RequestResolver::QUERY);
+        $resolver = self::$queryOneResolver ?: new RequestResolver(RequestResolver::QUERY);
 
         return $resolver($resourceType);
     }
