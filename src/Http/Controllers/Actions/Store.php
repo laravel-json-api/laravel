@@ -71,6 +71,6 @@ trait Store
             $response = $this->saved($model, $request, $query);
         }
 
-        return $response ?: new DataResponse($model);
+        return $response ?: (new DataResponse($model))->withRequest($query);
     }
 }

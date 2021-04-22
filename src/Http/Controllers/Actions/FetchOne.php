@@ -61,6 +61,6 @@ trait FetchOne
             $response = $this->read($model, $request);
         }
 
-        return $response ?: new DataResponse($model);
+        return $response ?: (new DataResponse($model))->withRequest($request);
     }
 }
