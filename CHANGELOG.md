@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#74](https://github.com/laravel-json-api/laravel/issues/74) Developers can now add default include paths to the query
+  request classes (e.g. `PostQuery` and `PostCollectionQuery`) via the `$defaultIncludePaths` property. These include
+  paths are used if the client does not provide any include paths.
+
 ## [1.0.0-beta.2] - 2021-04-20
 
 ### Added
