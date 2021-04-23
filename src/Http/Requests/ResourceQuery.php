@@ -53,6 +53,11 @@ class ResourceQuery extends FormRequest implements QueryParameters
     ];
 
     /**
+     * @var string[]|null
+     */
+    protected ?array $defaultIncludePaths = null;
+
+    /**
      * Specify the callback to use to guess the request class for querying many resources.
      *
      * @param callable $resolver
@@ -149,7 +154,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
             return IncludePaths::fromString($data['include'] ?: '');
         }
 
-        return null;
+        return IncludePaths::nullable($this->defaultIncludePaths);
     }
 
     /**
