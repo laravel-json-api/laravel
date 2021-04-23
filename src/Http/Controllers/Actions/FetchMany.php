@@ -61,6 +61,6 @@ trait FetchMany
             $response = $this->searched($data, $request);
         }
 
-        return $response ?: (new DataResponse($data))->withRequest($request);
+        return $response ?: DataResponse::make($data)->withQueryParameters($request);
     }
 }

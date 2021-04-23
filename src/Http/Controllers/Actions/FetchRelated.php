@@ -76,10 +76,10 @@ trait FetchRelated
             $response = $this->{$hook}($model, $data, $request);
         }
 
-        return $response ?: new RelatedResponse(
+        return $response ?: RelatedResponse::make(
             $model,
             $relation->name(),
             $data,
-        );
+        )->withQueryParameters($request);
     }
 }

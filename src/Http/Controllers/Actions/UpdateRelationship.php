@@ -81,10 +81,10 @@ trait UpdateRelationship
             $response = $this->{$hook}($model, $result, $request, $query);
         }
 
-        return $response ?: new RelationshipResponse(
+        return $response ?: RelationshipResponse::make(
             $model,
             $fieldName,
             $result
-        );
+        )->withQueryParameters($query);
     }
 }
