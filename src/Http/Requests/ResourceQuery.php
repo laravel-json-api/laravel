@@ -53,6 +53,8 @@ class ResourceQuery extends FormRequest implements QueryParameters
     ];
 
     /**
+     * The include paths to use if the client provides none.
+     *
      * @var string[]|null
      */
     protected ?array $defaultIncludePaths = null;
@@ -154,7 +156,7 @@ class ResourceQuery extends FormRequest implements QueryParameters
             return IncludePaths::fromString($data['include'] ?: '');
         }
 
-        return IncludePaths::nullable($this->defaultIncludePaths);
+        return IncludePaths::nullable($this->defaultIncludePaths());
     }
 
     /**
@@ -225,6 +227,16 @@ class ResourceQuery extends FormRequest implements QueryParameters
             'page',
             'filter',
         ])->all();
+    }
+
+    /**
+     * Get the default include paths to use if the client has provided none.
+     *
+     * @return string[]|null
+     */
+    protected function defaultIncludePaths(): ?array
+    {
+        return $this->defaultIncludePaths;
     }
 
     /**
