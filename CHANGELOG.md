@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file. This projec
   schemas. Previously only sortable attributes were supported. These new classes are added to schemas in the
   `sortables()` method.
 - Eloquent schemas now support a default sort order via the `$defaultSort` property.
+- New generator command `jsonapi:sort-field` to create a custom sort field class.
 - [#74](https://github.com/laravel-json-api/laravel/issues/74) Developers can now add default include paths to the query
   request classes (e.g. `PostQuery` and `PostCollectionQuery`) via the `$defaultIncludePaths` property. These include
   paths are used if the client does not provide any include paths.

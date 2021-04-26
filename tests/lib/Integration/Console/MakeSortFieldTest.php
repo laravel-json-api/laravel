@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Laravel\Tests\Integration\Console;
 use Illuminate\Filesystem\Filesystem;
 use LaravelJsonApi\Laravel\Tests\Integration\TestCase;
 
-class MakeFilterTest extends TestCase
+class MakeSortFieldTest extends TestCase
 {
 
     /**
@@ -55,10 +55,10 @@ class MakeFilterTest extends TestCase
             'namespace' => 'JsonApi',
         ]);
 
-        $result = $this->artisan('jsonapi:filter CustomFilter');
+        $result = $this->artisan('jsonapi:sort-field CustomSort');
 
         $this->assertSame(0, $result);
-        $this->assertFilterCreated('JsonApi');
+        $this->assertSortFieldCreated('JsonApi');
     }
 
     public function testCustomNamespace(): void
@@ -67,31 +67,31 @@ class MakeFilterTest extends TestCase
             'namespace' => 'Foo\Bar',
         ]);
 
-        $result = $this->artisan('jsonapi:filter', [
-            'name' => 'CustomFilter'
+        $result = $this->artisan('jsonapi:sort-field', [
+            'name' => 'CustomSort'
         ]);
 
         $this->assertSame(0, $result);
-        $this->assertFilterCreated('Foo\Bar');
+        $this->assertSortFieldCreated('Foo\Bar');
     }
 
     /**
      * @param string $namespace
      * @return void
      */
-    private function assertFilterCreated(string $namespace): void
+    private function assertSortFieldCreated(string $namespace): void
     {
         $path = str_replace('\\', '/', $namespace);
 
-        $this->assertFileExists($path = app_path("{$path}/Filters/CustomFilter.php"));
+        $this->assertFileExists($path = app_path("{$path}/Sorting/CustomSort.php"));
         $content = file_get_contents($path);
 
         $tests = [
-            "namespace App\\{$namespace}\\Filters;",
-            'use LaravelJsonApi\Eloquent\Contracts\Filter;',
-            'class CustomFilter implements Filter',
-            '* @return CustomFilter',
-            '* CustomFilter constructor.',
+            "namespace App\\{$namespace}\\Sorting;",
+            'use LaravelJsonApi\Eloquent\Contracts\SortField;',
+            'class CustomSort implements SortField',
+            '* @return CustomSort',
+            '* CustomSort constructor.',
         ];
 
         foreach ($tests as $expected) {
