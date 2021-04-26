@@ -95,24 +95,24 @@ class RequestResolver
     {
         $app = app();
 
-        try {
-            $fqn = $this->custom($resourceType) ?: Str::replaceLast('Schema', $this->type, get_class(
-                $app->make(SchemaContainer::class)->schemaFor($resourceType)
-            ));
+        $fqn = $this->custom($resourceType) ?: Str::replaceLast('Schema', $this->type, get_class(
+            $app->make(SchemaContainer::class)->schemaFor($resourceType)
+        ));
 
-            if (!class_exists($fqn) && !$app->bound($fqn)) {
-                if (true === $allowNull) {
-                    return null;
-                } else if (isset(self::$defaults[$this->type])) {
-                    $fqn = self::$defaults[$this->type];
-                }
+        if (!class_exists($fqn) && !$app->bound($fqn)) {
+            if (true === $allowNull) {
+                return null;
+            } else if (isset(self::$defaults[$this->type])) {
+                $fqn = self::$defaults[$this->type];
             }
+        }
 
+        try {
             return $app->make($fqn);
         } catch (BindingResolutionException $ex) {
            throw new LogicException(sprintf(
-               'Unable to create request class of type [%s] for resource type %s.',
-               $this->type,
+               'Unable to create request class %s for resource type %s.',
+               $fqn,
                $resourceType
            ), 0, $ex);
         }

@@ -34,6 +34,7 @@ use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
+use LaravelJsonApi\Eloquent\Sorting\SortCountable;
 use LaravelJsonApi\HashIds\HashId;
 
 class PostSchema extends Schema
@@ -90,6 +91,16 @@ class PostSchema extends Schema
             Scope::make('published', 'wherePublished')->asBoolean(),
             Where::make('slug')->singular(),
             OnlyTrashed::make('trashed'),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sortables(): iterable
+    {
+        return [
+            SortCountable::make($this, 'comments'),
         ];
     }
 

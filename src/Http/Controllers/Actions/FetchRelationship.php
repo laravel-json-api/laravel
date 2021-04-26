@@ -76,10 +76,10 @@ trait FetchRelationship
             $response = $this->{$hook}($model, $data, $request);
         }
 
-        return $response ?: new RelationshipResponse(
+        return $response ?: RelationshipResponse::make(
             $model,
             $relation->name(),
             $data
-        );
+        )->withQueryParameters($request);
     }
 }

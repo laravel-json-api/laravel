@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.3] - 2021-04-26
+
+### Added
+
+- [#14](https://github.com/laravel-json-api/laravel/issues/14) Additional sort parameters can now be added to Eloquent
+  schemas. Previously only sortable attributes were supported. These new classes are added to schemas in the
+  `sortables()` method.
+- Eloquent schemas now support a default sort order via the `$defaultSort` property.
+- New generator command `jsonapi:sort-field` to create a custom sort field class.
+- [#74](https://github.com/laravel-json-api/laravel/issues/74) Developers can now add default include paths to the query
+  request classes (e.g. `PostQuery` and `PostCollectionQuery`) via the `$defaultIncludePaths` property. These include
+  paths are used if the client does not provide any include paths.
+
 ## [1.0.0-beta.2] - 2021-04-20
 
 ### Added

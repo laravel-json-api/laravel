@@ -73,6 +73,6 @@ trait Update
             $response = $this->saved($model, $request, $query);
         }
 
-        return $response ?: new DataResponse($model);
+        return $response ?: DataResponse::make($model)->withQueryParameters($query);
     }
 }

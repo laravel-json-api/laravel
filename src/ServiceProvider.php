@@ -55,6 +55,7 @@ class ServiceProvider extends BaseServiceProvider
                 Console\MakeResource::class,
                 Console\MakeSchema::class,
                 Console\MakeServer::class,
+                Console\MakeSortField::class,
                 Console\StubPublish::class,
             ]);
         }
