@@ -22,6 +22,7 @@ namespace App\Tests\Api\V1\Posts;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Tests\Api\V1\TestCase;
+use Illuminate\Support\Arr;
 
 class ReadCommentIdentifiersTest extends TestCase
 {
@@ -102,6 +103,12 @@ class ReadCommentIdentifiersTest extends TestCase
                 'to' => 3,
                 'total' => 5,
             ],
+        ])->assertLinks([
+            'first' => $self . '?' . Arr::query(['page' => ['number' => 1, 'size' => 3], 'sort' => 'id']),
+            'last' => $self . '?' . Arr::query(['page' => ['number' => 2, 'size' => 3], 'sort' => 'id']),
+            'next' => $self . '?' . Arr::query(['page' => ['number' => 2, 'size' => 3], 'sort' => 'id']),
+            'related' => url('/api/v1/posts', [$this->post, 'comments']),
+            'self' => $self,
         ]);
     }
 

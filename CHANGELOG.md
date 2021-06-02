@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.4] - 2021-06-02
+
+### Fixed
+
+- [#76](https://github.com/laravel-json-api/laravel/issues/76) Pagination links will now be correctly added to related
+  resources and relationship identifiers responses.
+
 ## [1.0.0-beta.3] - 2021-04-26
 
 ### Added

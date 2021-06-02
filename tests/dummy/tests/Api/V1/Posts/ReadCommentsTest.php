@@ -22,6 +22,7 @@ namespace App\Tests\Api\V1\Posts;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Tests\Api\V1\TestCase;
+use Illuminate\Support\Arr;
 
 class ReadCommentsTest extends TestCase
 {
@@ -78,7 +79,7 @@ class ReadCommentsTest extends TestCase
             ->jsonApi('comments')
             ->page(['number' => '1', 'size' => '3'])
             ->sort('id')
-            ->get(url('/api/v1/posts', [$this->post, 'comments']));
+            ->get($url = url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany($expected)->assertExactMeta([
             'count' => 5,
@@ -90,6 +91,10 @@ class ReadCommentsTest extends TestCase
                 'to' => 3,
                 'total' => 5,
             ],
+        ])->assertLinks([
+            'first' => $url . '?' . Arr::query(['page' => ['number' => 1, 'size' => 3], 'sort' => 'id']),
+            'last' => $url . '?' . Arr::query(['page' => ['number' => 2, 'size' => 3], 'sort' => 'id']),
+            'next' => $url . '?' . Arr::query(['page' => ['number' => 2, 'size' => 3], 'sort' => 'id']),
         ]);
     }
 
