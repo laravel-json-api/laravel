@@ -57,6 +57,11 @@ class PostSchema extends Schema
     protected int $maxDepth = 3;
 
     /**
+     * @var string
+     */
+    protected $defaultSort = '-createdAt';
+
+    /**
      * @inheritDoc
      */
     public function fields(): array

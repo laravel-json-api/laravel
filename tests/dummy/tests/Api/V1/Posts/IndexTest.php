@@ -24,16 +24,22 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Date;
 
 class IndexTest extends TestCase
 {
 
     public function test(): void
     {
-        $posts = Post::factory()->count(3)->create();
+        $posts = Post::factory()->sequence(
+            ['created_at' => Date::now()->subWeek()],
+            ['created_at' => Date::yesterday()],
+            ['created_at' => Date::now()],
+        )->count(3)->create();
 
-        $expected = collect($posts)
-            ->map(fn($post) => $this->serializer->post($post)->jsonSerialize())
+        $expected = $posts
+            ->sortByDesc('created_at')
+            ->values()
             ->all();
 
         /** Draft post should not appear. */
@@ -45,7 +51,7 @@ class IndexTest extends TestCase
             ->expects('posts')
             ->get('/api/v1/posts');
 
-        $response->assertFetchedManyExact($expected);
+        $response->assertFetchedManyInOrder($expected);
     }
 
     public function testWithUser(): void
@@ -89,9 +95,18 @@ class IndexTest extends TestCase
         ];
 
         $links = [
-            'first' => 'http://localhost/api/v1/posts?' . Arr::query(['page' => ['number' => 1, 'size' => 3]]),
-            'next' => 'http://localhost/api/v1/posts?' . Arr::query(['page' => ['number' => 2, 'size' => 3]]),
-            'last' => 'http://localhost/api/v1/posts?' . Arr::query(['page' => ['number' => 2, 'size' => 3]]),
+            'first' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'page' => ['number' => 1, 'size' => 3],
+                    'sort' => '-createdAt',
+                ]),
+            'next' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'page' => ['number' => 2, 'size' => 3],
+                    'sort' => '-createdAt',
+                ]),
+            'last' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'page' => ['number' => 2, 'size' => 3],
+                    'sort' => '-createdAt',
+            ]),
         ];
 
         $response = $this
@@ -191,10 +206,12 @@ class IndexTest extends TestCase
             'first' => 'http://localhost/api/v1/posts?' . Arr::query([
                     'filter' => ['published' => 'true'],
                     'page' => ['number' => 1, 'size' => 10],
+                    'sort' => '-createdAt',
                 ]),
             'last' => 'http://localhost/api/v1/posts?' . Arr::query([
                     'filter' => ['published' => 'true'],
                     'page' => ['number' => 1, 'size' => 10],
+                    'sort' => '-createdAt',
                 ]),
         ];
 
