@@ -127,6 +127,16 @@ class ResourceQuery extends FormRequest implements QueryParameters
         }
 
         if ($this->isViewingRelationship()) {
+
+            if (method_exists($authorizer, 'showRelated')
+                && !\Str::of($this->url())->contains('relationships')) {
+                return $authorizer->showRelated(
+                    $this,
+                    $this->modelOrFail(),
+                    $this->jsonApi()->route()->fieldName(),
+                );
+            }
+
             return $authorizer->showRelationship(
                 $this,
                 $this->modelOrFail(),
