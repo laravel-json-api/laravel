@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Added
+
+- The authorizer now has separate `showRelated()` and `showRelationship()` methods. Previously both these controller
+  actions were authorized via the single `showRelationship()` method. Adding the new `showRelated` method means
+  developers can now implement separate authorization logic for these two actions if desired. Our default implementation
+  remains unchanged - both are authorized using the `view<RelationshipName>` method on the relevant policy.
+
 ## [1.0.0-beta.4] - 2021-06-02
 
 ### Fixed
