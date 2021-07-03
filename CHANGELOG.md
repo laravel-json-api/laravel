@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file. This projec
 - The request class now has a `isCreatingOrUpdating()` helper method to determine whether the request is to create or
   updated a resource.
 - Add stop on first failure to all validators in the resource request class.
+- [#85](https://github.com/laravel-json-api/laravel/issues/85) When running an application with debug mode turned on,
+  the default JSON:API error object for an exception will now contain detailed exception information, including the
+  stack trace, in the object's `meta` member.
 
 ### Changed
 
