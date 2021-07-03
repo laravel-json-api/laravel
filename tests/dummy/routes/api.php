@@ -19,8 +19,7 @@ JsonApiRoute::server('v1')
 
         /** Users */
         $server->resource('users')->only('show')->actions(function ($actions) {
-            // we use `-me` because `me` would match the hash-id pattern
-            $actions->get('-me', 'me');
+            $actions->get('me');
         });
 
         /** Videos */

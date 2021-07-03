@@ -52,7 +52,7 @@ class ReadTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->jsonApi('users')
-            ->get(url('/api/v1/users/-me'));
+            ->get(url('/api/v1/users/me'));
 
         $response->assertFetchedOneExact($expected);
     }
