@@ -271,4 +271,67 @@ class ActionsTest extends TestCase
         $this->assertSame("api.v1.posts.image", $route->getName());
         $this->assertSame(['api', 'my-middleware1', 'jsonapi:v1', 'my-middleware2'], $route->action['middleware']);
     }
+
+    /**
+     * This test was created from a question on Slack. In the test, we check that if an
+     * action is registered without a URL prefix, the route matching can distinguish
+     * between:
+     *
+     * DELETE /api/v1/posts/purge
+     * DELETE /api/v1/posts/123
+     */
+    public function testNoActionPrefixCanMatchIfActionDoesNotMatchIdPattern(): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutes(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->resources(function ($server) {
+                $server->resource('posts', PostController::class)
+                    ->actions(function ($actions) {
+                        $actions->delete('purge');
+                        $actions->withId()->post('publish');
+                    });
+            });
+        });
+
+        $route = $this->assertMatch('DELETE', '/api/v1/posts/purge');
+        $this->assertSame('App\Http\Controllers\Api\V1\PostController@purge', $route->action['controller']);
+        $this->assertSame('v1.posts.purge', $route->getName());
+
+        $route = $this->assertMatch('DELETE', '/api/v1/posts/123');
+        $this->assertSame('App\Http\Controllers\Api\V1\PostController@destroy', $route->action['controller']);
+        $this->assertSame('v1.posts.destroy', $route->getName());
+
+        $route = $this->assertMatch('POST', '/api/v1/posts/123/publish');
+        $this->assertSame('App\Http\Controllers\Api\V1\PostController@publish', $route->action['controller']);
+        $this->assertSame('v1.posts.publish', $route->getName());
+    }
+
+    /**
+     * This is a common scenario that is seen in questions - registering a `me` action
+     * on the users resource to return the current signed-in user.
+     */
+    public function testUserMeDoesNotConflictWithRetrievingUser(): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'users', '\d+');
+
+        $this->defaultApiRoutes(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->resources(function ($server) {
+                $server->resource('users', 'App\Http\Controllers\Api\V1\UserController')
+                    ->actions(function ($actions) {
+                        $actions->get('me');
+                    });
+            });
+        });
+
+        $route = $this->assertMatch('GET', '/api/v1/users/me');
+        $this->assertSame('App\Http\Controllers\Api\V1\UserController@me', $route->action['controller']);
+        $this->assertSame('v1.users.me', $route->getName());
+
+        $route = $this->assertMatch('GET', '/api/v1/users/1');
+        $this->assertSame('App\Http\Controllers\Api\V1\UserController@show', $route->action['controller']);
+        $this->assertSame('v1.users.show', $route->getName());
+    }
 }

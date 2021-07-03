@@ -17,6 +17,12 @@ JsonApiRoute::server('v1')
             $actions->withId()->post('publish');
         });
 
+        /** Users */
+        $server->resource('users')->only('show')->actions(function ($actions) {
+            // we use `-me` because `me` would match the hash-id pattern
+            $actions->get('-me', 'me');
+        });
+
         /** Videos */
         $server->resource('videos')->relationships(function ($relationships) {
             $relationships->hasMany('tags');
