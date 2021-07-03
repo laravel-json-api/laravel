@@ -13,6 +13,12 @@ All notable changes to this project will be documented in this file. This projec
   remains unchanged - both are authorized using the `view<RelationshipName>` method on the relevant policy.
 - The request class now has a `isCreatingOrUpdating()` helper method to determine whether the request is to create or
   updated a resource.
+- Add stop on first failure to all validators in the resource request class.
+
+### Changed
+
+- Minimum Laravel version is now `8.30`. This change was required to use the `$stopOnFirstFailure` property on Laravel's
+  `FormRequest` class.
 
 ## [1.0.0-beta.4] - 2021-06-02
 

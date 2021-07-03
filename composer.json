@@ -31,7 +31,7 @@
         "laravel-json-api/exceptions": "^1.0.0-beta.2",
         "laravel-json-api/spec": "^1.0.0-beta.1",
         "laravel-json-api/validation": "^1.0.0-beta.2",
-        "laravel/framework": "^8.0"
+        "laravel/framework": "^8.30"
     },
     "require-dev": {
         "laravel-json-api/hashids": "^1.0.0-beta.2",

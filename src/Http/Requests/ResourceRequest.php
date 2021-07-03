@@ -316,7 +316,7 @@ class ResourceRequest extends FormRequest
             $this->relationshipRules(),
             $this->messages(),
             $this->attributes()
-        );
+        )->stopOnFirstFailure($this->stopOnFirstFailure);
     }
 
     /**
@@ -338,7 +338,7 @@ class ResourceRequest extends FormRequest
                 $this->attributes(),
                 method_exists($this, 'deleteAttributes') ? $this->deleteAttributes() : []
             )
-        );
+        )->stopOnFirstFailure($this->stopOnFirstFailure);
     }
 
     /**
