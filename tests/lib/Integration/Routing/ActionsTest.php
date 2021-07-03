@@ -19,7 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 
+use App\Http\Controllers\Api\V1\PostController;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 class ActionsTest extends TestCase
@@ -243,5 +245,30 @@ class ActionsTest extends TestCase
         });
 
         $this->assertNotFound($method, '/api/v1/posts/123abc/-actions/foo-bar');
+    }
+
+    /**
+     * @see https://github.com/laravel-json-api/laravel/issues/90
+     */
+    public function testWithMiddleware(): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutes(function () {
+            Route::name('api.')->middleware('my-middleware1')->group(function () {
+                JsonApiRoute::server('v1')->prefix('v1')->resources(function ($server) {
+                    $server->resource('posts', PostController::class)
+                        ->actions(function ($actions) {
+                            $actions->withId()->get('image');
+                        })->middleware('my-middleware2');
+                });
+            });
+        });
+
+        $route = $this->assertMatch('GET', '/api/v1/posts/123/image');
+        $this->assertSame("App\Http\Controllers\Api\V1\PostController@image", $route->action['controller']);
+        $this->assertSame("api.v1.posts.image", $route->getName());
+        $this->assertSame(['api', 'my-middleware1', 'jsonapi:v1', 'my-middleware2'], $route->action['middleware']);
     }
 }
