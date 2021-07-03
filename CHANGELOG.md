@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file. This projec
   actions were authorized via the single `showRelationship()` method. Adding the new `showRelated` method means
   developers can now implement separate authorization logic for these two actions if desired. Our default implementation
   remains unchanged - both are authorized using the `view<RelationshipName>` method on the relevant policy.
+- The request class now has a `isCreatingOrUpdating()` helper method to determine whether the request is to create or
+  updated a resource.
 
 ## [1.0.0-beta.4] - 2021-06-02
 

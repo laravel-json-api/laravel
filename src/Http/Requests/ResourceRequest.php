@@ -238,7 +238,7 @@ class ResourceRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        if ($this->isCreating() || $this->isUpdating()) {
+        if ($this->isCreatingOrUpdating()) {
             $this->assertSupportedMediaType();
             $this->validateResourceDocument();
         } else if ($this->isModifyingRelationship()) {

@@ -126,6 +126,16 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
+     * Is this a request to create or update a resource?
+     *
+     * @return bool
+     */
+    public function isCreatingOrUpdating(): bool
+    {
+        return $this->isCreating() || $this->isUpdating();
+    }
+
+    /**
      * Is this a request to replace a resource relationship?
      *
      * @return bool
