@@ -22,6 +22,9 @@ All notable changes to this project will be documented in this file. This projec
 
 - Minimum Laravel version is now `8.30`. This change was required to use the `$stopOnFirstFailure` property on Laravel's
   `FormRequest` class.
+- Removed the `LaravelJsonApi\Spec\UnexpectedDocumentException` which was thrown if there was a failure when decoding
+  request JSON content before parsing it for compliance with the JSON:API specification. A `JsonApiException` will now
+  be thrown instead.
 
 ## [1.0.0-beta.4] - 2021-06-02
 
