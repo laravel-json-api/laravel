@@ -26,6 +26,11 @@ All notable changes to this project will be documented in this file. This projec
   request JSON content before parsing it for compliance with the JSON:API specification. A `JsonApiException` will now
   be thrown instead.
 
+### Fixed
+
+- [#101](https://github.com/laravel-json-api/laravel/issues/101) Ensure controller create action always returns a
+  response that will result in a `201 Created` response.
+
 ## [1.0.0-beta.4] - 2021-06-02
 
 ### Fixed

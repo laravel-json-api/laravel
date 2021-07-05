@@ -71,6 +71,8 @@ trait Store
             $response = $this->saved($model, $request, $query);
         }
 
-        return $response ?: DataResponse::make($model)->withQueryParameters($query);
+        return $response ?? DataResponse::make($model)
+                ->withQueryParameters($query)
+                ->didCreate();
     }
 }
