@@ -30,6 +30,9 @@ All notable changes to this project will be documented in this file. This projec
 
 - [#101](https://github.com/laravel-json-api/laravel/issues/101) Ensure controller create action always returns a
   response that will result in a `201 Created` response.
+- [#102](https://github.com/laravel-json-api/laravel/issues/102) The attach and detach to-many relationship controller
+  actions now correctly resolve the collection query class using the relation's inverse resource type. Previously they
+  were incorrectly using the primary resource type to resolve the query class.
 
 ## [1.0.0-beta.4] - 2021-06-02
 

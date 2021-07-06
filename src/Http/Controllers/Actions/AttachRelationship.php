@@ -52,7 +52,7 @@ trait AttachRelationship
             $resourceType = $route->resourceType()
         );
 
-        $query = ResourceQuery::queryMany($resourceType);
+        $query = ResourceQuery::queryMany($relation->inverse());
 
         $model = $route->model();
         $response = null;
