@@ -17,11 +17,19 @@ All notable changes to this project will be documented in this file. This projec
 - [#85](https://github.com/laravel-json-api/laravel/issues/85) When running an application with debug mode turned on,
   the default JSON:API error object for an exception will now contain detailed exception information, including the
   stack trace, in the object's `meta` member.
+- [#103](https://github.com/laravel-json-api/laravel/issues/103) Can now fully customise attribute serialization to JSON
+  using the `extractUsing()` callback. This receives the model, column name and value. This is useful if the developer
+  needs to control the serialization of a few fields on their schema. However, the recommendation is to use a resource
+  class for complete control over the serialization of a model to a JSON:API resource.
 
 ### Changed
 
 - Minimum Laravel version is now `8.30`. This change was required to use the `$stopOnFirstFailure` property on Laravel's
   `FormRequest` class.
+- Schema classes no longer automatically sort their fields by name when iterating over them. This change was made to
+  give the developer full control over the order of fields (particularly as this order affects the order in which fields
+  are listed when serialized to a JSON:API resource). Developers can list fields in name order if that is the preferred
+  order.
 - Removed the `LaravelJsonApi\Spec\UnexpectedDocumentException` which was thrown if there was a failure when decoding
   request JSON content before parsing it for compliance with the JSON:API specification. A `JsonApiException` will now
   be thrown instead.
