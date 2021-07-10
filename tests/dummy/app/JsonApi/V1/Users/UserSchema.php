@@ -44,7 +44,7 @@ class UserSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed(),
+            HashId::make()->alreadyHashed()->withLength(10),
             DateTime::make('createdAt')->readOnly(),
             Str::make('name'),
             DateTime::make('updatedAt')->readOnly(),

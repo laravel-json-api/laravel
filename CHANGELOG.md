@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.5] - 2021-07-10
+
+### Added
+
+- The authorizer now has separate `showRelated()` and `showRelationship()` methods. Previously both these controller
+  actions were authorized via the single `showRelationship()` method. Adding the new `showRelated` method means
+  developers can now implement separate authorization logic for these two actions if desired. Our default implementation
+  remains unchanged - both are authorized using the `view<RelationshipName>` method on the relevant policy.
+- The request class now has a `isCreatingOrUpdating()` helper method to determine whether the request is to create or
+  updated a resource.
+- Add stop on first failure to all validators in the resource request class.
+- [#85](https://github.com/laravel-json-api/laravel/issues/85) When running an application with debug mode turned on,
+  the default JSON:API error object for an exception will now contain detailed exception information, including the
+  stack trace, in the object's `meta` member.
+- [#103](https://github.com/laravel-json-api/laravel/issues/103) Can now fully customise attribute serialization to JSON
+  using the `extractUsing()` callback. This receives the model, column name and value. This is useful if the developer
+  needs to control the serialization of a few fields on their schema. However, the recommendation is to use a resource
+  class for complete control over the serialization of a model to a JSON:API resource.
+
+### Changed
+
+- Minimum Laravel version is now `8.30`. This change was required to use the `$stopOnFirstFailure` property on Laravel's
+  `FormRequest` class.
+- Schema classes no longer automatically sort their fields by name when iterating over them. This change was made to
+  give the developer full control over the order of fields (particularly as this order affects the order in which fields
+  are listed when serialized to a JSON:API resource). Developers can list fields in name order if that is the preferred
+  order.
+- Removed the `LaravelJsonApi\Spec\UnexpectedDocumentException` which was thrown if there was a failure when decoding
+  request JSON content before parsing it for compliance with the JSON:API specification. A `JsonApiException` will now
+  be thrown instead.
+
+### Fixed
+
+- [#101](https://github.com/laravel-json-api/laravel/issues/101) Ensure controller create action always returns a
+  response that will result in a `201 Created` response.
+- [#102](https://github.com/laravel-json-api/laravel/issues/102) The attach and detach to-many relationship controller
+  actions now correctly resolve the collection query class using the relation's inverse resource type. Previously they
+  were incorrectly using the primary resource type to resolve the query class.
+
 ## [1.0.0-beta.4] - 2021-06-02
 
 ### Fixed

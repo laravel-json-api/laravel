@@ -23,6 +23,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
+use Illuminate\Support\Str;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Validation\Factory as ValidationFactory;
@@ -85,13 +86,23 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
-     * Is this a request to view resources in a relationship (Read related/relationship actions.)
+     * Is this a request to view related resources in a relationship? (Show-related action.)
+     *
+     * @return bool
+     */
+    public function isViewingRelated(): bool
+    {
+        return $this->isMethod('GET') && $this->isRelationship() && !$this->urlHasRelationships();
+    }
+
+    /**
+     * Is this a request to view resource identifiers in a relationship? (Show-relationship action.)
      *
      * @return bool
      */
     public function isViewingRelationship(): bool
     {
-        return $this->isMethod('GET') && $this->isRelationship();
+        return $this->isMethod('GET') && $this->isRelationship() && $this->urlHasRelationships();
     }
 
     /**
@@ -112,6 +123,16 @@ class FormRequest extends BaseFormRequest
     public function isUpdating(): bool
     {
         return $this->isMethod('PATCH') && $this->isNotRelationship();
+    }
+
+    /**
+     * Is this a request to create or update a resource?
+     *
+     * @return bool
+     */
+    public function isCreatingOrUpdating(): bool
+    {
+        return $this->isCreating() || $this->isUpdating();
     }
 
     /**
@@ -319,5 +340,15 @@ class FormRequest extends BaseFormRequest
     private function doesntHaveResourceId(): bool
     {
         return !$this->hasResourceId();
+    }
+
+    /**
+     * Does the URL contain the keyword "relationships".
+     *
+     * @return bool
+     */
+    private function urlHasRelationships(): bool
+    {
+        return Str::of($this->url())->contains('relationships');
     }
 }

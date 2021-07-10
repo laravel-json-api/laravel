@@ -17,6 +17,11 @@ JsonApiRoute::server('v1')
             $actions->withId()->post('publish');
         });
 
+        /** Users */
+        $server->resource('users')->only('show')->actions(function ($actions) {
+            $actions->get('me');
+        });
+
         /** Videos */
         $server->resource('videos')->relationships(function ($relationships) {
             $relationships->hasMany('tags');

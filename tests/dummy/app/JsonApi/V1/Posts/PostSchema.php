@@ -57,12 +57,17 @@ class PostSchema extends Schema
     protected int $maxDepth = 3;
 
     /**
+     * @var string
+     */
+    protected $defaultSort = '-createdAt';
+
+    /**
      * @inheritDoc
      */
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed(),
+            HashId::make()->alreadyHashed()->withLength(10),
             BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->readOnly(),
             Str::make('content'),

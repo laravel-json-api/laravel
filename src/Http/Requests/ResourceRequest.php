@@ -31,7 +31,6 @@ use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
-use LaravelJsonApi\Spec\UnexpectedDocumentException;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -238,7 +237,7 @@ class ResourceRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        if ($this->isCreating() || $this->isUpdating()) {
+        if ($this->isCreatingOrUpdating()) {
             $this->assertSupportedMediaType();
             $this->validateResourceDocument();
         } else if ($this->isModifyingRelationship()) {
@@ -316,7 +315,7 @@ class ResourceRequest extends FormRequest
             $this->relationshipRules(),
             $this->messages(),
             $this->attributes()
-        );
+        )->stopOnFirstFailure($this->stopOnFirstFailure);
     }
 
     /**
@@ -338,7 +337,7 @@ class ResourceRequest extends FormRequest
                 $this->attributes(),
                 method_exists($this, 'deleteAttributes') ? $this->deleteAttributes() : []
             )
-        );
+        )->stopOnFirstFailure($this->stopOnFirstFailure);
     }
 
     /**
@@ -487,7 +486,7 @@ class ResourceRequest extends FormRequest
      * Validate the JSON API document for a resource request.
      *
      * @return void
-     * @throws HttpExceptionInterface
+     * @throws JsonApiException
      */
     private function validateResourceDocument(): void
     {
@@ -510,7 +509,6 @@ class ResourceRequest extends FormRequest
      * Validate the JSON API document for a modify relationship request.
      *
      * @return void
-     * @throws UnexpectedDocumentException
      * @throws JsonApiException
      */
     private function validateRelationshipDocument(): void
