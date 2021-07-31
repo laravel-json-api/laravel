@@ -25,17 +25,17 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "laravel-json-api/core": "^1.0.0-stable",
-        "laravel-json-api/eloquent": "^1.0.0-stable",
-        "laravel-json-api/encoder-neomerx": "^1.0.0-stable",
-        "laravel-json-api/exceptions": "^1.0.0-stable",
-        "laravel-json-api/spec": "^1.0.0-stable",
-        "laravel-json-api/validation": "^1.0.0-stable",
+        "laravel-json-api/core": "^1.0.0",
+        "laravel-json-api/eloquent": "^1.0.0",
+        "laravel-json-api/encoder-neomerx": "^1.0.0",
+        "laravel-json-api/exceptions": "^1.0.0",
+        "laravel-json-api/spec": "^1.0.0",
+        "laravel-json-api/validation": "^1.0.0",
         "laravel/framework": "^8.30"
     },
     "require-dev": {
-        "laravel-json-api/hashids": "^1.0.0-stable",
-        "laravel-json-api/testing": "^1.0.0-stable",
+        "laravel-json-api/hashids": "^1.0.0",
+        "laravel-json-api/testing": "^1.0.0",
         "orchestra/testbench": "^6.9",
         "phpunit/phpunit": "^9.5"
     },
@@ -54,7 +54,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "1.x-dev"
+            "dev-develop": "1.x-dev",
+            "dev-2.x": "2.x-dev"
         },
         "laravel": {
             "aliases": {
@@ -66,7 +67,7 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
