@@ -46,7 +46,7 @@ class VideoSchema extends Schema
         return [
             ID::make()->uuid()->clientIds(),
             DateTime::make('createdAt')->sortable()->readOnly(),
-            BelongsToMany::make('tags'),
+            BelongsToMany::make('tags')->canCount(),
             Str::make('title')->sortable(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
             Str::make('url'),

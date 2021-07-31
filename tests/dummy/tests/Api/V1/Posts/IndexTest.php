@@ -245,7 +245,6 @@ class IndexTest extends TestCase
         Post::factory()->create(['published_at' => null]);
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->query(['withCount' => 'tags'])

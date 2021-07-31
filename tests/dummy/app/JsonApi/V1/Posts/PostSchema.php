@@ -69,18 +69,18 @@ class PostSchema extends Schema
         return [
             HashId::make()->alreadyHashed()->withLength(10),
             BelongsTo::make('author')->type('users')->readOnly(),
-            HasMany::make('comments')->readOnly(),
+            HasMany::make('comments')->canCount()->readOnly(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
             SoftDelete::make('deletedAt')->sortable(),
             MorphToMany::make('media', [
                 BelongsToMany::make('images'),
                 BelongsToMany::make('videos'),
-            ]),
+            ])->canCount(),
             DateTime::make('publishedAt')->sortable(),
             Str::make('slug'),
             Str::make('synopsis'),
-            BelongsToMany::make('tags')->mustValidate(),
+            BelongsToMany::make('tags')->canCount()->mustValidate(),
             Str::make('title')->sortable(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
         ];
