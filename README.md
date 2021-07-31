@@ -19,6 +19,16 @@ composer require laravel-json-api/laravel
 
 See our documentation for further installation instructions.
 
+## Upgrading
+
+When upgrading you typically want to upgrade this package and all our related packages. This is the recommended way:
+
+```bash
+composer require laravel-json-api/laravel --no-update
+composer require laravel-json-api/testing --dev --no-update
+composer up laravel-json-api/* cloudcreativity/json-api-testing
+```
+
 ## Example Application
 
 To view an example Laravel application that uses this package, see the
