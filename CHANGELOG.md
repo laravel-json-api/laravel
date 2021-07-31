@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0] - 2021-07-31
+
+### Added
+
+- New relationship filter classes: `Has`, `WhereHas`, `WhereDoesntHave`. Refer to
+  the [filter documentation](https://laraveljsonapi.io/docs/1.0/schemas/filters.html#available-filters) for details.
+
+### Changed
+
+- **BREAKING: Countable Relationships.** This feature is now turned off by default. Although included in the 1.0
+  release, this feature is **not considered production-ready**. This is because we plan to make breaking changes to it,
+  which will change how the client requests countable relationships. As such, this feature is considered
+  highly-experimental and developers must opt-in to it by calling the `canCount()` method on a relationship. Refer to
+  the [Countable relationships chapter](https://laraveljsonapi.io/docs/1.0/digging-deeper/countable.html) in the
+  documentation for more details.
+- **BREAKING: Cursor Pagination.** Laravel now has its own cursor pagination feature. We have therefore moved our
+  implementation into its own
+  package: [laravel-json-api/cursor-pagination](https://github.com/laravel-json-api/cursor-pagination)
+  This change has been made because it makes sense for the in-built cursor pagination implementation to use Laravel's
+  cursor pagination implementation rather than our own custom one. Support for Laravel's cursor pagination will be added
+  during the `1.x` release cycle. If you are already using our cursor implementation, you can migrate in two easy steps:
+    1. Install the new package: `composer require laravel-json-api/cursor-pagination`
+    2. In any schemas using the cursor pagination, change the import statement
+       from `LaravelJsonApi\Eloquent\Pagination\CursorPagination` to `LaravelJsonApi\CursorPagination\CursorPagination`.
+
 ## [1.0.0-beta.5] - 2021-07-10
 
 ### Added

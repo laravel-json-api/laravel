@@ -48,10 +48,12 @@ class TagSchema extends Schema
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('name')->sortable(),
             BelongsToMany::make('posts')
+                ->canCount()
                 ->cannotEagerLoad()
                 ->readOnly(),
             DateTime::make('updatedAt')->sortable()->readOnly(),
             BelongsToMany::make('videos')
+                ->canCount()
                 ->cannotEagerLoad()
                 ->readOnly(),
         ];
