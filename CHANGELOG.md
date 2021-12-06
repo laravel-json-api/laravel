@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Changed
+
+- The maximum PHP version is now 8.0. PHP 8.1 is not supported because it introduces a breaking change. The next major
+  version of this package will add support for PHP 8.1.
+
 ## [1.0.0] - 2021-07-31
 
 ### Added

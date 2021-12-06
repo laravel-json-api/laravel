@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^7.4|8.0.*",
         "ext-json": "*",
         "laravel-json-api/core": "^1.0.0",
         "laravel-json-api/eloquent": "^1.0.0",
