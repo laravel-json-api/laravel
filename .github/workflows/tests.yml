@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 2.x ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, 2.x ]
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0']
+        php: ['7.4', '8.0', '8.1']
         laravel: ['^8.30']
 
     steps:

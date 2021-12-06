@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased (2.x)
+
+### Added
+
+- This package now supports PHP 8.1.
+
+### Changed
+
+- **BREAKING** PHP 8.1 introduces `readonly` as a keyword. It was therefore necessary to rename the following interface
+  and trait:
+  - `LaravelJsonApi\Eloquent\Contracts\ReadOnly` is now `IsReadOnly`.
+  - `LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly` is now `IsReadOnly`.
+
 ## Unreleased
 
 ### Changed
