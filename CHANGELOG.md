@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.1] - 2021-12-08
+
+### Changed
+
+- The maximum PHP version is now 8.0. PHP 8.1 is not supported because it introduces a breaking change. The next major
+  version of this package will add support for PHP 8.1.
+
+### Fixed
+
+- [#139](https://github.com/laravel-json-api/laravel/issues/139) Fix the `WhereHas` and `WhereDoesntHave` filters.
+  Previously these were not iterating over the filters from the correct resource schema - they were iterating over
+  the filters from the schema to which the relationship belonged. They now correctly iterate over the filters from the
+  schema for the resource that is on the inverse side of the relationship.
+
 ## [1.0.0] - 2021-07-31
 
 ### Added

@@ -165,16 +165,24 @@ class ReadTest extends TestCase
 
         $expected = $this->serializer
             ->post($post)
-            ->only('slug', 'synopsis', 'title')
+            ->only('author', 'slug', 'synopsis', 'title')
+            ->replace('author', ['type' => 'users', 'id' => $post->author])
+            ->jsonSerialize();
+
+        $author = $this->serializer
+            ->user($post->author)
+            ->only('name')
             ->jsonSerialize();
 
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('posts')
-            ->sparseFields('posts', ['slug', 'synopsis', 'title'])
+            ->sparseFields('posts', ['author', 'slug', 'synopsis', 'title'])
+            ->sparseFields('users', ['name'])
+            ->includePaths('author')
             ->get(url('/api/v1/posts', $expected['id']));
 
-        $response->assertFetchedOneExact($expected);
+        $response->assertFetchedOneExact($expected)->assertIncluded([$author]);
     }
 
     public function testWithCount(): void
