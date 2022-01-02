@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The default JSON:API resource class can now be changed via
+  the `LaravelJsonApi\Laravel\LaravelJsonApi::defaultResource()` method. This should be set in a service
+  provider's `register()` method.
+- [#127](https://github.com/laravel-json-api/laravel/issues/127) The `JsonApiResource` class now has a
+  protected `serializeRelation` method that can be used to override the default serialization of relationships if
+  needed.
+
+### Fixed
+
+- [#130](https://github.com/laravel-json-api/laravel/issues/130) The `JsonApiResource` now correctly handles conditional
+  fields when iterating over relationships to find a specific relation.
+
 ## [1.0.1] - 2021-12-08
 
 ### Changed
@@ -13,8 +29,8 @@ All notable changes to this project will be documented in this file. This projec
 ### Fixed
 
 - [#139](https://github.com/laravel-json-api/laravel/issues/139) Fix the `WhereHas` and `WhereDoesntHave` filters.
-  Previously these were not iterating over the filters from the correct resource schema - they were iterating over
-  the filters from the schema to which the relationship belonged. They now correctly iterate over the filters from the
+  Previously these were not iterating over the filters from the correct resource schema - they were iterating over the
+  filters from the schema to which the relationship belonged. They now correctly iterate over the filters from the
   schema for the resource that is on the inverse side of the relationship.
 
 ## [1.0.0] - 2021-07-31
