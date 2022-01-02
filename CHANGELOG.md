@@ -13,8 +13,14 @@ All notable changes to this project will be documented in this file. This projec
 
 - **BREAKING** PHP 8.1 introduces `readonly` as a keyword. It was therefore necessary to rename the following interface
   and trait:
-  - `LaravelJsonApi\Eloquent\Contracts\ReadOnly` is now `IsReadOnly`.
-  - `LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly` is now `IsReadOnly`.
+    - `LaravelJsonApi\Eloquent\Contracts\ReadOnly` is now `IsReadOnly`.
+    - `LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly` is now `IsReadOnly`.
+- [#83](https://github.com/laravel-json-api/laravel/issues/83) Amended container bindings to ensure package works with
+  Laravel Octane. Most of these changes should have no impact on consuming applications. However, the following changes
+  could potentially be breaking to the JSON:API `Server` class in an application:
+    - The type-hint of the first constructor argument has changed to `LaravelJsonApi\Core\Support\AppResolver`.
+    - The deprecated `$container` property has been removed, and the `$app` property is now private. To access the
+      current application instance in your server class, use `$this->app()` instead.
 
 ## [1.0.1] - 2021-12-08
 
@@ -26,8 +32,8 @@ All notable changes to this project will be documented in this file. This projec
 ### Fixed
 
 - [#139](https://github.com/laravel-json-api/laravel/issues/139) Fix the `WhereHas` and `WhereDoesntHave` filters.
-  Previously these were not iterating over the filters from the correct resource schema - they were iterating over
-  the filters from the schema to which the relationship belonged. They now correctly iterate over the filters from the
+  Previously these were not iterating over the filters from the correct resource schema - they were iterating over the
+  filters from the schema to which the relationship belonged. They now correctly iterate over the filters from the
   schema for the resource that is on the inverse side of the relationship.
 
 ## [1.0.0] - 2021-07-31

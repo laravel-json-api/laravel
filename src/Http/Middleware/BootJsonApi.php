@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Contracts\Server\Repository;
@@ -32,9 +32,9 @@ class BootJsonApi
 {
 
     /**
-     * @var IlluminateContainer
+     * @var Container
      */
-    private IlluminateContainer $container;
+    private Container $container;
 
     /**
      * @var Repository
@@ -44,10 +44,10 @@ class BootJsonApi
     /**
      * BootJsonApi constructor.
      *
-     * @param IlluminateContainer $container
+     * @param Container $container
      * @param Repository $servers
      */
-    public function __construct(IlluminateContainer $container, Repository $servers)
+    public function __construct(Container $container, Repository $servers)
     {
         $this->container = $container;
         $this->servers = $servers;
@@ -64,8 +64,10 @@ class BootJsonApi
     public function handle($request, Closure $next, string $name)
     {
         /**
-         * When handling a HTTP request, both the JSON:API server and
+         * When handling an HTTP request, both the JSON:API server and
          * request classes can be singletons bound into the container.
+         * (The middleware will remove these instances from the container
+         * once the HTTP request is terminated.)
          */
         $this->container->instance(
             Server::class,
@@ -79,7 +81,7 @@ class BootJsonApi
 
         /**
          * Before we do anything, we must ensure the server is set up to
-         * handle a HTTP request. We do that by invoking the `serving()`
+         * handle an HTTP request. We do that by invoking the `serving()`
          * hook on the server instance.
          */
         if (method_exists($server, 'serving')) {
@@ -101,5 +103,16 @@ class BootJsonApi
         PagePagination::bindPageResolver();
 
         return $next($request);
+    }
+
+    /**
+     * Handle tasks after the response has been sent.
+     *
+     * @return void
+     */
+    public function terminate(): void
+    {
+        $this->container->forgetInstance(Server::class);
+        $this->container->forgetInstance(RouteContract::class);
     }
 }

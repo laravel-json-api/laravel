@@ -19,17 +19,19 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\ServerRepository;
+use LaravelJsonApi\Core\Support\AppResolver;
+use LaravelJsonApi\Core\Support\ContainerResolver;
 use LaravelJsonApi\Laravel\Http\Middleware\BootJsonApi;
 
 class ServiceProvider extends BaseServiceProvider
 {
-
     /**
      * Boot application services.
      *
@@ -59,7 +61,6 @@ class ServiceProvider extends BaseServiceProvider
                 Console\StubPublish::class,
             ]);
         }
-
     }
 
     /**
@@ -67,9 +68,26 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
+        $this->bindResolvers();
         $this->bindAuthorizer();
         $this->bindService();
         $this->bindServer();
+    }
+
+    /**
+     * Bind the Octane-compatible lazy instance resolvers into the service container.
+     *
+     * @return void
+     */
+    private function bindResolvers(): void
+    {
+        $this->app->bind(AppResolver::class, static function () {
+            return new AppResolver(static fn() => app());
+        });
+
+        $this->app->bind(ContainerResolver::class, static function () {
+            return new ContainerResolver(static fn() => Container::getInstance());
+        });
     }
 
     /**
@@ -93,7 +111,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     private function bindService(): void
     {
-        $this->app->singleton(JsonApiService::class);
+        $this->app->bind(JsonApiService::class);
     }
 
     /**
