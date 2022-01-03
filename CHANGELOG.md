@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- [#147](https://github.com/laravel-json-api/laravel/issues/147) Related relationship response now correctly merge the
+  relationship links into the top-level document links member.
 - [#130](https://github.com/laravel-json-api/laravel/issues/130) The `JsonApiResource` now correctly handles conditional
   fields when iterating over relationships to find a specific relation.
 - [#105](https://github.com/laravel-json-api/laravel/issues/105) The JSON:API document returned by a relationship `self`
