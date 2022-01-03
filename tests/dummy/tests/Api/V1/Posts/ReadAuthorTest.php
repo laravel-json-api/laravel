@@ -51,9 +51,12 @@ class ReadAuthorTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('users')
-            ->get(url('/api/v1/posts', [$this->post, 'author']));
+            ->get($related = url('/api/v1/posts', [$this->post, 'author']));
 
-        $response->assertFetchedOneExact($expected);
+        $response->assertFetchedOneExact($expected)->assertLinks([
+            'self' => url('/api/v1/posts', [$this->post, 'relationships', 'author']),
+            'related' => $related,
+        ]);
     }
 
     public function testFilterMatches(): void

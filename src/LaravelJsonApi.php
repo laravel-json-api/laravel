@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Query\Custom\ExtendedQueryParameters;
+use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Eloquent\Resources\Relation;
 use LaravelJsonApi\Laravel\Http\Requests\RequestResolver;
 
@@ -54,6 +55,19 @@ final class LaravelJsonApi
     public static function defaultAuthorizer(string $authorizerClass): self
     {
         AuthorizerResolver::useDefault($authorizerClass);
+
+        return new self();
+    }
+
+    /**
+     * Set the default resource class.
+     *
+     * @param string $resourceClass
+     * @return LaravelJsonApi
+     */
+    public static function defaultResource(string $resourceClass): self
+    {
+        ResourceResolver::useDefault($resourceClass);
 
         return new self();
     }

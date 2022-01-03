@@ -56,11 +56,16 @@ class ReadCommentsTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->get(url('/api/v1/posts', [$this->post, 'comments']));
+            ->get($related = url('/api/v1/posts', [$this->post, 'comments']));
 
-        $response->assertFetchedMany($expected)->assertExactMeta([
-            'count' => 3,
-        ]);
+        $links = [
+            'self' => url('/api/v1/posts', [$this->post, 'relationships', 'comments']),
+            'related' => $related,
+        ];
+
+        $response->assertFetchedMany($expected)
+            ->assertLinks($links)
+            ->assertExactMeta(['count' => 3]);
     }
 
     public function testPaginated(): void
