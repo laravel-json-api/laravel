@@ -37,9 +37,9 @@ class ReadTest extends TestCase
             ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->get(url('/api/v1/posts', $expected['id']));
+            ->get($self = url('/api/v1/posts', $expected['id']));
 
-        $response->assertFetchedOneExact($expected);
+        $response->assertFetchedOneExact($expected)->assertLinks(compact('self'));
     }
 
     public function testIncludeAuthorAndTags(): void

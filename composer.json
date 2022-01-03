@@ -27,10 +27,10 @@
         "ext-json": "*",
         "laravel-json-api/core": "2.x-dev as 1.1",
         "laravel-json-api/eloquent": "^2.0",
-        "laravel-json-api/encoder-neomerx": "^1.0.0",
-        "laravel-json-api/exceptions": "^1.0.0",
-        "laravel-json-api/spec": "^1.0.0",
-        "laravel-json-api/validation": "^1.0.0",
+        "laravel-json-api/encoder-neomerx": "^1.1",
+        "laravel-json-api/exceptions": "^1.0",
+        "laravel-json-api/spec": "^1.0",
+        "laravel-json-api/validation": "^1.0",
         "laravel/framework": "^8.30"
     },
     "require-dev": {
