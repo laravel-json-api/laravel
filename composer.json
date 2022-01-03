@@ -27,7 +27,7 @@
         "ext-json": "*",
         "laravel-json-api/core": "^1.1",
         "laravel-json-api/eloquent": "^1.0.1",
-        "laravel-json-api/encoder-neomerx": "^1.0.0",
+        "laravel-json-api/encoder-neomerx": "^1.1",
         "laravel-json-api/exceptions": "^1.0.0",
         "laravel-json-api/spec": "^1.0.0",
         "laravel-json-api/validation": "^1.0.0",

@@ -13,11 +13,18 @@ All notable changes to this project will be documented in this file. This projec
 - [#127](https://github.com/laravel-json-api/laravel/issues/127) The `JsonApiResource` class now has a
   protected `serializeRelation` method that can be used to override the default serialization of relationships if
   needed.
+- [#111](https://github.com/laravel-json-api/laravel/issues/111) Relationship documents returned by relationship `self`
+  routes will now include any non-standard links set on the resource relationship in the top-level `links` member.
 
 ### Fixed
 
 - [#130](https://github.com/laravel-json-api/laravel/issues/130) The `JsonApiResource` now correctly handles conditional
   fields when iterating over relationships to find a specific relation.
+- [#105](https://github.com/laravel-json-api/laravel/issues/105) The JSON:API document returned by a relationship `self`
+  route now handles a relationship not existing if it is hidden. Previously an exception was thrown when attempting to
+  merge relationship links into the document.
+- [#111](https://github.com/laravel-json-api/laravel/issues/111) Relationship documents now handle a relationship that
+  does not have one or both of the `self` and `related` relationship links.
 
 ## [1.0.1] - 2021-12-08
 
