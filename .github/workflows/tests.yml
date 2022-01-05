@@ -15,7 +15,7 @@ jobs:
       fail-fast: true
       matrix:
         php: ['7.4', '8.0', '8.1']
-        laravel: ['^8.30']
+        laravel: ['^8.76']
 
     steps:
     - name: Checkout Code
@@ -28,6 +28,7 @@ jobs:
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
         tools: composer:v2
         coverage: none
+        ini-values: error_reporting=E_ALL
 
     - name: Set Laravel Version
       run: composer require "laravel/framework:${{ matrix.laravel }}" --no-update -n

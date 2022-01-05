@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
@@ -30,6 +31,7 @@ class TestCase extends BaseTestCase
 
     use DatabaseMigrations;
     use MakesJsonApiRequests;
+    use InteractsWithDeprecationHandling;
 
     /**
      * @return void
@@ -37,6 +39,8 @@ class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->withoutDeprecationHandling();
 
         $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/../../dummy/database/migrations');

@@ -8,6 +8,7 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         convertDeprecationsToExceptions="true"
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
@@ -34,6 +35,7 @@
     </testsuite>
   </testsuites>
   <php>
+    <ini name="error_reporting" value="E_ALL"/>
     <env name="DB_CONNECTION" value="testing"/>
   </php>
 </phpunit>
