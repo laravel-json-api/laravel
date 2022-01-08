@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. This projec
   and trait:
     - `LaravelJsonApi\Eloquent\Contracts\ReadOnly` is now `IsReadOnly`.
     - `LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly` is now `IsReadOnly`.
+- Return types have been added to all internal methods in all child packages, to remove deprecation messages in PHP 8.1
 - [#83](https://github.com/laravel-json-api/laravel/issues/83) Amended container bindings to ensure package works with
   Laravel Octane. Most of these changes should have no impact on consuming applications. However, the following changes
   could potentially be breaking to the JSON:API `Server` class in an application:
