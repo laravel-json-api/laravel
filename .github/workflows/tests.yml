@@ -14,31 +14,31 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0', '8.1']
-        laravel: ['^8.76']
+        php: [ '7.4', '8.0', '8.1' ]
+        laravel: [ '^8.76' ]
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
-        tools: composer:v2
-        coverage: none
-        ini-values: error_reporting=E_ALL
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
+          tools: composer:v2
+          coverage: none
+          ini-values: error_reporting=E_ALL
 
-    - name: Set Laravel Version
-      run: composer require "laravel/framework:${{ matrix.laravel }}" --no-update -n
+      - name: Set Laravel Version
+        run: composer require "laravel/framework:${{ matrix.laravel }}" --no-update -n
 
-    - name: Install dependencies
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 5
-        max_attempts: 5
-        command: composer install --no-suggest --prefer-dist -n -o
+      - name: Install dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer install --no-suggest --prefer-dist -n -o
 
-    - name: Execute tests
-      run: vendor/bin/phpunit
+      - name: Execute tests
+        run: vendor/bin/phpunit
