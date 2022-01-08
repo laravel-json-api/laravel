@@ -19,11 +19,20 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Tests\Integration;
 
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use LaravelJsonApi\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    use InteractsWithDeprecationHandling;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutDeprecationHandling();
+    }
 
     /**
      * @inheritDoc
