@@ -69,7 +69,7 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
                 'content' => $post->content,
                 'createdAt' => optional($post->created_at)->jsonSerialize(),
@@ -127,7 +127,7 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'tags',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
                 'createdAt' => $tag->created_at->jsonSerialize(),
                 'name' => $tag->name,
@@ -168,7 +168,7 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'users',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
                 'createdAt' => $user->created_at->jsonSerialize(),
                 'name' => $user->name,

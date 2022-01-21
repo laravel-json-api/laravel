@@ -21,6 +21,7 @@ namespace App\JsonApi\V1\Posts;
 
 use App\Models\Post;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Relations\HasMany;
@@ -35,7 +36,6 @@ use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
 use LaravelJsonApi\Eloquent\Sorting\SortCountable;
-use LaravelJsonApi\HashIds\HashId;
 
 class PostSchema extends Schema
 {
@@ -67,7 +67,7 @@ class PostSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed()->withLength(10),
+            ID::make(),
             BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->canCount()->readOnly(),
             Str::make('content'),

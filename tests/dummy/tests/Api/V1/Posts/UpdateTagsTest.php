@@ -100,7 +100,7 @@ class UpdateTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => $comment->getRouteKey(),
+                'id' => (string) $comment->getRouteKey(),
             ],
         ];
 

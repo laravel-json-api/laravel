@@ -286,7 +286,7 @@ class UpdateTest extends TestCase
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => $this->post->getRouteKey(),
+            'id' => (string) $this->post->getRouteKey(),
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
@@ -300,7 +300,7 @@ class UpdateTest extends TestCase
                 'author' => [
                     'data' => [
                         'type' => 'users',
-                        'id' => $this->post->author->getRouteKey(),
+                        'id' => (string) $this->post->author->getRouteKey(),
                     ],
                 ],
                 'tags' => [

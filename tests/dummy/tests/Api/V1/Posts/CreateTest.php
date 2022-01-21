@@ -25,7 +25,6 @@ use App\Models\Tag;
 use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
-use Vinkla\Hashids\Facades\Hashids;
 
 class CreateTest extends TestCase
 {
@@ -66,8 +65,6 @@ class CreateTest extends TestCase
         $id = $response
             ->assertCreatedWithServerId(url('/api/v1/posts'), $expected)
             ->id();
-
-        $id = Hashids::decode($id);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $post->author->getKey(),

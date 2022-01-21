@@ -81,7 +81,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'comments',
-                'id' => $comment->getRouteKey(),
+                'id' => (string) $comment->getRouteKey(),
             ],
         ];
 
@@ -147,7 +147,7 @@ class AttachTagsTest extends TestCase
         $data = [
             [
                 'type' => 'tags',
-                'id' => $tag->getRouteKey(),
+                'id' => (string) $tag->getRouteKey(),
             ],
         ];
 

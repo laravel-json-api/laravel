@@ -128,13 +128,13 @@ class IndexTest extends TestCase
         $expected1 = $this->serializer->post($posts[0])->jsonSerialize();
         $expected1['relationships']['author']['data'] = $user1 = [
             'type' => 'users',
-            'id' => $posts[0]->author->getRouteKey(),
+            'id' => (string) $posts[0]->author->getRouteKey(),
         ];
 
         $expected2 = $this->serializer->post($posts[1])->jsonSerialize();
         $expected2['relationships']['author']['data'] = $user2 = [
             'type' => 'users',
-            'id' => $posts[1]->author->getRouteKey(),
+            'id' => (string) $posts[1]->author->getRouteKey(),
         ];
 
         $response = $this

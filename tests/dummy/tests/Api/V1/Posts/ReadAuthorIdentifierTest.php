@@ -56,7 +56,7 @@ class ReadAuthorIdentifierTest extends TestCase
             ],
             'data' => [
                 'type' => 'users',
-                'id' => $this->post->author->getRouteKey(),
+                'id' => (string) $this->post->author->getRouteKey(),
             ],
             'jsonapi' => [
                 'version' => '1.0',

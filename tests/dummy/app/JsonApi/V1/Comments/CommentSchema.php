@@ -21,12 +21,12 @@ namespace App\JsonApi\V1\Comments;
 
 use App\Models\Comment;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use LaravelJsonApi\HashIds\HashId;
 
 class CommentSchema extends Schema
 {
@@ -44,7 +44,7 @@ class CommentSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed()->withLength(10),
+            ID::make(),
             Str::make('content'),
             DateTime::make('createdAt')->sortable()->readOnly(),
             BelongsTo::make('post'),

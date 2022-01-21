@@ -53,7 +53,7 @@ class TestCase extends BaseTestCase
             'type' => $type,
             'id' => ($modelOrResourceId instanceof UrlRoutable) ?
                 (string) $modelOrResourceId->getRouteKey() :
-                $modelOrResourceId
+                (string) $modelOrResourceId
         ])->values()->all();
     }
 }

@@ -21,12 +21,12 @@ namespace App\JsonApi\V1\Tags;
 
 use App\Models\Tag;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use LaravelJsonApi\HashIds\HashId;
 
 class TagSchema extends Schema
 {
@@ -44,7 +44,7 @@ class TagSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed()->withLength(10),
+            ID::make(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('name')->sortable(),
             BelongsToMany::make('posts')

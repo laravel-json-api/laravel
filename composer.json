@@ -35,7 +35,6 @@
     },
     "require-dev": {
         "cloudcreativity/json-api-testing": "^4.0",
-        "laravel-json-api/hashids": "^1.1",
         "laravel-json-api/testing": "^1.1",
         "orchestra/testbench": "^6.23",
         "phpunit/phpunit": "^9.5.10"
