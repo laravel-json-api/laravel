@@ -216,7 +216,6 @@ class IndexTest extends TestCase
         ];
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->filter(['published' => 'true'])

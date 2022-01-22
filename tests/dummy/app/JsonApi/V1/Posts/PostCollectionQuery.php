@@ -43,6 +43,10 @@ class PostCollectionQuery extends ResourceQuery
                 'array',
                 JsonApiRule::filter(),
             ],
+            'filter.id' => ['array'],
+            'filter.id.*' => ['integer'],
+            'filter.published' => [JsonApiRule::boolean()->asString()],
+            'filter.slug' => ['string'],
             'include' => [
                 'nullable',
                 'string',
