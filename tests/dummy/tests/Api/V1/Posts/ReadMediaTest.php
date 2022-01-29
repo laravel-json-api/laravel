@@ -150,13 +150,11 @@ class ReadMediaTest extends TestCase
 
         $expectedImages = $images->toBase()->map(fn(Image $image) => $this->serializer
             ->image($image)
-            ->jsonSerialize()
         )->all();
 
         $expectedVideos = $videos->toBase()->map(fn(Video $video) => $this->serializer
             ->video($video)
             ->withRelationshipMeta('tags', ['count' => 1])
-            ->jsonSerialize()
         )->all();
 
         $expected = collect($expectedImages)->merge($expectedVideos)->all();

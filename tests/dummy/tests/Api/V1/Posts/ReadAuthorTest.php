@@ -45,8 +45,7 @@ class ReadAuthorTest extends TestCase
     public function test(): void
     {
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -62,8 +61,7 @@ class ReadAuthorTest extends TestCase
     public function testFilterMatches(): void
     {
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->jsonApi('users')
@@ -124,8 +122,7 @@ class ReadAuthorTest extends TestCase
         $this->post->update(['published_at' => null]);
 
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->actingAs($this->post->author)

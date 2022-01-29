@@ -46,7 +46,7 @@ class ReadTagsTest extends TestCase
         $this->post->tags()->attach($tags);
 
         $expected = $tags
-            ->map(fn(Tag $tag) => $this->serializer->tag($tag)->jsonSerialize())
+            ->map(fn(Tag $tag) => $this->serializer->tag($tag))
             ->all();
 
         $response = $this
@@ -84,7 +84,6 @@ class ReadTagsTest extends TestCase
         $expected = $tags->map(fn(Tag $tag) => $this->serializer
             ->tag($tag)
             ->withRelationshipMeta('posts', ['count' => 1])
-            ->jsonSerialize()
         )->all();
 
         $response = $this

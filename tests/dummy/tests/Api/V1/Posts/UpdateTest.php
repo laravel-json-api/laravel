@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
             ->serialize()
             ->replace('tags', $this->identifiersFor('tags', $tags));
 
-        $expected = $data->forget('updatedAt')->jsonSerialize();
+        $expected = $data->forget('updatedAt');
 
         $response = $this
             ->actingAs($this->post->author)

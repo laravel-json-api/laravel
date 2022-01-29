@@ -30,8 +30,7 @@ class ReadTest extends TestCase
         $user = User::factory()->createOne();
 
         $expected = $this->serializer
-            ->user($user)
-            ->jsonSerialize();
+            ->user($user);
 
         $response = $this
             ->actingAs(User::factory()->createOne())
@@ -46,8 +45,7 @@ class ReadTest extends TestCase
         $user = User::factory()->createOne();
 
         $expected = $this->serializer
-            ->user($user)
-            ->jsonSerialize();
+            ->user($user);
 
         $response = $this
             ->actingAs($user)

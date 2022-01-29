@@ -51,8 +51,7 @@ class CreateTest extends TestCase
 
         $expected = $data
             ->forget('createdAt', 'updatedAt')
-            ->replace('author', ['type' => 'users', 'id' => $post->author])
-            ->jsonSerialize();
+            ->replace('author', ['type' => 'users', 'id' => $post->author]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -107,8 +106,7 @@ class CreateTest extends TestCase
 
         $data = $this
             ->serialize($post)
-            ->replace('slug', $exists->slug)
-            ->jsonSerialize();
+            ->replace('slug', $exists->slug);
 
         $expected = [
             'detail' => 'The slug has already been taken.',
@@ -132,8 +130,7 @@ class CreateTest extends TestCase
 
         $data = $this
             ->serialize($post)
-            ->withId('81166677-f3c4-440c-9a4a-12b89802d731')
-            ->jsonSerialize();
+            ->withId('81166677-f3c4-440c-9a4a-12b89802d731');
 
         $expected = [
             'detail' => "Resource type posts does not support client-generated IDs.",
