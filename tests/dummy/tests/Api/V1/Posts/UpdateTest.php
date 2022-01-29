@@ -64,7 +64,7 @@ class UpdateTest extends TestCase
             ->includePaths('author', 'tags')
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected);
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $this->post->author->getKey(),
@@ -120,7 +120,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $this->post->author->getKey(),
@@ -159,7 +159,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertSoftDeleted($this->post);
         $this->assertTrue($deleted);
@@ -191,7 +191,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', array_merge($this->post->getOriginal(), [
             'deleted_at' => null,

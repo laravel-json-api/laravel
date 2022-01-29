@@ -49,7 +49,7 @@ class DeleteTest extends TestCase
             ->jsonApi()
             ->delete(url('api/v1/posts', $this->post));
 
-        $response->assertDeleted();
+        $response->assertNoContent();
 
         $this->assertDatabaseMissing('posts', [
             'id' => $this->post->getKey(),
