@@ -21,13 +21,11 @@ namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
 use Illuminate\Support\Str;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Validation\Factory as ValidationFactory;
-use LogicException;
 
 class FormRequest extends BaseFormRequest
 {
