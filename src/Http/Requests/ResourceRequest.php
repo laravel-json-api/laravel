@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,36 @@ class ResourceRequest extends FormRequest
         $resolver = self::$requestResolver ?: new RequestResolver(RequestResolver::REQUEST);
 
         return $resolver($resourceType, true);
+    }
+
+    /**
+     * Get the model that the request relates to, if the URL has a resource id.
+     *
+     * @return Model|object|null
+     */
+    public function model(): ?object
+    {
+        $route = $this->jsonApi()->route();
+
+        if ($route->hasResourceId()) {
+            return $route->model();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the model that the request relates to, or fail if there is none.
+     *
+     * @return Model|object
+     */
+    public function modelOrFail(): object
+    {
+        if ($model = $this->model()) {
+            return $model;
+        }
+
+        throw new LogicException('No model exists for this route.');
     }
 
     /**

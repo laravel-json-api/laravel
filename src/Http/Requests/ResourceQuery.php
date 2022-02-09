@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
@@ -28,6 +29,7 @@ use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
+use LogicException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
@@ -235,6 +237,36 @@ class ResourceQuery extends FormRequest implements QueryParameters
             'page',
             'filter',
         ])->all();
+    }
+
+    /**
+     * Get the model that the request relates to, if the URL has a resource id.
+     *
+     * @return Model|object|null
+     */
+    protected function model(): ?object
+    {
+        $route = $this->jsonApi()->route();
+
+        if ($route->hasResourceId()) {
+            return $route->model();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the model that the request relates to, or fail if there is none.
+     *
+     * @return Model|object
+     */
+    protected function modelOrFail(): object
+    {
+        if ($model = $this->model()) {
+            return $model;
+        }
+
+        throw new LogicException('No model exists for this route.');
     }
 
     /**
