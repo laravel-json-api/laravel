@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,17 +125,13 @@ class IndexTest extends TestCase
     {
         $posts = Post::factory()->count(2)->create();
 
-        $expected1 = $this->serializer->post($posts[0])->jsonSerialize();
-        $expected1['relationships']['author']['data'] = $user1 = [
-            'type' => 'users',
-            'id' => $posts[0]->author->getRouteKey(),
-        ];
+        $expected1 = $this->serializer
+            ->post($posts[0])
+            ->putRelation('author', $user1 = ['type' => 'users', 'id' => $posts[0]->author]);
 
-        $expected2 = $this->serializer->post($posts[1])->jsonSerialize();
-        $expected2['relationships']['author']['data'] = $user2 = [
-            'type' => 'users',
-            'id' => $posts[1]->author->getRouteKey(),
-        ];
+        $expected2 = $this->serializer
+            ->post($posts[1])
+            ->putRelation('author', $user2 = ['type' => 'users', 'id' => $posts[1]->author]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -174,7 +170,7 @@ class IndexTest extends TestCase
     public function testSlugFilter(): void
     {
         $posts = Post::factory()->count(2)->create();
-        $expected = $this->serializer->post($posts[1])->jsonSerialize();
+        $expected = $this->serializer->post($posts[1]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -216,7 +212,6 @@ class IndexTest extends TestCase
         ];
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
             ->filter(['published' => 'true'])
@@ -238,7 +233,6 @@ class IndexTest extends TestCase
         $expected = collect($posts)->map(fn($post) => $this->serializer
             ->post($post)
             ->withRelationshipMeta('tags', ['count' => 1])
-            ->jsonSerialize()
         )->all();
 
         /** Draft post should not appear. */

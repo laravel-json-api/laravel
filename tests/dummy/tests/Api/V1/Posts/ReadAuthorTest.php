@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,7 @@ class ReadAuthorTest extends TestCase
     public function test(): void
     {
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -62,8 +61,7 @@ class ReadAuthorTest extends TestCase
     public function testFilterMatches(): void
     {
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->jsonApi('users')
@@ -124,8 +122,7 @@ class ReadAuthorTest extends TestCase
         $this->post->update(['published_at' => null]);
 
         $expected = $this->serializer
-            ->user($this->post->author)
-            ->jsonSerialize();
+            ->user($this->post->author);
 
         $response = $this
             ->actingAs($this->post->author)

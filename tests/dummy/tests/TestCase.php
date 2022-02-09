@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,6 @@ abstract class TestCase extends BaseTestCase
 
         /** Fix "now" so that updated at dates are predictable. */
         Date::setTestNow(CarbonImmutable::now()->startOfSecond());
-
-        config()->set('hashids', [
-            'default' => 'main',
-            'connections' => [
-                'main' => [
-                    'salt' => 'Z3wxm8m6fxPMRtjX',
-                    'length' => 10,
-                ],
-            ],
-        ]);
     }
 
     /**
@@ -78,7 +68,6 @@ abstract class TestCase extends BaseTestCase
             \LaravelJsonApi\Spec\ServiceProvider::class,
             \LaravelJsonApi\Validation\ServiceProvider::class,
             \LaravelJsonApi\Encoder\Neomerx\ServiceProvider::class,
-            \Vinkla\Hashids\HashidsServiceProvider::class,
             ServiceProvider::class,
             AppServiceProvider::class,
             AuthServiceProvider::class,

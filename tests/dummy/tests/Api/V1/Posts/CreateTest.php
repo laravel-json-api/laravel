@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ use App\Models\Tag;
 use App\Models\Video;
 use App\Tests\Api\V1\TestCase;
 use LaravelJsonApi\Core\Document\ResourceObject;
-use Vinkla\Hashids\Facades\Hashids;
 
 class CreateTest extends TestCase
 {
@@ -52,8 +51,7 @@ class CreateTest extends TestCase
 
         $expected = $data
             ->forget('createdAt', 'updatedAt')
-            ->replace('author', ['type' => 'users', 'id' => $post->author])
-            ->jsonSerialize();
+            ->replace('author', ['type' => 'users', 'id' => $post->author]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -66,8 +64,6 @@ class CreateTest extends TestCase
         $id = $response
             ->assertCreatedWithServerId(url('/api/v1/posts'), $expected)
             ->id();
-
-        $id = Hashids::decode($id);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $post->author->getKey(),
@@ -110,8 +106,7 @@ class CreateTest extends TestCase
 
         $data = $this
             ->serialize($post)
-            ->replace('slug', $exists->slug)
-            ->jsonSerialize();
+            ->replace('slug', $exists->slug);
 
         $expected = [
             'detail' => 'The slug has already been taken.',
@@ -135,8 +130,7 @@ class CreateTest extends TestCase
 
         $data = $this
             ->serialize($post)
-            ->withId('81166677-f3c4-440c-9a4a-12b89802d731')
-            ->jsonSerialize();
+            ->withId('81166677-f3c4-440c-9a4a-12b89802d731');
 
         $expected = [
             'detail' => "Resource type posts does not support client-generated IDs.",

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class PublishTest extends TestCase
 
         $expected = $this->serializer
             ->post($this->post)
-            ->replace('publishedAt', $date->jsonSerialize())
+            ->replace('publishedAt', $date)
             ->replace('author', ['type' => 'users', 'id' => $this->post->author]);
 
         $response = $this
@@ -57,7 +57,7 @@ class PublishTest extends TestCase
             ->includePaths('author')
             ->post(url('/api/v1/posts', [$this->post, '-actions/publish']));
 
-        $response->assertFetchedOneExact($expected->jsonSerialize());
+        $response->assertFetchedOneExact($expected);
         $response->assertIncluded([$expected['author']]);
 
         $this->assertDatabaseHas('posts', array_replace(

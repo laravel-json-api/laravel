@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class ReadTest extends TestCase
     public function test(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->jsonSerialize();
+        $expected = $this->serializer->post($post);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -56,8 +56,7 @@ class ReadTest extends TestCase
         $expected = $this->serializer
             ->post($post)
             ->replace('author', $author = ['type' => 'users', 'id' => $post->author])
-            ->replace('tags', $identifiers)
-            ->jsonSerialize();
+            ->replace('tags', $identifiers);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -96,8 +95,7 @@ class ReadTest extends TestCase
 
         $expected = $this->serializer
             ->post($post)
-            ->replace('media', $ids)
-            ->jsonSerialize();
+            ->replace('media', $ids);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -120,8 +118,7 @@ class ReadTest extends TestCase
 
         $expected = $this->serializer
             ->post($post)
-            ->replace('tags', [])
-            ->jsonSerialize();
+            ->replace('tags', []);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -135,7 +132,7 @@ class ReadTest extends TestCase
     public function testSlugFilter(): void
     {
         $post = Post::factory()->create();
-        $expected = $this->serializer->post($post)->jsonSerialize();
+        $expected = $this->serializer->post($post);
 
         $response = $this
             ->jsonApi()
@@ -166,13 +163,11 @@ class ReadTest extends TestCase
         $expected = $this->serializer
             ->post($post)
             ->only('author', 'slug', 'synopsis', 'title')
-            ->replace('author', ['type' => 'users', 'id' => $post->author])
-            ->jsonSerialize();
+            ->replace('author', ['type' => 'users', 'id' => $post->author]);
 
         $author = $this->serializer
             ->user($post->author)
-            ->only('name')
-            ->jsonSerialize();
+            ->only('name');
 
         $response = $this
             ->withoutExceptionHandling()
@@ -195,8 +190,7 @@ class ReadTest extends TestCase
         $expected = $this->serializer
             ->post($post)
             ->withRelationshipMeta('tags', ['count' => 1])
-            ->withRelationshipMeta('comments', ['count' => 3])
-            ->jsonSerialize();
+            ->withRelationshipMeta('comments', ['count' => 3]);
 
         $response = $this
             ->withoutExceptionHandling()
@@ -246,7 +240,7 @@ class ReadTest extends TestCase
     public function testDraftAsAuthor(): void
     {
         $post = Post::factory()->create(['published_at' => null]);
-        $expected = $this->serializer->post($post)->jsonSerialize();
+        $expected = $this->serializer->post($post);
 
         $response = $this
             ->actingAs($post->author)

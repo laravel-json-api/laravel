@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ namespace App\JsonApi\V1\Tags;
 
 use App\Models\Tag;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsToMany;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use LaravelJsonApi\HashIds\HashId;
 
 class TagSchema extends Schema
 {
@@ -44,7 +44,7 @@ class TagSchema extends Schema
     public function fields(): array
     {
         return [
-            HashId::make()->alreadyHashed()->withLength(10),
+            ID::make(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             Str::make('name')->sortable(),
             BelongsToMany::make('posts')

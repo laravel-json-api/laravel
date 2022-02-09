@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class ReadTagsTest extends TestCase
         $this->post->tags()->attach($tags);
 
         $expected = $tags
-            ->map(fn(Tag $tag) => $this->serializer->tag($tag)->jsonSerialize())
+            ->map(fn(Tag $tag) => $this->serializer->tag($tag))
             ->all();
 
         $response = $this
@@ -84,7 +84,6 @@ class ReadTagsTest extends TestCase
         $expected = $tags->map(fn(Tag $tag) => $this->serializer
             ->tag($tag)
             ->withRelationshipMeta('posts', ['count' => 1])
-            ->jsonSerialize()
         )->all();
 
         $response = $this

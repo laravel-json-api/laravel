@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ class ReadTest extends TestCase
         $user = User::factory()->createOne();
 
         $expected = $this->serializer
-            ->user($user)
-            ->jsonSerialize();
+            ->user($user);
 
         $response = $this
             ->actingAs(User::factory()->createOne())
@@ -46,8 +45,7 @@ class ReadTest extends TestCase
         $user = User::factory()->createOne();
 
         $expected = $this->serializer
-            ->user($user)
-            ->jsonSerialize();
+            ->user($user);
 
         $response = $this
             ->actingAs($user)

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.0.0] - 2022-02-09
+
+### Added
+
+- This package now supports Laravel 9.
+- This package now supports PHP 8.1.
+
+### Changed
+
+- **BREAKING** PHP 8.1 introduces `readonly` as a keyword. It was therefore necessary to rename the following interface
+  and trait:
+    - `LaravelJsonApi\Eloquent\Contracts\ReadOnly` is now `IsReadOnly`.
+    - `LaravelJsonApi\Eloquent\Fields\Concerns\ReadOnly` is now `IsReadOnly`.
+- Return types have been added to all internal methods in all child packages, to remove deprecation messages in PHP 8.1
+- [#83](https://github.com/laravel-json-api/laravel/issues/83) Amended container bindings to ensure package works with
+  Laravel Octane. Most of these changes should have no impact on consuming applications. However, the following changes
+  could potentially be breaking to the JSON:API `Server` class in an application:
+    - The type-hint of the first constructor argument has changed to `LaravelJsonApi\Core\Support\AppResolver`.
+    - The deprecated `$container` property has been removed, and the `$app` property is now private. To access the
+      current application instance in your server class, use `$this->app()` instead.
+- **BREAKING** [#110](https://github.com/laravel-json-api/laravel/issues/110) The `model()` and `modelOrFail()` methods
+  on the `ResourceQuery` request class have been changed from `public` to `protected`. These were not documented for use
+  on this query class, and were only intended to be used publicly on the `ResourceRequest` class. Although technically
+  breaking, this change is unlikely to affect the vast majority of applications which should not be using the method.
+
 ## [1.1.0] - 2022-01-03
 
 ### Added

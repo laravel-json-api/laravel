@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@ class Serializer
             'type' => 'images',
             'id' => (string) $image->getRouteKey(),
             'attributes' => [
-                'createdAt' => $image->created_at->jsonSerialize(),
-                'updatedAt' => $image->updated_at->jsonSerialize(),
+                'createdAt' => $image->created_at,
+                'updatedAt' => $image->updated_at,
                 'url' => $image->url,
             ],
             'links' => [
@@ -69,16 +69,16 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
                 'content' => $post->content,
-                'createdAt' => optional($post->created_at)->jsonSerialize(),
-                'deletedAt' => optional($post->deleted_at)->jsonSerialize(),
-                'publishedAt' => optional($post->published_at)->jsonSerialize(),
+                'createdAt' => $post->created_at,
+                'deletedAt' => $post->deleted_at,
+                'publishedAt' => $post->published_at,
                 'slug' => $post->slug,
                 'synopsis' => $post->synopsis,
                 'title' => $post->title,
-                'updatedAt' => optional($post->updated_at)->jsonSerialize(),
+                'updatedAt' => $post->updated_at,
             ],
             'relationships' => [
                 'author' => [
@@ -127,11 +127,11 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'tags',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
-                'createdAt' => $tag->created_at->jsonSerialize(),
+                'createdAt' => $tag->created_at,
                 'name' => $tag->name,
-                'updatedAt' => $tag->updated_at->jsonSerialize(),
+                'updatedAt' => $tag->updated_at,
             ],
             'relationships' => [
                 'posts' => [
@@ -168,11 +168,11 @@ class Serializer
 
         return ResourceObject::fromArray([
             'type' => 'users',
-            'id' => $id,
+            'id' => (string) $id,
             'attributes' => [
-                'createdAt' => $user->created_at->jsonSerialize(),
+                'createdAt' => $user->created_at,
                 'name' => $user->name,
-                'updatedAt' => $user->updated_at->jsonSerialize(),
+                'updatedAt' => $user->updated_at,
             ],
             'links' => [
                 'self' => $self,
@@ -195,9 +195,9 @@ class Serializer
             'type' => 'videos',
             'id' => (string) $video->getRouteKey(),
             'attributes' => [
-                'createdAt' => $video->created_at->jsonSerialize(),
+                'createdAt' => $video->created_at,
                 'title' => $video->title,
-                'updatedAt' => $video->updated_at->jsonSerialize(),
+                'updatedAt' => $video->updated_at,
                 'url' => $video->url,
             ],
             'relationships' => [

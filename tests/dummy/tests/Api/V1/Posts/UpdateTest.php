@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
             ->serialize()
             ->replace('tags', $this->identifiersFor('tags', $tags));
 
-        $expected = $data->forget('updatedAt')->jsonSerialize();
+        $expected = $data->forget('updatedAt');
 
         $response = $this
             ->actingAs($this->post->author)
@@ -64,7 +64,7 @@ class UpdateTest extends TestCase
             ->includePaths('author', 'tags')
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected);
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $this->post->author->getKey(),
@@ -120,7 +120,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', [
             'author_id' => $this->post->author->getKey(),
@@ -159,7 +159,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertSoftDeleted($this->post);
         $this->assertTrue($deleted);
@@ -191,7 +191,7 @@ class UpdateTest extends TestCase
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 
-        $response->assertUpdated($expected->jsonSerialize());
+        $response->assertFetchedOne($expected);
 
         $this->assertDatabaseHas('posts', array_merge($this->post->getOriginal(), [
             'deleted_at' => null,
@@ -286,7 +286,7 @@ class UpdateTest extends TestCase
 
         return ResourceObject::fromArray([
             'type' => 'posts',
-            'id' => $this->post->getRouteKey(),
+            'id' => (string) $this->post->getRouteKey(),
             'attributes' => [
                 'content' => $other->content,
                 'createdAt' => $this->post->created_at->toJSON(),
@@ -300,7 +300,7 @@ class UpdateTest extends TestCase
                 'author' => [
                     'data' => [
                         'type' => 'users',
-                        'id' => $this->post->author->getRouteKey(),
+                        'id' => (string) $this->post->author->getRouteKey(),
                     ],
                 ],
                 'tags' => [

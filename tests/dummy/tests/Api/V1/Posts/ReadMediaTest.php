@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,13 +150,11 @@ class ReadMediaTest extends TestCase
 
         $expectedImages = $images->toBase()->map(fn(Image $image) => $this->serializer
             ->image($image)
-            ->jsonSerialize()
         )->all();
 
         $expectedVideos = $videos->toBase()->map(fn(Video $video) => $this->serializer
             ->video($video)
             ->withRelationshipMeta('tags', ['count' => 1])
-            ->jsonSerialize()
         )->all();
 
         $expected = collect($expectedImages)->merge($expectedVideos)->all();
