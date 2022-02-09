@@ -54,8 +54,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "1.x-dev",
-            "dev-2.x": "2.x-dev"
+            "dev-develop": "2.x-dev"
         },
         "laravel": {
             "aliases": {
@@ -67,7 +66,7 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
