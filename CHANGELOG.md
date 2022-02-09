@@ -23,6 +23,10 @@ All notable changes to this project will be documented in this file. This projec
     - The type-hint of the first constructor argument has changed to `LaravelJsonApi\Core\Support\AppResolver`.
     - The deprecated `$container` property has been removed, and the `$app` property is now private. To access the
       current application instance in your server class, use `$this->app()` instead.
+- **BREAKING** [#110](https://github.com/laravel-json-api/laravel/issues/110) The `model()` and `modelOrFail()` methods
+  on the `ResourceQuery` request class have been changed from `public` to `protected`. These were not documented for use
+  on this query class, and were only intended to be used publicly on the `ResourceRequest` class. Although technically
+  breaking, this change is unlikely to affect the vast majority of applications which should not be using the method.
 
 ## [1.1.0] - 2022-01-03
 

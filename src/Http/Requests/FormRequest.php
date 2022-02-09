@@ -232,36 +232,6 @@ class FormRequest extends BaseFormRequest
     }
 
     /**
-     * Get the model that the request relates to, if the URL has a resource id.
-     *
-     * @return Model|object|null
-     */
-    public function model(): ?object
-    {
-        $route = $this->jsonApi()->route();
-
-        if ($route->hasResourceId()) {
-            return $route->model();
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the model that the request relates to, or fail if there is none.
-     *
-     * @return Model|object
-     */
-    public function modelOrFail(): object
-    {
-        if ($model = $this->model()) {
-            return $model;
-        }
-
-        throw new LogicException('No model exists for this route.');
-    }
-
-    /**
      * @return bool
      */
     protected function passesAuthorization()
