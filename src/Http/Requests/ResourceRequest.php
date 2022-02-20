@@ -23,11 +23,13 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\IncludePaths;
+use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
@@ -48,6 +50,11 @@ class ResourceRequest extends FormRequest
      * @var array|null
      */
     private ?array $validationData = null;
+
+    /**
+     * @var LazyRelation|null
+     */
+    private ?LazyRelation $relation = null;
 
     /**
      * Specify the callback to use to guess the request class for a JSON API resource.
@@ -114,6 +121,38 @@ class ResourceRequest extends FormRequest
         }
 
         throw new LogicException('No model exists for this route.');
+    }
+
+    /**
+     * Get the model referenced in a to-one relationship.
+     *
+     * @return Model|object|null
+     */
+    public function toOne(): ?object
+    {
+        if ($this->isModifyingRelationship()) {
+            return $this->relation()->get();
+        }
+
+        throw new LogicException(
+            'Can only retrieve the model for a to-one relationship when the relationship is being modified.'
+        );
+    }
+
+    /**
+     * Get the models referenced in a to-many relationship.
+     *
+     * @return Collection
+     */
+    public function toMany(): Collection
+    {
+        if ($this->isModifyingRelationship()) {
+            return $this->relation()->collect();
+        }
+
+        throw new LogicException(
+            'Can only retrieve the models for a to-many relationship when the relationship is being modified.'
+        );
     }
 
     /**
@@ -555,6 +594,24 @@ class ResourceRequest extends FormRequest
         if ($document->invalid()) {
             throw new JsonApiException($document);
         }
+    }
+
+    /**
+     * @return LazyRelation
+     */
+    private function relation(): LazyRelation
+    {
+        if ($this->relation) {
+            return $this->relation;
+        }
+
+        $jsonApi = $this->jsonApi();
+
+        return $this->relation = new LazyRelation(
+            $jsonApi->server(),
+            $jsonApi->route()->relation(),
+            $this->json()->all(),
+        );
     }
 
 }

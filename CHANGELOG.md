@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#110](https://github.com/laravel-json-api/laravel/issues/110) For requests that modify a relationship, it is now
+  possible to get the model or models referenced in the request JSON using the `toOne()` or `toMany()` methods on the
+  resource request class.
+
 ## [2.0.0] - 2022-02-09
 
 ### Added
