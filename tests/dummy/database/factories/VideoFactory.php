@@ -42,7 +42,7 @@ class VideoFactory extends Factory
         return [
             'owner_id' => User::factory(),
             'title' => $this->faker->words(3, true),
-            'url' => $this->faker->url,
+            'url' => $this->faker->url(),
         ];
     }
 }
