@@ -99,7 +99,9 @@ class Route implements RouteContract
             throw new LogicException('No JSON API resource id name set on route.');
         }
 
-        if ($modelOrResourceId = $this->route->parameter($name)) {
+        $modelOrResourceId = $this->route->parameter($name);
+
+        if (!empty($modelOrResourceId) || '0' === $modelOrResourceId) {
             return $modelOrResourceId;
         }
 
