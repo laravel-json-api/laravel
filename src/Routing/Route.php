@@ -27,6 +27,7 @@ use LaravelJsonApi\Contracts\Routing\Route as RouteContract;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -101,11 +102,11 @@ class Route implements RouteContract
 
         $modelOrResourceId = $this->route->parameter($name);
 
-        if (!empty($modelOrResourceId) || '0' === $modelOrResourceId) {
-            return $modelOrResourceId;
+        if (!is_object($modelOrResourceId) && ResourceIdentifier::idIsEmpty($modelOrResourceId)) {
+            throw new LogicException('No JSON API resource id set on route.');
         }
 
-        throw new LogicException('No JSON API resource id set on route.');
+        return $modelOrResourceId;
     }
 
     /**
