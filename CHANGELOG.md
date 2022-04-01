@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.1.1] - 2022-04-01
+
+### Fixed
+
+- [#178](https://github.com/laravel-json-api/laravel/issues/178) Allow a resource id that is `"0"`.
+
 ## [2.1.0] - 2022-02-20
 
 ### Added
