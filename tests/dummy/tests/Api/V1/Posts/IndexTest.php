@@ -218,8 +218,87 @@ class IndexTest extends TestCase
             ->page(['number' => 1, 'size' => 10])
             ->get('/api/v1/posts');
 
-        $response->assertFetchedMany($expected)
+        $response
+            ->assertFetchedMany($expected)
             ->assertMeta($meta)
+            ->assertLinks($links);
+    }
+
+    public function testSparseFieldSets(): void
+    {
+        $posts = Post::factory()->count(3)->create();
+
+        $expected = $posts->map(
+            fn(Post $post) => $this->serializer
+                ->post($post)
+                ->only('author', 'slug', 'synopsis', 'title')
+                ->replace('author', ['type' => 'users', 'id' => $post->author])
+        );
+
+        $authors = $this->identifiersFor(
+            'users', $posts->pluck('author')
+        );
+
+        $response = $this
+            ->jsonApi('posts')
+            ->sparseFields('posts', ['author', 'slug', 'synopsis', 'title'])
+            ->sparseFields('users', ['name'])
+            ->includePaths('author')
+            ->get('/api/v1/posts');
+
+        $response
+            ->assertFetchedManyExact($expected)
+            ->assertIncluded($authors);
+    }
+
+    public function testSparseFieldSetsAndPaginated(): void
+    {
+        $posts = Post::factory()->count(5)->create();
+
+        $expected = $posts->take(3)->map(
+            fn(Post $post) => $this->serializer
+                ->post($post)
+                ->only('author', 'slug', 'synopsis', 'title')
+                ->replace('author', ['type' => 'users', 'id' => $post->author])
+        );
+
+        $meta = [
+            'currentPage' => 1,
+            'from' => 1,
+            'lastPage' => 2,
+            'perPage' => 3,
+            'to' => 3,
+            'total' => 5,
+        ];
+
+        $links = [
+            'first' => 'http://localhost/api/v1/posts?' . Arr::query([
+                    'fields' => $fields = [
+                        'posts' => 'author,slug,synopsis,title',
+                    ],
+                    'include' => 'author',
+                    'page' => ['number' => 1, 'size' => 3],
+                    'sort' => '-createdAt',
+                ]),
+            'last' => $last = 'http://localhost/api/v1/posts?' . Arr::query([
+                    'fields' => $fields,
+                    'include' => 'author',
+                    'page' => ['number' => 2, 'size' => 3],
+                    'sort' => '-createdAt',
+                ]),
+            'next' => $last,
+        ];
+
+        $response = $this
+            ->jsonApi('posts')
+            ->sparseFields('posts', ['author', 'slug', 'synopsis', 'title'])
+            ->includePaths('author')
+            ->page(['number' => 1, 'size' => 3])
+            ->get('/api/v1/posts');
+
+        $response
+            ->assertFetchedManyExact($expected)
+            ->assertExactMeta($meta)
             ->assertLinks($links);
     }
 

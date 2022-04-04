@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Fixed
+
+- [#175](https://github.com/laravel-json-api/laravel/issues/175) Fix page URLs missing sparse field sets.
+
 ## [2.1.1] - 2022-04-01
 
 ### Fixed

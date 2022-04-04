@@ -21,6 +21,7 @@ namespace App\Tests\Api\V1;
 
 use App\Tests\TestCase as BaseTestCase;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Collection;
 use LaravelJsonApi\Testing\MakesJsonApiRequests;
 
 class TestCase extends BaseTestCase
@@ -49,7 +50,7 @@ class TestCase extends BaseTestCase
      */
     protected function identifiersFor(string $type, $modelsOrResourceIds): array
     {
-        return collect($modelsOrResourceIds)->map(fn($modelOrResourceId) => [
+        return Collection::make($modelsOrResourceIds)->map(fn($modelOrResourceId) => [
             'type' => $type,
             'id' => ($modelOrResourceId instanceof UrlRoutable) ?
                 (string) $modelOrResourceId->getRouteKey() :
