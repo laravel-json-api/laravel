@@ -19,11 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
+use App\Http\Controllers\Controller;
 
-class JsonApiController
+class JsonApiController extends Controller
 {
 
     /**
@@ -39,12 +37,5 @@ class JsonApiController
     use Actions\UpdateRelationship;
     use Actions\AttachRelationship;
     use Actions\DetachRelationship;
-
-    /**
-     * Laravel Controller Traits
-     */
-    use AuthorizesRequests;
-    use DispatchesJobs;
-    use ValidatesRequests;
 
 }
