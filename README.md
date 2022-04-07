@@ -5,10 +5,15 @@
 Implement feature-rich [JSON:API](https://jsonapi.org) compliant APIs in your
 [Laravel](https://laravel.com) applications. Build your next standards-compliant API today.
 
-### Why use JSON:API?
+## Why use JSON:API and Laravel JSON:API?
+
+Great question! [Here's some reasons from this excellent article by Denisa Halmaghi](https://graffino.com/web-development/how-to-use-laravel-json-api-to-create-a-json-api-compliant-backend-in-laravel):
+
+### Why Use JSON:API?
 
 - Standardised, consistent APIs.
-- Feature rich - some of which are filtering, pagination, eager loading and sparse fieldsets.
+- Feature rich - some of which are: sparse fieldsets (only fetch the fields you need), filtering, sorting, pagination,
+  eager loading for relationships (includes, which solve the _N+1_ problem).
 - Easy to understand.
 
 ### Why use Laravel JSON:API?
