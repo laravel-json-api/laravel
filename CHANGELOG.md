@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#181](https://github.com/laravel-json-api/laravel/issues/181) The `JsonApiController` now extends the base Laravel
+  controller.
+
 ## [2.1.2] - 2022-04-04
 
 ### Fixed
