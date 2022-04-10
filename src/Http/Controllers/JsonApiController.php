@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Laravel\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller;
 
-class JsonApiController
+class JsonApiController extends Controller
 {
-
     /**
      * JSON:API Actions
      */
@@ -46,5 +46,4 @@ class JsonApiController
     use AuthorizesRequests;
     use DispatchesJobs;
     use ValidatesRequests;
-
 }
