@@ -119,7 +119,7 @@ When upgrading you typically want to upgrade this package and all our related pa
 ```bash
 composer require laravel-json-api/laravel --no-update
 composer require laravel-json-api/testing --dev --no-update
-composer up laravel-json-api/* cloudcreativity/json-api-testing
+composer up "laravel-json-api/*" cloudcreativity/json-api-testing
 ```
 
 ## Example Application
