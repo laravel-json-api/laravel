@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The `JsonApiException` class now has a `context()` method. Laravel's exception handler uses this to add log context if
+  the exception is being logged. This means logging of JSON:API exceptions will now include the HTTP status code and the
+  JSON:API errors.
+
 ## [2.3.0] - 2022-04-11
 
 ### Added
