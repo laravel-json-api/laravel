@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
 use App\Models\Post;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
@@ -94,5 +95,36 @@ class ResponseTest extends TestCase
             ->get('/test');
 
         $response->assertExactErrorStatus($error);
+    }
+
+    public function testValidHeader(): void
+    {
+        Route::get('/test', fn() => []);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->get('/test');
+
+        $response->assertStatusCode(Response::HTTP_OK);
+    }
+
+    public function testInvalidHeader(): void
+    {
+        $error = [
+            'status' => '406',
+            'title' => 'The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request.'
+        ];
+
+        Route::get('/test', fn() => ErrorResponse::error($error));
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi()
+            ->withHeader('Accepts', 'application/json')
+            ->get('/test');
+
+        $response->assertExactErrorStatus($error);
+        $response->assertStatusCode(Response::HTTP_NOT_ACCEPTABLE);
     }
 }

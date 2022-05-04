@@ -316,6 +316,18 @@ class ResourceQuery extends FormRequest implements QueryParameters
     }
 
     /**
+     * Determine if the given content types match.
+     *
+     * @param  string  $actual
+     * @param  string  $type
+     * @return bool
+     */
+    public static function matchesType($actual, $type)
+    {
+        return $actual === $type;
+    }
+
+    /**
      * Get an exception if the media type is not acceptable.
      *
      * @return HttpExceptionInterface
