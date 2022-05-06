@@ -102,4 +102,20 @@ class DeleteTest extends TestCase
             'id' => $this->post->getKey(),
         ]);
     }
+
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
+    {
+        $response = $this
+            ->actingAs($this->post->author)
+            ->jsonApi()
+            ->accept($mediaType)
+            ->delete(url('api/v1/posts', $this->post));
+
+        $response->assertStatus(406);
+    }
 }

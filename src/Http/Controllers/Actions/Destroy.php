@@ -41,6 +41,26 @@ trait Destroy
      */
     public function destroy(Route $route, StoreContract $store)
     {
+        /**
+         * As we do not have a query request class for a delete request,
+         * we need to manually check that the request Accept header
+         * is the JSON:API media type.
+         */
+        $acceptable = false;
+
+        foreach (request()->getAcceptableContentTypes() as $contentType) {
+            if ($contentType === ResourceRequest::JSON_API_MEDIA_TYPE) {
+                $acceptable = true;
+                break;
+            }
+        }
+
+        abort_unless(
+            $acceptable,
+            406,
+            __("The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request."),
+        );
+
         $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
         );

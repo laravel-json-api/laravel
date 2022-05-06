@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased 3.x
+
+### Fixed
+
+- **BREAKING** [#190](https://github.com/laravel-json-api/laravel/issues/190) The JSON:API media type now needs to be
+  sent in the `Accept` header for a delete resource request. Previously there was no checking of the `Accept` media
+  type, so anything could be sent. This is incorrect as the JSON:API specification shows the `Accept` header as
+  `application/vnd.api+json` for [delete resource requests.](https://jsonapi.org/format/#crud-deleting)
+
 ## Unreleased
 
 ### Added

@@ -110,6 +110,7 @@ class RequestBodyContentTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->actingAs($post->author)
+            ->withHeader('Accept', 'application/vnd.api+json')
             ->delete('/api/v1/posts/' . $post->getRouteKey());
 
         $response->assertNoContent();
