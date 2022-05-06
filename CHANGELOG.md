@@ -19,6 +19,10 @@ All notable changes to this project will be documented in this file. This projec
 - The `JsonApiException` class now has a `context()` method. Laravel's exception handler uses this to add log context
   when the exception is logged. This means logging of JSON:API exceptions will now include the HTTP status code and the
   JSON:API errors.
+- Moved the default `406 Not Acceptable` and `415 Unsupported Media Type` messages to the following two new exception
+  classes:
+    - `Exceptions\HttpNotAcceptableException`
+    - `Exceptions\HttpUnsupportedMediaTypeException`
 
 ### Fixed
 
