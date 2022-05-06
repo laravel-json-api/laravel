@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Laravel\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
@@ -29,8 +28,8 @@ use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
+use LaravelJsonApi\Laravel\Exceptions\HttpNotAcceptableException;
 use LogicException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
 
@@ -336,10 +335,6 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     protected function notAcceptable(): HttpExceptionInterface
     {
-        return new HttpException(
-            Response::HTTP_NOT_ACCEPTABLE,
-            __("The requested resource is capable of generating only content not acceptable "
-            . "according to the Accept headers sent in the request.")
-        );
+        return new HttpNotAcceptableException();
     }
 }

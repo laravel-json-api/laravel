@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Laravel\Http\Requests;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Schema\Relation;
@@ -31,10 +30,10 @@ use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
+use LaravelJsonApi\Laravel\Exceptions\HttpUnsupportedMediaTypeException;
 use LaravelJsonApi\Spec\RelationBuilder;
 use LaravelJsonApi\Spec\ResourceBuilder;
 use LogicException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use function array_key_exists;
 
@@ -349,10 +348,7 @@ class ResourceRequest extends FormRequest
      */
     protected function unsupportedMediaType(): HttpExceptionInterface
     {
-        return new HttpException(
-            Response::HTTP_UNSUPPORTED_MEDIA_TYPE,
-            __('The request entity has a media type which the server or resource does not support.')
-        );
+        return new HttpUnsupportedMediaTypeException();
     }
 
     /**
