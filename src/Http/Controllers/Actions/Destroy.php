@@ -26,6 +26,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Laravel\Exceptions\HttpNotAcceptableException;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait Destroy
@@ -37,7 +38,7 @@ trait Destroy
      * @param Route $route
      * @param StoreContract $store
      * @return Response|Responsable
-     * @throws AuthenticationException|AuthorizationException
+     * @throws AuthenticationException|AuthorizationException|HttpNotAcceptableException
      */
     public function destroy(Route $route, StoreContract $store)
     {
@@ -55,11 +56,7 @@ trait Destroy
             }
         }
 
-        abort_unless(
-            $acceptable,
-            406,
-            __("The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request."),
-        );
+        throw_unless($acceptable, new HttpNotAcceptableException());
 
         $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
