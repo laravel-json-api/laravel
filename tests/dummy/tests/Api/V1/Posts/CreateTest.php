@@ -162,7 +162,12 @@ class CreateTest extends TestCase
         $this->assertDatabaseCount('posts', 0);
     }
 
-    public function testNotAcceptableMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $post = Post::factory()->make();
         $data = $this->serialize($post);
@@ -170,7 +175,7 @@ class CreateTest extends TestCase
         $response = $this
             ->actingAs($post->author)
             ->jsonApi('posts')
-            ->accept('text/html')
+            ->accept($mediaType)
             ->withData($data)
             ->post('/api/v1/posts');
 

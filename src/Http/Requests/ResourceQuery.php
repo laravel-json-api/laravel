@@ -48,11 +48,11 @@ class ResourceQuery extends FormRequest implements QueryParameters
     private static $queryOneResolver;
 
     /**
+     * The media types the resource accepts, in addition to JSON:API.
+     *
      * @var string[]
      */
-    protected array $mediaTypes = [
-        self::JSON_API_MEDIA_TYPE,
-    ];
+    protected array $mediaTypes = [];
 
     /**
      * The include paths to use if the client provides none.
@@ -304,10 +304,24 @@ class ResourceQuery extends FormRequest implements QueryParameters
      */
     protected function isAcceptableMediaType(): bool
     {
+        /**
+         * We expect the JSON:API media type to exactly match.
+         */
+        foreach ($this->getAcceptableContentTypes() as $contentType) {
+            if (self::JSON_API_MEDIA_TYPE === $contentType) {
+                return true;
+            }
+        }
+
+        /**
+         * Otherwise we check if any additional media types match.
+         */
         return $this->accepts($this->mediaTypes());
     }
 
     /**
+     * Get the media types the resource accepts, in addition to JSON:API.
+     *
      * @return string[]
      */
     protected function mediaTypes(): array

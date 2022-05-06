@@ -267,12 +267,17 @@ class ReadTest extends TestCase
         ]);
     }
 
-    public function testInvalidMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $post = Post::factory()->create();
 
         $this->jsonApi()
-            ->accept('text/html')
+            ->accept($mediaType)
             ->get(url('/api/v1/posts', $post))
             ->assertStatus(406);
     }

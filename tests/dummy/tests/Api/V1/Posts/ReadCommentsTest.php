@@ -144,10 +144,15 @@ class ReadCommentsTest extends TestCase
         );
     }
 
-    public function testInvalidMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $this->jsonApi()
-            ->accept('text/html')
+            ->accept($mediaType)
             ->get(url('/api/v1/posts', [$this->post, 'comments']))
             ->assertStatus(406);
     }

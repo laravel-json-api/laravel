@@ -326,10 +326,16 @@ class IndexTest extends TestCase
         $response->assertFetchedManyExact($expected);
     }
 
-    public function testInvalidMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
-        $this->jsonApi()
-            ->accept('text/html')
+        $this
+            ->jsonApi()
+            ->accept($mediaType)
             ->get('/api/v1/posts')
             ->assertStatus(406);
     }
