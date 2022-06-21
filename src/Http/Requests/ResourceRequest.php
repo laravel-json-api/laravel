@@ -204,7 +204,7 @@ class ResourceRequest extends FormRequest
     {
         $document = $this->json()->all();
 
-        if (!is_array($document) || !isset($document['data']) || !is_array($document['data'])) {
+        if (!is_array($document) || !array_key_exists('data', $document) || !(is_array($document['data']) || is_null($document['data']))) {
             throw new LogicException('Expecting JSON API specification compliance to have been run.');
         }
 
