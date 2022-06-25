@@ -17,28 +17,28 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Models;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Controllers\Actions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserController extends Controller
+class Phone extends Model
 {
-    use Actions\FetchOne;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
+    use HasFactory;
 
     /**
-     * Return the current user.
-     *
-     * @param Request $request
-     * @return DataResponse
+     * @var string[]
      */
-    public function me(Request $request): DataResponse
+    protected $fillable = [
+        'number',
+    ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
     {
-        return DataResponse::make($request->user());
+        return $this->belongsTo(User::class);
     }
 }

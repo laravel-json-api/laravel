@@ -17,28 +17,35 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Controllers\Actions;
-
-class UserController extends Controller
+return new class extends Migration
 {
-    use Actions\FetchOne;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
+    /**
+     * Run the migration.
+     *
+     * @return void
+     */
+    public function up(): void
+    {
+        Schema::create('phones', function (Blueprint $table): void {
+            $table->id();
+            $table->timestamps();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('number');
+        });
+    }
 
     /**
-     * Return the current user.
+     * Reverse the migration.
      *
-     * @param Request $request
-     * @return DataResponse
+     * @return void
      */
-    public function me(Request $request): DataResponse
+    public function down(): void
     {
-        return DataResponse::make($request->user());
+        Schema::dropIfExists('phones');
     }
-}
+};
+

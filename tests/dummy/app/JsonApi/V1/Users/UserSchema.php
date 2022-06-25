@@ -22,6 +22,7 @@ namespace App\JsonApi\V1\Users;
 use App\Models\User;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
+use LaravelJsonApi\Eloquent\Fields\Relations\HasOne;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
@@ -47,6 +48,7 @@ class UserSchema extends Schema
             ID::make(),
             DateTime::make('createdAt')->readOnly(),
             Str::make('name'),
+            HasOne::make('phone')->deleteDetachedModel(),
             DateTime::make('updatedAt')->readOnly(),
         ];
     }

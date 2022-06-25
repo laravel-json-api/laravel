@@ -18,6 +18,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -59,5 +60,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return 'support@example.com' === $this->email;
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function phone(): HasOne
+    {
+        return $this->hasOne(Phone::class);
     }
 }

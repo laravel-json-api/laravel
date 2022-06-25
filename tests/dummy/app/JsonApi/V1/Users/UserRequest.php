@@ -17,28 +17,20 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\JsonApi\V1\Users;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Controllers\Actions;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
-class UserController extends Controller
+class UserRequest extends ResourceRequest
 {
-    use Actions\FetchOne;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
-
     /**
-     * Return the current user.
-     *
-     * @param Request $request
-     * @return DataResponse
+     * @return array
      */
-    public function me(Request $request): DataResponse
+    public function rules(): array
     {
-        return DataResponse::make($request->user());
+        return [
+            'phone' => JsonApiRule::toOne(),
+        ];
     }
 }

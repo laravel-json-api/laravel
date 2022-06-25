@@ -17,28 +17,33 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\JsonApi\V1\Phones;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Controllers\Actions;
+use App\Models\Phone;
+use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
+use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Schema;
 
-class UserController extends Controller
+class PhoneSchema extends Schema
 {
-    use Actions\FetchOne;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
+    /**
+     * The model the schema corresponds to.
+     *
+     * @var string
+     */
+    public static string $model = Phone::class;
 
     /**
-     * Return the current user.
-     *
-     * @param Request $request
-     * @return DataResponse
+     * @inheritDoc
      */
-    public function me(Request $request): DataResponse
+    public function fields(): iterable
     {
-        return DataResponse::make($request->user());
+        return [
+            ID::make(),
+            DateTime::make('createdAt')->readOnly(),
+            Str::make('number'),
+            DateTime::make('updatedAt')->readOnly(),
+        ];
     }
 }
