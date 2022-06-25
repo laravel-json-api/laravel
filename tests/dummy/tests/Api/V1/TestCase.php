@@ -44,6 +44,17 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * @return array
+     */
+    public function notAcceptableMediaTypeProvider(): array
+    {
+        return [
+            'application/json' => ['application/json'],
+            'text/html' => ['text/html'],
+        ];
+    }
+
+    /**
      * @param string $type
      * @param $modelsOrResourceIds
      * @return array

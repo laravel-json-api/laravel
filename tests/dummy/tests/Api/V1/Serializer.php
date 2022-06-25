@@ -174,6 +174,14 @@ class Serializer
                 'name' => $user->name,
                 'updatedAt' => $user->updated_at,
             ],
+            'relationships' => [
+                'phone' => [
+                    'links' => [
+                        'self' => "{$self}/relationships/phone",
+                        'related' => "{$self}/phone",
+                    ],
+                ],
+            ],
             'links' => [
                 'self' => $self,
             ],

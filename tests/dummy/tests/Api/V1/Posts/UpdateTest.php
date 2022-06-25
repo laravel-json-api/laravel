@@ -244,14 +244,19 @@ class UpdateTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function testNotAcceptableMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $data = $this->serialize();
 
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('posts')
-            ->accept('text/html')
+            ->accept($mediaType)
             ->withData($data)
             ->patch(url('/api/v1/posts', $this->post));
 

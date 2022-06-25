@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.4.0] - 2022-06-25
+
+### Added
+
+- The `JsonApiException` class now has a `context()` method. Laravel's exception handler uses this to add log context
+  when the exception is logged. This means logging of JSON:API exceptions will now include the HTTP status code and the
+  JSON:API errors.
+- Moved the default `406 Not Acceptable` and `415 Unsupported Media Type` messages to the following two new exception
+  classes:
+    - `Exceptions\HttpNotAcceptableException`
+    - `Exceptions\HttpUnsupportedMediaTypeException`
+
+### Fixed
+
+- [#184](https://github.com/laravel-json-api/laravel/issues/184) Ensure that an `Accept` header with the media type
+  `application/json` is rejected with a `406 Not Acceptable` response. Previously this media type worked, which is
+  incorrect as the JSON:API specification requires the media type `application/vnd.api+json`.
+- [#197](https://github.com/laravel-json-api/laravel/pull/197) Fix sending `null` for a to-one relationship update.
+
 ## [2.3.0] - 2022-04-11
 
 ### Added

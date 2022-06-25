@@ -132,10 +132,16 @@ class ReadAuthorTest extends TestCase
         $response->assertFetchedOneExact($expected);
     }
 
-    public function testInvalidMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
-        $this->jsonApi()
-            ->accept('text/html')
+        $this
+            ->jsonApi()
+            ->accept($mediaType)
             ->get(url('/api/v1/posts', [$this->post, 'author']))
             ->assertStatus(406);
     }

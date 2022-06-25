@@ -140,7 +140,12 @@ class AttachTagsTest extends TestCase
         $this->assertDatabaseCount('taggables', 2);
     }
 
-    public function testNotAcceptableMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $tag = Tag::factory()->create();
 
@@ -154,7 +159,7 @@ class AttachTagsTest extends TestCase
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('posts')
-            ->accept('text/html')
+            ->accept($mediaType)
             ->withData($data)
             ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 

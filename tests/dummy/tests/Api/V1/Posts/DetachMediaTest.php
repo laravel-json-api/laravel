@@ -177,12 +177,17 @@ class DetachMediaTest extends TestCase
         $this->assertDatabaseCount('post_video', $existingVideos->count());
     }
 
-    public function testNotAcceptableMediaType(): void
+    /**
+     * @param string $mediaType
+     * @return void
+     * @dataProvider notAcceptableMediaTypeProvider
+     */
+    public function testNotAcceptableMediaType(string $mediaType): void
     {
         $response = $this
             ->actingAs($this->post->author)
             ->jsonApi('posts')
-            ->accept('text/html')
+            ->accept($mediaType)
             ->withData([])
             ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 

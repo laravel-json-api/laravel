@@ -17,28 +17,31 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\V1;
+namespace Database\Factories;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Controllers\Actions;
+use App\Models\Phone;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserController extends Controller
+class PhoneFactory extends Factory
 {
-    use Actions\FetchOne;
-    use Actions\FetchRelated;
-    use Actions\FetchRelationship;
-    use Actions\UpdateRelationship;
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Phone::class;
 
     /**
-     * Return the current user.
+     * Define the model's default state.
      *
-     * @param Request $request
-     * @return DataResponse
+     * @return array
      */
-    public function me(Request $request): DataResponse
+    public function definition(): array
     {
-        return DataResponse::make($request->user());
+        return [
+            'number' => $this->faker->phoneNumber(),
+            'user_id' => User::factory(),
+        ];
     }
 }
