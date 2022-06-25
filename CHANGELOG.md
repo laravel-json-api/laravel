@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file. This projec
 - [#184](https://github.com/laravel-json-api/laravel/issues/184) Ensure that an `Accept` header with the media type
   `application/json` is rejected with a `406 Not Acceptable` response. Previously this media type worked, which is
   incorrect as the JSON:API specification requires the media type `application/vnd.api+json`.
+- [#197](https://github.com/laravel-json-api/laravel/pull/197) Fix sending `null` for a to-one relationship update.
 
 ## [2.3.0] - 2022-04-11
 
