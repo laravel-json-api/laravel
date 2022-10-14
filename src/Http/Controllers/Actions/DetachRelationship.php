@@ -32,7 +32,7 @@ trait DetachRelationship
 {
 
     /**
-     * Attach records to a has-many relationship.
+     * Detach records to a has-many relationship.
      *
      * @param Route $route
      * @param StoreContract $store
