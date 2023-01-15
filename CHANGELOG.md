@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.5.0] - 2023-01-15
+
+### Added
+
+- Relations can now be conditionally set to be eager-loadable via the `canEagerLoad()` method.
+- New `WhereNull` and `WhereNotNull` filters.
+
+### Fixed
+
+- [#204](https://github.com/laravel-json-api/laravel/issues/204) Fix exception parser causing error when request does
+  not have a matching route (e.g. in a `404 Not Found` scenario).
+- Fixed PHP 8.2 deprecation messages in the `laravel-json-api/validation` dependency.
+
 ## [2.4.0] - 2022-06-25
 
 ### Added
