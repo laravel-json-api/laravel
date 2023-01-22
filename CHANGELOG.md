@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Fixed
+
+- [#223](https://github.com/laravel-json-api/laravel/issues/223) Ensure Eloquent models always have fresh data after
+  write operation. This is to prevent cached relationships from having "stale" data after the write operation. This can
+  occur if a related model's attributes change during the write operation, but the related model was cached before the
+  write operation occurred.
+
 ## [2.5.0] - 2023-01-15
 
 ### Added
