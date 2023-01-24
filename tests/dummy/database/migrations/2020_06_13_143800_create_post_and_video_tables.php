@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2022 Cloud Creativity Limited
+ * Copyright 2023 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostAndVideoTables extends Migration
+return new class extends Migration
 {
 
     /**
@@ -29,7 +31,7 @@ class CreatePostAndVideoTables extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table): void {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
@@ -47,13 +49,13 @@ class CreatePostAndVideoTables extends Migration
                 ->onUpdate('cascade');
         });
 
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table): void {
             $table->uuid('uuid')->primary();
             $table->timestamps();
             $table->string('url');
         });
 
-        Schema::create('videos', function (Blueprint $table) {
+        Schema::create('videos', function (Blueprint $table): void {
             $table->uuid('uuid')->primary();
             $table->timestamps();
             $table->unsignedBigInteger('owner_id');
@@ -67,7 +69,7 @@ class CreatePostAndVideoTables extends Migration
                 ->onUpdate('cascade');
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table): void {
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('post_id');
@@ -87,13 +89,13 @@ class CreatePostAndVideoTables extends Migration
                 ->cascadeOnUpdate();
         });
 
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('tags', function (Blueprint $table): void {
             $table->id();
             $table->timestamps();
             $table->string('name');
         });
 
-        Schema::create('taggables', function (Blueprint $table) {
+        Schema::create('taggables', function (Blueprint $table): void {
             $table->unsignedBigInteger('tag_id');
             $table->morphs('taggable');
             $table->primary([
@@ -109,7 +111,7 @@ class CreatePostAndVideoTables extends Migration
                 ->cascadeOnDelete();
         });
 
-        Schema::create('image_post', function (Blueprint $table) {
+        Schema::create('image_post', function (Blueprint $table): void {
             $table->uuid('image_uuid');
             $table->unsignedBigInteger('post_id');
             $table->primary(['image_uuid', 'post_id']);
@@ -127,7 +129,7 @@ class CreatePostAndVideoTables extends Migration
                 ->cascadeOnUpdate();
         });
 
-        Schema::create('post_video', function (Blueprint $table) {
+        Schema::create('post_video', function (Blueprint $table): void {
             $table->unsignedBigInteger('post_id');
             $table->uuid('video_uuid');
             $table->primary(['post_id', 'video_uuid']);
@@ -159,4 +161,4 @@ class CreatePostAndVideoTables extends Migration
         Schema::dropIfExists('videos');
         Schema::dropIfExists('posts');
     }
-}
+};

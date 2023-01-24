@@ -12,7 +12,29 @@ All notable changes to this project will be documented in this file. This projec
   type, so anything could be sent. This is incorrect as the JSON:API specification shows the `Accept` header as
   `application/vnd.api+json` for [delete resource requests.](https://jsonapi.org/format/#crud-deleting)
 
-## Unreleased
+## [2.5.1] - 2023-01-23
+
+### Fixed
+
+- [#223](https://github.com/laravel-json-api/laravel/issues/223) Ensure Eloquent models always have fresh data after
+  write operation. This is to prevent cached relationships from having "stale" data after the write operation. This can
+  occur if a related model's attributes change during the write operation, but the related model was cached before the
+  write operation occurred.
+
+## [2.5.0] - 2023-01-15
+
+### Added
+
+- Relations can now be conditionally set to be eager-loadable via the `canEagerLoad()` method.
+- New `WhereNull` and `WhereNotNull` filters.
+
+### Fixed
+
+- [#204](https://github.com/laravel-json-api/laravel/issues/204) Fix exception parser causing error when request does
+  not have a matching route (e.g. in a `404 Not Found` scenario).
+- Fixed PHP 8.2 deprecation messages in the `laravel-json-api/validation` dependency.
+
+## [2.4.0] - 2022-06-25
 
 ### Added
 
@@ -29,6 +51,7 @@ All notable changes to this project will be documented in this file. This projec
 - [#184](https://github.com/laravel-json-api/laravel/issues/184) Ensure that an `Accept` header with the media type
   `application/json` is rejected with a `406 Not Acceptable` response. Previously this media type worked, which is
   incorrect as the JSON:API specification requires the media type `application/vnd.api+json`.
+- [#197](https://github.com/laravel-json-api/laravel/pull/197) Fix sending `null` for a to-one relationship update.
 
 ## [2.3.0] - 2022-04-11
 

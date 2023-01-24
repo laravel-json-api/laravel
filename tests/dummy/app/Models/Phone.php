@@ -17,29 +17,28 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace App\Models;
 
-use App\Models\Image;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ImageFactory extends Factory
+class Phone extends Model
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Image::class;
+    use HasFactory;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array
+     * @var string[]
      */
-    public function definition()
+    protected $fillable = [
+        'number',
+    ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
     {
-        return [
-            'url' => $this->faker->url(),
-        ];
+        return $this->belongsTo(User::class);
     }
 }

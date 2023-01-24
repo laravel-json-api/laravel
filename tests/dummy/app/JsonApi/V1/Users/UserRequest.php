@@ -17,35 +17,20 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace App\JsonApi\V1\Users;
 
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
-class PostFactory extends Factory
+class UserRequest extends ResourceRequest
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Post::class;
-
-    /**
-     * Define the model's default state.
-     *
      * @return array
      */
-    public function definition()
+    public function rules(): array
     {
         return [
-            'author_id' => User::factory(),
-            'content' => $this->faker->text(),
-            'published_at' => $this->faker->dateTimeThisMonth(),
-            'slug' => $this->faker->unique()->slug(),
-            'synopsis' => $this->faker->sentence(),
-            'title' => $this->faker->words(3, true),
+            'phone' => JsonApiRule::toOne(),
         ];
     }
 }

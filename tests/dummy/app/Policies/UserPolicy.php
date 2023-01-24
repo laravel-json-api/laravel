@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2022 Cloud Creativity Limited
+ * Copyright 2023 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ use App\Models\User;
 
 class UserPolicy
 {
-
     /**
      * Determine if the user can view the other user.
      *
@@ -34,5 +33,29 @@ class UserPolicy
     public function view(User $user, User $other): bool
     {
         return true;
+    }
+
+    /**
+     * Determine if the user can view the other user's phone.
+     *
+     * @param User $user
+     * @param User $other
+     * @return bool
+     */
+    public function viewPhone(User $user, User $other): bool
+    {
+        return $user->is($other);
+    }
+
+    /**
+     * Determine if the user can update the other user's phone.
+     *
+     * @param User $user
+     * @param User $other
+     * @return bool
+     */
+    public function updatePhone(User $user, User $other): bool
+    {
+        return $user->is($other);
     }
 }

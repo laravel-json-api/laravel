@@ -17,35 +17,33 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace App\JsonApi\V1\Phones;
 
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Phone;
+use LaravelJsonApi\Eloquent\Fields\DateTime;
+use LaravelJsonApi\Eloquent\Fields\ID;
+use LaravelJsonApi\Eloquent\Fields\Str;
+use LaravelJsonApi\Eloquent\Schema;
 
-class PostFactory extends Factory
+class PhoneSchema extends Schema
 {
     /**
-     * The name of the factory's corresponding model.
+     * The model the schema corresponds to.
      *
      * @var string
      */
-    protected $model = Post::class;
+    public static string $model = Phone::class;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function definition()
+    public function fields(): iterable
     {
         return [
-            'author_id' => User::factory(),
-            'content' => $this->faker->text(),
-            'published_at' => $this->faker->dateTimeThisMonth(),
-            'slug' => $this->faker->unique()->slug(),
-            'synopsis' => $this->faker->sentence(),
-            'title' => $this->faker->words(3, true),
+            ID::make(),
+            DateTime::make('createdAt')->readOnly(),
+            Str::make('number'),
+            DateTime::make('updatedAt')->readOnly(),
         ];
     }
 }

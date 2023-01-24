@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2022 Cloud Creativity Limited
+ * Copyright 2023 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,9 @@ JsonApiRoute::server('v1')
         });
 
         /** Users */
-        $server->resource('users')->only('show')->actions(function ($actions) {
+        $server->resource('users')->only('show')->relationships(function ($relationships) {
+            $relationships->hasOne('phone');
+        })->actions(function ($actions) {
             $actions->get('me');
         });
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2022 Cloud Creativity Limited
+ * Copyright 2023 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ class ResourceRequest extends FormRequest
     {
         $document = $this->json()->all();
 
-        if (!is_array($document) || !isset($document['data']) || !is_array($document['data'])) {
+        if (!is_array($document) || !array_key_exists('data', $document) || !(is_array($document['data']) || is_null($document['data']))) {
             throw new LogicException('Expecting JSON API specification compliance to have been run.');
         }
 
