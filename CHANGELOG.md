@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased 3.x
 
+### Changed
+
+- Upgraded to Laravel 10 and set minimum PHP version to `8.1`.
+- **BREAKING** If using the `laravel-json-api/cursor-pagination` package, you now need to passed the schema's `id` field
+  to the paginator's `make()` method. I.e. use `CursorPagination::make($this->id())`
+
 ### Fixed
 
 - **BREAKING** [#190](https://github.com/laravel-json-api/laravel/issues/190) The JSON:API media type now needs to be
