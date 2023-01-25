@@ -18,6 +18,13 @@ All notable changes to this project will be documented in this file. This projec
   type, so anything could be sent. This is incorrect as the JSON:API specification shows the `Accept` header as
   `application/vnd.api+json` for [delete resource requests.](https://jsonapi.org/format/#crud-deleting)
 
+## [2.5.2] - 2023-01-25
+
+### Fixed
+
+- [#225](https://github.com/laravel-json-api/laravel/issues/225) Fix validation of empty field list for a resource type
+  in the `fields` query parameter, e.g. `/api/v1/employees?fields[employees]=`.
+
 ## [2.5.1] - 2023-01-23
 
 ### Fixed

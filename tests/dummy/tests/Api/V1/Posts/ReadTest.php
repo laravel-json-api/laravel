@@ -180,6 +180,35 @@ class ReadTest extends TestCase
         $response->assertFetchedOneExact($expected)->assertIncluded([$author]);
     }
 
+    /**
+     * @return void
+     * @see https://github.com/laravel-json-api/laravel/issues/225
+     */
+    public function testSparseFieldSetsHasEmptyFieldList(): void
+    {
+        $post = Post::factory()->create();
+
+        $expected = $this->serializer
+            ->post($post)
+            ->only('author', 'slug', 'synopsis', 'title')
+            ->replace('author', ['type' => 'users', 'id' => $post->author]);
+
+        $author = $this->serializer
+            ->user($post->author)
+            ->withoutAttributes()
+            ->withoutRelationships();
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('posts')
+            ->sparseFields('posts', ['author', 'slug', 'synopsis', 'title'])
+            ->sparseFields('users', [])
+            ->includePaths('author')
+            ->get(url('/api/v1/posts', $expected['id']));
+
+        $response->assertFetchedOneExact($expected)->assertIncluded([$author]);
+    }
+
     public function testWithCount(): void
     {
         $post = Post::factory()
