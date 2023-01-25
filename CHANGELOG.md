@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.5.2] - 2023-01-25
+
+### Fixed
+
+- [#225](https://github.com/laravel-json-api/laravel/issues/225) Fix validation of empty field list for a resource type
+  in the `fields` query parameter, e.g. `/api/v1/employees?fields[employees]=`.
+
 ## [2.5.1] - 2023-01-23
 
 ### Fixed
