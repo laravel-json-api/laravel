@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- New `MultiPaginator` that allows a schema to offer multiple different pagination strategies.
+
 ## [2.5.2] - 2023-01-25
 
 ### Fixed
