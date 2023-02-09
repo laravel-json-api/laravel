@@ -32,6 +32,7 @@ use LaravelJsonApi\Eloquent\Filters\OnlyTrashed;
 use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
+use LaravelJsonApi\Eloquent\Pagination\MultiPagination;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
@@ -39,7 +40,6 @@ use LaravelJsonApi\Eloquent\Sorting\SortCountable;
 
 class PostSchema extends Schema
 {
-
     use SoftDeletes;
 
     /**
@@ -112,9 +112,15 @@ class PostSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): PagePagination
+    public function pagination(): MultiPagination
     {
-        return PagePagination::make()->withoutNestedMeta();
+        return new MultiPagination(
+            PagePagination::make()->withoutNestedMeta(),
+            PagePagination::make()
+                ->withoutNestedMeta()
+                ->withSimplePagination()
+                ->withPageKey('current-page')
+                ->withPerPageKey('per-page')
+        );
     }
-
 }
