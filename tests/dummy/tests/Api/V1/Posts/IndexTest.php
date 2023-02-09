@@ -119,50 +119,49 @@ class IndexTest extends TestCase
         $response
             ->assertFetchedMany($expected)
             ->assertMeta($meta)
-            ->assertLinks($links);
+            ->assertExactLinks($links);
     }
 
-    public function testCursorPagination(): void
+    public function testMultiPagination(): void
     {
-        $posts = Post::factory()->count(5)->create([
+        $posts = Post::factory()->count(6)->create([
             'created_at' => fn() => fake()->dateTime(),
         ])->sortByDesc('created_at')->values();
 
-        $expected = $this->identifiersFor('posts', $posts->take(3));
+        $expected = $this->identifiersFor('posts', $posts->skip(2)->take(2));
 
         $meta = [
-            'from' => $expected[0]['id'],
-            'hasMore' => true,
-            'perPage' => 3,
-            'to' => $expected[2]['id'],
+            'currentPage' => 2,
+            'from' => 3,
+            'perPage' => 2,
+            'to' => 4,
         ];
 
         $links = [
             'first' => 'http://localhost/api/v1/posts?' . Arr::query([
-                    'page' => ['limit' => 3],
+                    'page' => ['current-page' => 1, 'per-page' => 2],
                     'sort' => '-createdAt',
                 ]),
             'next' => 'http://localhost/api/v1/posts?' . Arr::query([
-                    'page' => ['after' => $expected[2]['id'], 'limit' => 3],
+                    'page' => ['current-page' => 3, 'per-page' => 2],
                     'sort' => '-createdAt',
                 ]),
             'prev' => 'http://localhost/api/v1/posts?' . Arr::query([
-                    'page' => ['before' => $expected[0]['id'], 'limit' => 3],
+                    'page' => ['current-page' => 1, 'per-page' => 2],
                     'sort' => '-createdAt',
                 ]),
         ];
 
         $response = $this
-            ->withoutExceptionHandling()
             ->jsonApi()
             ->expects('posts')
-            ->page(['limit' => 3])
+            ->page(['current-page' => 2, 'per-page' => 2])
             ->get('/api/v1/posts');
 
         $response
             ->assertFetchedMany($expected)
             ->assertMeta($meta)
-            ->assertLinks($links);
+            ->assertExactLinks($links);
     }
 
     public function testIncludeAuthor(): void

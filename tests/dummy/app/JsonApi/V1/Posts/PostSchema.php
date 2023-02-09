@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Posts;
 
 use App\Models\Post;
-use LaravelJsonApi\CursorPagination\CursorPagination;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Relations\BelongsTo;
@@ -117,7 +116,11 @@ class PostSchema extends Schema
     {
         return new MultiPagination(
             PagePagination::make()->withoutNestedMeta(),
-            CursorPagination::make($this->id())->withoutNestedMeta(),
+            PagePagination::make()
+                ->withoutNestedMeta()
+                ->withSimplePagination()
+                ->withPageKey('current-page')
+                ->withPerPageKey('per-page')
         );
     }
 }
