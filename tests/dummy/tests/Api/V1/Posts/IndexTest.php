@@ -23,6 +23,7 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Tests\Api\V1\TestCase;
+use Faker\Generator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 
@@ -125,7 +126,7 @@ class IndexTest extends TestCase
     public function testMultiPagination(): void
     {
         $posts = Post::factory()->count(6)->create([
-            'created_at' => fn() => fake()->dateTime(),
+            'created_at' => fn() => app(Generator::class)->dateTime(),
         ])->sortByDesc('created_at')->values();
 
         $expected = $this->identifiersFor('posts', $posts->skip(2)->take(2));
