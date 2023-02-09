@@ -14,9 +14,23 @@ All notable changes to this project will be documented in this file. This projec
 ### Fixed
 
 - **BREAKING** [#190](https://github.com/laravel-json-api/laravel/issues/190) The JSON:API media type now needs to be
-  sent in the `Accept` header for a delete resource request. Previously there was no checking of the `Accept` media
+  sent in the `Accept` header for a "delete" resource request. Previously there was no checking of the `Accept` media
   type, so anything could be sent. This is incorrect as the JSON:API specification shows the `Accept` header as
   `application/vnd.api+json` for [delete resource requests.](https://jsonapi.org/format/#crud-deleting)
+
+## [2.6.0] - 2023-02-09
+
+### Added
+
+- New `MultiPaginator` that allows a schema to offer multiple different pagination strategies.
+
+### Fixed
+
+- The JSON:API rule validators for the follow query parameter fields all errored if a non-array value was provided. This
+  is now fixed:
+    - `fields`
+    - `page`
+    - `filter`
 
 ## [2.5.2] - 2023-01-25
 
