@@ -30,7 +30,6 @@ class StubPublishTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->markTestSkipped('@TODO requires bugfix: https://github.com/laravel/framework/pull/45864');
         parent::setUp();
         $this->withoutMockingConsoleOutput();
 
