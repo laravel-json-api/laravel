@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [3.0.0] - 2023-02-14
+
+### Changed
+
+- Upgraded to Laravel 10 and set minimum PHP version to `8.1`.
+- **BREAKING** If using the `laravel-json-api/cursor-pagination` package, you now need to passed the schema's `id` field
+  to the paginator's `make()` method. I.e. use `CursorPagination::make($this->id())`
+
+### Fixed
+
+- **BREAKING** [#190](https://github.com/laravel-json-api/laravel/issues/190) The JSON:API media type now needs to be
+  sent in the `Accept` header for a "delete" resource request. Previously there was no checking of the `Accept` media
+  type, so anything could be sent. This is incorrect as the JSON:API specification shows the `Accept` header as
+  `application/vnd.api+json` for [delete resource requests.](https://jsonapi.org/format/#crud-deleting)
+
 ## [2.6.0] - 2023-02-09
 
 ### Added

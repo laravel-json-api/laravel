@@ -26,6 +26,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Laravel\Exceptions\HttpNotAcceptableException;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 trait Destroy
@@ -37,10 +38,26 @@ trait Destroy
      * @param Route $route
      * @param StoreContract $store
      * @return Response|Responsable
-     * @throws AuthenticationException|AuthorizationException
+     * @throws AuthenticationException|AuthorizationException|HttpNotAcceptableException
      */
     public function destroy(Route $route, StoreContract $store)
     {
+        /**
+         * As we do not have a query request class for a delete request,
+         * we need to manually check that the request Accept header
+         * is the JSON:API media type.
+         */
+        $acceptable = false;
+
+        foreach (request()->getAcceptableContentTypes() as $contentType) {
+            if ($contentType === ResourceRequest::JSON_API_MEDIA_TYPE) {
+                $acceptable = true;
+                break;
+            }
+        }
+
+        throw_unless($acceptable, new HttpNotAcceptableException());
+
         $request = ResourceRequest::forResourceIfExists(
             $resourceType = $route->resourceType()
         );

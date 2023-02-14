@@ -33,7 +33,7 @@ class FormRequest extends BaseFormRequest
     /**
      * @var string
      */
-    protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
+    public const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
     /**
      * @return bool
