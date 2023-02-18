@@ -30,7 +30,7 @@ class ActionsTest extends TestCase
     /**
      * @return array
      */
-    public function methodProvider(): array
+    public static function methodProvider(): array
     {
         return [
             'GET' => ['GET'],
