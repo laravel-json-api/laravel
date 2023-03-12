@@ -51,7 +51,7 @@ trait FetchRelated
         $response = null;
 
         if (method_exists($this, $hook = 'readingRelated' . Str::classify($fieldName))) {
-            $response = $this->{$hook}($model, $request);
+            $response = $this->{$hook}($model, $request, $relation);
         }
 
         if ($response) {
@@ -73,7 +73,7 @@ trait FetchRelated
         }
 
         if (method_exists($this, $hook = 'readRelated' . Str::classify($fieldName))) {
-            $response = $this->{$hook}($model, $data, $request);
+            $response = $this->{$hook}($model, $data, $request, $relation);
         }
 
         return $response ?: RelatedResponse::make(
