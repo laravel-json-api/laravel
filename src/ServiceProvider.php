@@ -21,9 +21,14 @@ namespace LaravelJsonApi\Laravel;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Pipeline\Pipeline;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
+use LaravelJsonApi\Core\Bus\Commands\Dispatcher as CommandDispatcher;
+use LaravelJsonApi\Core\Bus\Queries\Dispatcher as QueryDispatcher;
+use LaravelJsonApi\Core\Http\Actions\FetchOne;
+use LaravelJsonApi\Core\Http\Actions\Store;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Core\Support\AppResolver;
@@ -72,6 +77,13 @@ class ServiceProvider extends BaseServiceProvider
         $this->bindAuthorizer();
         $this->bindService();
         $this->bindServer();
+        $this->bindActionsCommandsAndQueries();
+
+        /** @TODO wtf? why isn't it working without this? */
+        $this->app->bind(Pipeline::class, \Illuminate\Pipeline\Pipeline::class);
+
+        /** @TODO will need to remove this temporary wiring */
+        $this->app->bind(Contracts\Validation\Container::class, Validation\Container::class);
     }
 
     /**
@@ -134,5 +146,25 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
             return $app->make(Contracts\Server\Server::class)->resources();
         });
+
+        $this->app->bind(Contracts\Auth\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->authorizers();
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function bindActionsCommandsAndQueries(): void
+    {
+        /** Actions */
+        $this->app->bind(Contracts\Http\Actions\FetchOne::class, FetchOne::class);
+        $this->app->bind(Contracts\Http\Actions\Store::class, Store::class);
+
+        /** Commands */
+        $this->app->bind(Contracts\Bus\Commands\Dispatcher::class, CommandDispatcher::class);
+
+        /** Queries */
+        $this->app->bind(Contracts\Bus\Queries\Dispatcher::class, QueryDispatcher::class);
     }
 }

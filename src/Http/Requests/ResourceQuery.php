@@ -75,9 +75,9 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Resolve the request instance when querying many resources.
      *
      * @param string $resourceType
-     * @return QueryParameters|ResourceQuery
+     * @return ResourceQuery
      */
-    public static function queryMany(string $resourceType): QueryParameters
+    public static function queryMany(string $resourceType): ResourceQuery
     {
         $resolver = self::$queryManyResolver ?: new RequestResolver(RequestResolver::COLLECTION_QUERY);
 
@@ -236,6 +236,14 @@ class ResourceQuery extends FormRequest implements QueryParameters
             'page',
             'filter',
         ])->all();
+    }
+
+    /**
+     * @return array
+     */
+    public function toQuery(): array
+    {
+        throw new \RuntimeException('Not implemented.');
     }
 
     /**

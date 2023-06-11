@@ -59,4 +59,12 @@ class PostQuery extends ResourceQuery
             ],
         ];
     }
+
+    /**
+     * @return void
+     */
+    public function validateResolved()
+    {
+        // no-op
+    }
 }

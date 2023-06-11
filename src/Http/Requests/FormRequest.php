@@ -35,6 +35,58 @@ class FormRequest extends BaseFormRequest
      */
     public const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
+
+    /**
+     * Get the validator instance for the request.
+     *
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function makeValidator(array $input): \Illuminate\Contracts\Validation\Validator
+    {
+        $factory = $this->container->make(\Illuminate\Contracts\Validation\Factory::class);
+
+        $validator = $this->createDefaultValidatorWithInput($factory, $input);
+
+        if (method_exists($this, 'withValidator')) {
+            $this->withValidator($validator);
+        }
+
+        if (method_exists($this, 'after')) {
+            $validator->after($this->container->call(
+                $this->after(...),
+                ['validator' => $validator]
+            ));
+        }
+
+        $this->setValidator($validator);
+
+        return $this->validator;
+    }
+
+    /**
+     * Create the default validator instance.
+     *
+     * @param  \Illuminate\Contracts\Validation\Factory  $factory
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function createDefaultValidatorWithInput(\Illuminate\Contracts\Validation\Factory $factory, array $input)
+    {
+        $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+
+        $validator = $factory->make(
+            $input, $rules,
+            $this->messages(), $this->attributes()
+        )->stopOnFirstFailure($this->stopOnFirstFailure);
+
+        if ($this->isPrecognitive()) {
+            $validator->setRules(
+                $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+            );
+        }
+
+        return $validator;
+    }
+
     /**
      * @return bool
      */

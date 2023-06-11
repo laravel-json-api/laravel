@@ -27,7 +27,6 @@ use App\Tests\Api\V1\TestCase;
 
 class ReadTest extends TestCase
 {
-
     public function test(): void
     {
         $post = Post::factory()->create();

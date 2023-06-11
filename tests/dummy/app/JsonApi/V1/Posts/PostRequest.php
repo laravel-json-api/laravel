@@ -26,6 +26,10 @@ use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class PostRequest extends ResourceRequest
 {
+    public function validateResolved()
+    {
+        // no-op
+    }
 
     /**
      * @return array

@@ -17,25 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Validation;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
-use LaravelJsonApi\Contracts\Routing\Route;
+use LaravelJsonApi\Contracts\Validation\Factory as FactoryContract;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-trait FetchOne
+class Container implements \LaravelJsonApi\Contracts\Validation\Container
 {
     /**
-     * Fetch zero to one JSON:API resource by id.
-     *
-     * @param Route $route
-     * @param FetchOneContract $action
-     * @return Responsable
+     * @inheritDoc
      */
-    public function show(Route $route, FetchOneContract $action): Responsable
+    public function validatorsFor(string|ResourceType $resourceType): FactoryContract
     {
-        return $action
-            ->withIdOrModel($route->modelOrResourceId())
-            ->withHooks($this);
+        return new Factory(ResourceType::cast($resourceType));
     }
 }
