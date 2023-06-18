@@ -19,48 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Response;
-use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Contracts\Http\Actions\FetchMany as FetchManyContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
 
 trait FetchMany
 {
-
     /**
-     * Fetch zero to many JSON API resources.
+     * Fetch zero-to-many JSON:API resources.
      *
-     * @param Route $route
-     * @param StoreContract $store
-     * @return Responsable|Response
+     * @param JsonApiRequest $request
+     * @param FetchManyContract $action
+     * @return DataResponse
      */
-    public function index(Route $route, StoreContract $store)
+    public function index(JsonApiRequest $request, FetchManyContract $action): DataResponse
     {
-        $request = ResourceQuery::queryMany(
-            $resourceType = $route->resourceType()
-        );
-
-        $response = null;
-
-        if (method_exists($this, 'searching')) {
-            $response = $this->searching($request);
-        }
-
-        if ($response) {
-            return $response;
-        }
-
-        $data = $store
-            ->queryAll($resourceType)
-            ->withRequest($request)
-            ->firstOrPaginate($request->page());
-
-        if (method_exists($this, 'searched')) {
-            $response = $this->searched($data, $request);
-        }
-
-        return $response ?: DataResponse::make($data)->withQueryParameters($request);
+        return $action
+            ->withHooks($this)
+            ->execute($request);
     }
 }

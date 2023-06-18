@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Laravel\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Contracts\Validation\StoreValidator;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -38,6 +39,34 @@ class Factory implements \LaravelJsonApi\Contracts\Validation\Factory
      */
     public function __construct(private readonly ResourceType $type)
     {
+    }
+
+    /**
+     * @return QueryManyValidator
+     */
+    public function queryMany(): QueryManyValidator
+    {
+        return new class($this->type) implements QueryManyValidator {
+            public function __construct(private readonly ResourceType $type)
+            {
+            }
+
+            public function forRequest(Request $request): Validator
+            {
+                return $this->make($request, (array) $request->query());
+            }
+
+            public function make(?Request $request, array $parameters): Validator
+            {
+                try {
+                    $query = ResourceQuery::queryMany($this->type->value);
+                } catch (\Throwable $ex) {
+                    throw new \RuntimeException('Not expecting resource query to throw.');
+                }
+
+                return $query->makeValidator($parameters);
+            }
+        };
     }
 
     /**

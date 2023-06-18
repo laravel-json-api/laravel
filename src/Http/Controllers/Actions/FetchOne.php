@@ -19,23 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
-use LaravelJsonApi\Contracts\Routing\Route;
+use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
 
 trait FetchOne
 {
     /**
      * Fetch zero to one JSON:API resource by id.
      *
-     * @param Route $route
+     * @param JsonApiRequest $request
      * @param FetchOneContract $action
-     * @return Responsable
+     * @return DataResponse
      */
-    public function show(Route $route, FetchOneContract $action): Responsable
+    public function show(JsonApiRequest $request, FetchOneContract $action): DataResponse
     {
         return $action
-            ->withIdOrModel($route->modelOrResourceId())
-            ->withHooks($this);
+            ->withHooks($this)
+            ->execute($request);
     }
 }

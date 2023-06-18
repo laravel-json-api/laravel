@@ -27,6 +27,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
 use LaravelJsonApi\Core\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Core\Bus\Queries\Dispatcher as QueryDispatcher;
+use LaravelJsonApi\Core\Http\Actions\FetchMany;
 use LaravelJsonApi\Core\Http\Actions\FetchOne;
 use LaravelJsonApi\Core\Http\Actions\Store;
 use LaravelJsonApi\Core\JsonApiService;
@@ -158,6 +159,7 @@ class ServiceProvider extends BaseServiceProvider
     private function bindActionsCommandsAndQueries(): void
     {
         /** Actions */
+        $this->app->bind(Contracts\Http\Actions\FetchMany::class, FetchMany::class);
         $this->app->bind(Contracts\Http\Actions\FetchOne::class, FetchOne::class);
         $this->app->bind(Contracts\Http\Actions\Store::class, Store::class);
 

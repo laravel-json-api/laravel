@@ -19,20 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Contracts\Http\Actions\Store as StoreAction;
+use LaravelJsonApi\Contracts\Http\Actions\Store as StoreContract;
+use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
 
 trait Store
 {
     /**
      * Create a new resource.
      *
-     * @param StoreAction $action
-     * @return Responsable
+     * @param JsonApiRequest $request
+     * @param StoreContract $action
+     * @return DataResponse
      */
-    public function store(StoreAction $action): Responsable
+    public function store(JsonApiRequest $request, StoreContract $action): DataResponse
     {
         return $action
-            ->withHooks($this);
+            ->withHooks($this)
+            ->execute($request);
     }
 }
