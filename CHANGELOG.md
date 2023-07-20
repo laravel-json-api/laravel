@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [3.1.0] - 2023-07-20
+
+### Added
+
+- [core#12](https://github.com/laravel-json-api/core/pull/12) Add `ulid()` method to the `ID` field class.
+
 ## [3.0.0] - 2023-02-14
 
 ### Changed

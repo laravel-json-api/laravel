@@ -68,7 +68,7 @@ class ToManyLinksTest extends TestCase
     /**
      * @return array[]
      */
-    public function scenarioProvider(): array
+    public static function scenarioProvider(): array
     {
         return [
             'hidden' => [

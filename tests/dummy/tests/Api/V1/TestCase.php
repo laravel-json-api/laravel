@@ -46,7 +46,7 @@ class TestCase extends BaseTestCase
     /**
      * @return array
      */
-    public function notAcceptableMediaTypeProvider(): array
+    public static function notAcceptableMediaTypeProvider(): array
     {
         return [
             'application/json' => ['application/json'],

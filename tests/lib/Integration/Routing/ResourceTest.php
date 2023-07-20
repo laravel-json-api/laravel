@@ -30,7 +30,7 @@ class ResourceTest extends TestCase
     /**
      * @return array
      */
-    public function routeProvider(): array
+    public static function routeProvider(): array
     {
         return [
             'index' => ['GET', '/api/v1/posts', 'index', false],
@@ -330,7 +330,7 @@ class ResourceTest extends TestCase
     /**
      * @return array
      */
-    public function onlyProvider(): array
+    public static function onlyProvider(): array
     {
         return [
             ['index', [
@@ -390,7 +390,7 @@ class ResourceTest extends TestCase
     /**
      * @return array
      */
-    public function exceptProvider(): array
+    public static function exceptProvider(): array
     {
         return [
             ['store', [
@@ -474,7 +474,7 @@ class ResourceTest extends TestCase
     /**
      * @return array
      */
-    public function resourceMethodProvider(): array
+    public static function resourceMethodProvider(): array
     {
         return [
             'GET' => ['GET'],

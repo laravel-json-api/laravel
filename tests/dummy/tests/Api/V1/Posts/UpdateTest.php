@@ -90,7 +90,7 @@ class UpdateTest extends TestCase
     /**
      * @return array
      */
-    public function fieldProvider(): array
+    public static function fieldProvider(): array
     {
         return [
             ['content'],

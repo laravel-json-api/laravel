@@ -29,7 +29,7 @@ class HasOneTest extends TestCase
     /**
      * @return array
      */
-    public function genericProvider(): array
+    public static function genericProvider(): array
     {
         return [
             'showRelated' => [
@@ -173,7 +173,7 @@ class HasOneTest extends TestCase
     /**
      * @return array[]
      */
-    public function onlyProvider(): array
+    public static function onlyProvider(): array
     {
         return [
             ['related', [
@@ -228,7 +228,7 @@ class HasOneTest extends TestCase
     /**
      * @return array
      */
-    public function exceptProvider()
+    public static function exceptProvider(): array
     {
         return [
             ['related', [
@@ -308,7 +308,7 @@ class HasOneTest extends TestCase
     /**
      * @return array
      */
-    public function ownActionProvider(): array
+    public static function ownActionProvider(): array
     {
         return [
             'showRelated' => [
