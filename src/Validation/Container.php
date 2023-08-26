@@ -17,25 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
+namespace LaravelJsonApi\Laravel\Validation;
 
-use LaravelJsonApi\Contracts\Http\Actions\FetchMany as FetchManyContract;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
+use LaravelJsonApi\Contracts\Validation\Factory as FactoryContract;
+use LaravelJsonApi\Core\Values\ResourceType;
 
-trait FetchMany
+class Container implements \LaravelJsonApi\Contracts\Validation\Container
 {
     /**
-     * Fetch zero-to-many JSON:API resources.
-     *
-     * @param JsonApiRequest $request
-     * @param FetchManyContract $action
-     * @return DataResponse
+     * @inheritDoc
      */
-    public function index(JsonApiRequest $request, FetchManyContract $action): DataResponse
+    public function validatorsFor(string|ResourceType $resourceType): FactoryContract
     {
-        return $action
-            ->withHooks($this)
-            ->execute($request);
+        return new Factory(ResourceType::cast($resourceType));
     }
 }

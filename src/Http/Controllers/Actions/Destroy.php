@@ -19,15 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Laravel\Exceptions\HttpNotAcceptableException;
-use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Contracts\Http\Actions\Destroy as DestroyContract;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 trait Destroy
 {
@@ -35,71 +30,15 @@ trait Destroy
     /**
      * Destroy a resource.
      *
-     * @param Route $route
-     * @param StoreContract $store
+     * @param JsonApiRequest $request
+     * @param DestroyContract $action
      * @return Response|Responsable
-     * @throws AuthenticationException|AuthorizationException|HttpNotAcceptableException
      */
-    public function destroy(Route $route, StoreContract $store)
+    public function destroy(JsonApiRequest $request, DestroyContract $action): Responsable|Response
     {
-        /**
-         * As we do not have a query request class for a delete request,
-         * we need to manually check that the request Accept header
-         * is the JSON:API media type.
-         */
-        $acceptable = false;
-
-        foreach (request()->getAcceptableContentTypes() as $contentType) {
-            if ($contentType === ResourceRequest::JSON_API_MEDIA_TYPE) {
-                $acceptable = true;
-                break;
-            }
-        }
-
-        throw_unless($acceptable, new HttpNotAcceptableException());
-
-        $request = ResourceRequest::forResourceIfExists(
-            $resourceType = $route->resourceType()
-        );
-
-        $model = $route->model();
-
-        /**
-         * The resource request class is optional for deleting,
-         * as delete validation is optional. However, if we do not have
-         * a resource request then the action will not have been authorized.
-         * So we need to trigger authorization in this case.
-         */
-        if (!$request) {
-            $check = $route->authorizer()->destroy(
-                $request = \request(),
-                $model,
-            );
-
-            throw_if(false === $check && Auth::guest(), new AuthenticationException());
-            throw_if(false === $check, new AuthorizationException());
-        }
-
-        $response = null;
-
-        if (method_exists($this, 'deleting')) {
-            $response = $this->deleting($model, $request);
-        }
-
-        if ($response) {
-            return $response;
-        }
-
-        $store->delete(
-            $resourceType,
-            $route->modelOrResourceId()
-        );
-
-        if (method_exists($this, 'deleted')) {
-            $response = $this->deleted($model, $request);
-        }
-
-        return $response ?: response(null, Response::HTTP_NO_CONTENT);
+        return $action
+            ->withHooks($this)
+            ->execute($request);
     }
 
 }

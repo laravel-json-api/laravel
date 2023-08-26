@@ -60,7 +60,9 @@ class DetachTagsTest extends TestCase
             ->withData($ids)
             ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertNoContent();
+        $response->assertFetchedToMany(
+            $this->identifiersFor('tags', $keep),
+        );
 
         $this->assertSame($keep->count(), $this->post->tags()->count());
 

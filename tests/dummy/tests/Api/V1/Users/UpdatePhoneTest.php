@@ -48,6 +48,7 @@ class UpdatePhoneTest extends TestCase
         $id = ['type' => 'phones', 'id' => (string) $new->getRouteKey()];
 
         $response = $this
+            ->withoutExceptionHandling()
             ->actingAs($this->user)
             ->jsonApi('phones')
             ->withData($id)

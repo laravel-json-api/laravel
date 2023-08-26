@@ -25,12 +25,12 @@
     "require": {
         "php": "^8.1",
         "ext-json": "*",
-        "laravel-json-api/core": "^3.2",
-        "laravel-json-api/eloquent": "^3.0",
-        "laravel-json-api/encoder-neomerx": "^3.0",
-        "laravel-json-api/exceptions": "^2.0",
-        "laravel-json-api/spec": "^2.0",
-        "laravel-json-api/validation": "^3.0",
+        "laravel-json-api/core": "^4.0",
+        "laravel-json-api/eloquent": "^4.0",
+        "laravel-json-api/encoder-neomerx": "^4.0",
+        "laravel-json-api/exceptions": "^3.0",
+        "laravel-json-api/spec": "^3.0",
+        "laravel-json-api/validation": "^4.0",
         "laravel/framework": "^10.0"
     },
     "require-dev": {
@@ -53,7 +53,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "3.x-dev"
+            "dev-develop": "3.x-dev",
+            "dev-4.x": "4.x-dev"
         },
         "laravel": {
             "aliases": {
@@ -65,7 +66,7 @@
             ]
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "sort-packages": true

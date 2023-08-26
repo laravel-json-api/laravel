@@ -54,10 +54,17 @@ class AttachMediaTest extends TestCase
         $images = Image::factory()->count(2)->create();
         $videos = Video::factory()->count(2)->create();
 
-        $ids = collect($images)->merge($videos)->map(fn($model) => [
-            'type' => ($model instanceof Image) ? 'images' : 'videos',
+        $mapper = fn(object $model) => [
+            'type' => match($model::class) {
+                Image::class => 'images',
+                Video::class => 'videos',
+            },
             'id' => (string) $model->getRouteKey(),
-        ])->all();
+        ];
+
+        $ids = collect($images)->merge($videos)->map($mapper)->all();
+        $expectedImageIds = $existingImages->merge($images)->map($mapper)->all();
+        $expectedVideoIds = $existingVideos->merge($videos)->map($mapper)->all();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -66,7 +73,10 @@ class AttachMediaTest extends TestCase
             ->withData($ids)
             ->post(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
-        $response->assertNoContent();
+        $response->assertFetchedToMany([
+            ...$expectedImageIds,
+            ...$expectedVideoIds,
+        ]);
 
         $this->assertDatabaseCount('image_post', $images->count() + $existingImages->count());
         $this->assertDatabaseCount('post_video', $videos->count() + $existingVideos->count());

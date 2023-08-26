@@ -38,4 +38,8 @@ class VideoRequest extends ResourceRequest
         ];
     }
 
+    public function validateResolved()
+    {
+        // no-op
+    }
 }

@@ -19,72 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
 use Illuminate\Support\Str;
-use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\JsonApiService;
-use LaravelJsonApi\Validation\Factory as ValidationFactory;
 
-class FormRequest extends BaseFormRequest
+class JsonApiRequest extends BaseFormRequest
 {
-
     /**
      * @var string
      */
     public const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
-
     /**
-     * Get the validator instance for the request.
-     *
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return void
      */
-    public function makeValidator(array $input): \Illuminate\Contracts\Validation\Validator
+    public function validateResolved(): void
     {
-        $factory = $this->container->make(\Illuminate\Contracts\Validation\Factory::class);
-
-        $validator = $this->createDefaultValidatorWithInput($factory, $input);
-
-        if (method_exists($this, 'withValidator')) {
-            $this->withValidator($validator);
-        }
-
-        if (method_exists($this, 'after')) {
-            $validator->after($this->container->call(
-                $this->after(...),
-                ['validator' => $validator]
-            ));
-        }
-
-        $this->setValidator($validator);
-
-        return $this->validator;
-    }
-
-    /**
-     * Create the default validator instance.
-     *
-     * @param  \Illuminate\Contracts\Validation\Factory  $factory
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function createDefaultValidatorWithInput(\Illuminate\Contracts\Validation\Factory $factory, array $input)
-    {
-        $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
-
-        $validator = $factory->make(
-            $input, $rules,
-            $this->messages(), $this->attributes()
-        )->stopOnFirstFailure($this->stopOnFirstFailure);
-
-        if ($this->isPrecognitive()) {
-            $validator->setRules(
-                $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
-            );
-        }
-
-        return $validator;
+        // no-op
     }
 
     /**
@@ -269,69 +220,6 @@ class FormRequest extends BaseFormRequest
         }
 
         return null;
-    }
-
-    /**
-     * Get the JSON API schema for the request.
-     *
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return $this->jsonApi()->route()->schema();
-    }
-
-    /**
-     * @return bool
-     */
-    protected function passesAuthorization()
-    {
-        /**
-         * If the developer has implemented the `authorize` method, we
-         * will return the result if it is a boolean. This allows
-         * the developer to return a null value to indicate they want
-         * the default authorization to run.
-         */
-        if (method_exists($this, 'authorize')) {
-            if (is_bool($passes = $this->container->call([$this, 'authorize']))) {
-                return $passes;
-            }
-        }
-
-        /**
-         * If the developer has not authorized the request themselves,
-         * we run our default authorization as long as authorization is
-         * enabled for both the server and the schema (checked via the
-         * `mustAuthorize()` method).
-         */
-        if (method_exists($this, 'authorizeResource')) {
-            return $this->container->call([$this, 'authorizeResource']);
-        }
-
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function failedAuthorization()
-    {
-        /** @var Guard $auth */
-        $auth = $this->container->make(Guard::class);
-
-        if ($auth->guest()) {
-            throw new AuthenticationException();
-        }
-
-        parent::failedAuthorization();
-    }
-
-    /**
-     * @return ValidationFactory
-     */
-    final protected function validationErrors(): ValidationFactory
-    {
-        return $this->container->make(ValidationFactory::class);
     }
 
     /**

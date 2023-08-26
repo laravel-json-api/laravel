@@ -50,4 +50,9 @@ class UserQuery extends ResourceQuery
             'sort' => JsonApiRule::notSupported(),
         ];
     }
+
+    public function validateResolved()
+    {
+        // no-op
+    }
 }

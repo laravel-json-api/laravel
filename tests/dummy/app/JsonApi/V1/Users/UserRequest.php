@@ -33,4 +33,9 @@ class UserRequest extends ResourceRequest
             'phone' => JsonApiRule::toOne(),
         ];
     }
+
+    public function validateResolved()
+    {
+        // no-op
+    }
 }

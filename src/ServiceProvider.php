@@ -21,9 +21,22 @@ namespace LaravelJsonApi\Laravel;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Pipeline\Pipeline;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use LaravelJsonApi\Contracts;
+use LaravelJsonApi\Core\Bus\Commands\Dispatcher as CommandDispatcher;
+use LaravelJsonApi\Core\Bus\Queries\Dispatcher as QueryDispatcher;
+use LaravelJsonApi\Core\Http\Actions\AttachRelationship;
+use LaravelJsonApi\Core\Http\Actions\Destroy;
+use LaravelJsonApi\Core\Http\Actions\DetachRelationship;
+use LaravelJsonApi\Core\Http\Actions\FetchMany;
+use LaravelJsonApi\Core\Http\Actions\FetchOne;
+use LaravelJsonApi\Core\Http\Actions\FetchRelated;
+use LaravelJsonApi\Core\Http\Actions\FetchRelationship;
+use LaravelJsonApi\Core\Http\Actions\Store;
+use LaravelJsonApi\Core\Http\Actions\Update;
+use LaravelJsonApi\Core\Http\Actions\UpdateRelationship;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\ServerRepository;
 use LaravelJsonApi\Core\Support\AppResolver;
@@ -72,6 +85,13 @@ class ServiceProvider extends BaseServiceProvider
         $this->bindAuthorizer();
         $this->bindService();
         $this->bindServer();
+        $this->bindActionsCommandsAndQueries();
+
+        /** @TODO wtf? why isn't it working without this? */
+        $this->app->bind(Pipeline::class, \Illuminate\Pipeline\Pipeline::class);
+
+        /** @TODO will need to remove this temporary wiring */
+        $this->app->bind(Contracts\Validation\Container::class, Validation\Container::class);
     }
 
     /**
@@ -134,5 +154,33 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Contracts\Resources\Container::class, static function (Application $app) {
             return $app->make(Contracts\Server\Server::class)->resources();
         });
+
+        $this->app->bind(Contracts\Auth\Container::class, static function (Application $app) {
+            return $app->make(Contracts\Server\Server::class)->authorizers();
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function bindActionsCommandsAndQueries(): void
+    {
+        /** Actions */
+        $this->app->bind(Contracts\Http\Actions\FetchMany::class, FetchMany::class);
+        $this->app->bind(Contracts\Http\Actions\FetchOne::class, FetchOne::class);
+        $this->app->bind(Contracts\Http\Actions\FetchRelated::class, FetchRelated::class);
+        $this->app->bind(Contracts\Http\Actions\FetchRelationship::class, FetchRelationship::class);
+        $this->app->bind(Contracts\Http\Actions\Store::class, Store::class);
+        $this->app->bind(Contracts\Http\Actions\Update::class, Update::class);
+        $this->app->bind(Contracts\Http\Actions\Destroy::class, Destroy::class);
+        $this->app->bind(Contracts\Http\Actions\UpdateRelationship::class, UpdateRelationship::class);
+        $this->app->bind(Contracts\Http\Actions\AttachRelationship::class, AttachRelationship::class);
+        $this->app->bind(Contracts\Http\Actions\DetachRelationship::class, DetachRelationship::class);
+
+        /** Commands */
+        $this->app->bind(Contracts\Bus\Commands\Dispatcher::class, CommandDispatcher::class);
+
+        /** Queries */
+        $this->app->bind(Contracts\Bus\Queries\Dispatcher::class, QueryDispatcher::class);
     }
 }

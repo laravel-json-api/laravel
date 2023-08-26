@@ -57,10 +57,15 @@ class DetachMediaTest extends TestCase
         $detachVideos = $existingVideos->take(2);
         $keepVideos = $existingVideos->diff($detachVideos);
 
-        $ids = collect($detachImages)->merge($detachVideos)->map(fn($model) => [
-            'type' => ($model instanceof Image) ? 'images' : 'videos',
+        $mapper = fn(object $model) => [
+            'type' => match($model::class) {
+                Image::class => 'images',
+                Video::class => 'videos',
+            },
             'id' => (string) $model->getRouteKey(),
-        ])->all();
+        ];
+
+        $ids = collect($detachImages)->merge($detachVideos)->map($mapper)->all();
 
         $response = $this
             ->withoutExceptionHandling()
@@ -69,7 +74,10 @@ class DetachMediaTest extends TestCase
             ->withData($ids)
             ->delete(url('/api/v1/posts', [$this->post, 'relationships', 'media']));
 
-        $response->assertNoContent();
+        $response->assertFetchedToMany([
+            ...$keepImages->map($mapper)->all(),
+            ...$keepVideos->map($mapper)->all(),
+        ]);
 
         $this->assertDatabaseCount('image_post', $keepImages->count());
         $this->assertDatabaseCount('post_video', $keepVideos->count());

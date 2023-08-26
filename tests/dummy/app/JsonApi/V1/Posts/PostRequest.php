@@ -26,7 +26,6 @@ use LaravelJsonApi\Validation\Rule as JsonApiRule;
 
 class PostRequest extends ResourceRequest
 {
-
     /**
      * @return array
      */
@@ -78,5 +77,10 @@ class PostRequest extends ResourceRequest
         return [
             'no_comments' => $post->comments()->doesntExist(),
         ];
+    }
+
+    public function validateResolved()
+    {
+        // no-op
     }
 }

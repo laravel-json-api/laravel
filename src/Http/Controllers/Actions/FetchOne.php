@@ -19,48 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Response;
-use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
 
 trait FetchOne
 {
-
     /**
-     * Fetch zero to one JSON API resource by id.
+     * Fetch zero to one JSON:API resource by id.
      *
-     * @param Route $route
-     * @param StoreContract $store
-     * @return Responsable|Response
+     * @param JsonApiRequest $request
+     * @param FetchOneContract $action
+     * @return DataResponse
      */
-    public function show(Route $route, StoreContract $store)
+    public function show(JsonApiRequest $request, FetchOneContract $action): DataResponse
     {
-        $request = ResourceQuery::queryOne(
-            $resourceType = $route->resourceType()
-        );
-
-        $response = null;
-
-        if (method_exists($this, 'reading')) {
-            $response = $this->reading($request);
-        }
-
-        if ($response) {
-            return $response;
-        }
-
-        $model = $store
-            ->queryOne($resourceType, $route->modelOrResourceId())
-            ->withRequest($request)
-            ->first();
-
-        if (method_exists($this, 'read')) {
-            $response = $this->read($model, $request);
-        }
-
-        return $response ?: DataResponse::make($model)->withQueryParameters($request);
+        return $action
+            ->withHooks($this)
+            ->execute($request);
     }
 }

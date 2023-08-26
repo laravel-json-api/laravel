@@ -175,9 +175,9 @@ class Route implements RouteContract
      */
     public function authorizer(): Authorizer
     {
-        return $this->container->make(
-            $this->schema()->authorizer()
-        );
+        return $this->server
+            ->authorizers()
+            ->authorizerFor($this->resourceType());
     }
 
     /**

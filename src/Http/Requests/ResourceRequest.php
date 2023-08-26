@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
@@ -370,14 +371,18 @@ class ResourceRequest extends FormRequest
     /**
      * Create a validator to validate a relationship document.
      *
-     * @param ValidationFactory $factory
+     * @param string $fieldName
+     * @param array $data
      * @return Validator
+     * @throws BindingResolutionException
      */
-    protected function createRelationshipValidator(ValidationFactory $factory): Validator
+    public function createRelationshipValidator(string $fieldName, array $data): Validator
     {
+        $factory = $this->container->make(ValidationFactory::class);
+
         return $factory->make(
-            $this->validationDataForRelationship(),
-            $this->relationshipRules(),
+            $data,
+            $this->relationshipRules($fieldName),
             $this->messages(),
             $this->attributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
@@ -386,13 +391,15 @@ class ResourceRequest extends FormRequest
     /**
      * Create a validator to validate a delete request.
      *
-     * @param ValidationFactory $factory
+     * @param array $data
      * @return Validator
      */
-    protected function createDeleteValidator(ValidationFactory $factory): Validator
+    public function createDeleteValidator(array $data): Validator
     {
+        $factory = $this->container->make(ValidationFactory::class);
+
         return $factory->make(
-            $this->validationDataForDelete(),
+            $data,
             method_exists($this, 'deleteRules') ? $this->container->call([$this, 'deleteRules']) : [],
             array_merge(
                 $this->messages(),
@@ -457,7 +464,7 @@ class ResourceRequest extends FormRequest
      * @param array $document
      * @return array
      */
-    protected function dataForRelationship(object $model, string $fieldName, array $document): array
+    public function dataForRelationship(object $model, string $fieldName, array $document): array
     {
         $route = $this->jsonApi()->route();
 
@@ -505,7 +512,7 @@ class ResourceRequest extends FormRequest
      * @param object $model
      * @return array
      */
-    private function extractForUpdate(object $model): array
+    public function extractForUpdate(object $model): array
     {
         $encoder = $this->jsonApi()->server()->encoder();
 
@@ -537,10 +544,9 @@ class ResourceRequest extends FormRequest
      *
      * @return array
      */
-    private function relationshipRules(): array
+    private function relationshipRules(string $fieldName): array
     {
         $rules = $this->container->call([$this, 'rules']);
-        $fieldName = $this->getFieldName();
 
         return collect($rules)
             ->filter(fn($v, $key) => Str::startsWith($key, $fieldName))

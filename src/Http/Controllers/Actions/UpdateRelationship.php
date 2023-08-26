@@ -19,72 +19,26 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Response;
-use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Contracts\Http\Actions\UpdateRelationship as UpdateRelationshipContract;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
-use LaravelJsonApi\Core\Support\Str;
-use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
-use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
+use LaravelJsonApi\Laravel\Http\Requests\JsonApiRequest;
 
 trait UpdateRelationship
 {
-
     /**
      * Update a resource relationship.
      *
-     * @param Route $route
-     * @param StoreContract $store
-     * @return Responsable|Response
+     * @param JsonApiRequest $request
+     * @param UpdateRelationshipContract $action
+     * @return RelationshipResponse
      */
-    public function updateRelationship(Route $route, StoreContract $store)
+    public function updateRelationship(
+        JsonApiRequest $request,
+        UpdateRelationshipContract $action,
+    ): RelationshipResponse
     {
-        $relation = $route
-            ->schema()
-            ->relationship($fieldName = $route->fieldName());
-
-        $request = ResourceRequest::forResource(
-            $resourceType = $route->resourceType()
-        );
-
-        $query = $relation->toOne() ?
-            ResourceQuery::queryOne($relation->inverse()) :
-            ResourceQuery::queryMany($relation->inverse());
-
-        $model = $route->model();
-        $response = null;
-
-        if (method_exists($this, $hook = 'updating' . Str::classify($fieldName))) {
-            $response = $this->{$hook}($model, $request, $query);
-        }
-
-        if ($response) {
-            return $response;
-        }
-
-        $data = $request->validatedForRelation();
-
-        if ($relation->toOne()) {
-            $result = $store
-                ->modifyToOne($resourceType, $model, $fieldName)
-                ->withRequest($query)
-                ->associate($data);
-        } else {
-            $result = $store
-                ->modifyToMany($resourceType, $model, $fieldName)
-                ->withRequest($query)
-                ->sync($data);
-        }
-
-        if (method_exists($this, $hook = 'updated' . Str::classify($fieldName))) {
-            $response = $this->{$hook}($model, $result, $request, $query);
-        }
-
-        return $response ?: RelationshipResponse::make(
-            $model,
-            $fieldName,
-            $result
-        )->withQueryParameters($query);
+        return $action
+            ->withHooks($this)
+            ->execute($request);
     }
 }

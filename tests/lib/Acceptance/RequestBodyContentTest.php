@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Tests\Acceptance;
 
 use App\Models\Post;
+use App\Models\User;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
 
@@ -45,7 +46,9 @@ class RequestBodyContentTest extends TestCase
             'Content-Type' => 'application/vnd.api+json',
         ]);
 
-        $response = $this->call('POST', '/api/v1/posts', [], [], [], $headers);
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->call('POST', '/api/v1/posts', [], [], [], $headers);
 
         $response->assertStatus(400)->assertExactJson([
             'jsonapi' => [
@@ -70,7 +73,9 @@ class RequestBodyContentTest extends TestCase
             'Content-Type' => 'application/vnd.api+json',
         ]);
 
-        $response = $this->call('PATCH', "/api/v1/posts/{$post->getRouteKey()}", [], [], [], $headers);
+        $response = $this
+            ->actingAs($post->author)
+            ->call('PATCH', "/api/v1/posts/{$post->getRouteKey()}", [], [], [], $headers);
 
         $response->assertStatus(400)->assertExactJson([
             'jsonapi' => [
@@ -93,7 +98,11 @@ class RequestBodyContentTest extends TestCase
      */
     public function testEmptyContentLengthHeader(): void
     {
-        $headers = $this->transformHeadersToServerVars(['Content-Length' => '']);
+        $headers = $this->transformHeadersToServerVars([
+            'Accept' => 'application/vnd.api+json',
+            'Content-Length' => '',
+        ]);
+
         $this->call('GET', '/api/v1/posts', [], [], [], $headers)->assertSuccessful();
     }
 

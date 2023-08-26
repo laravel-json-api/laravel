@@ -65,4 +65,9 @@ class MediaCollectionQuery extends ResourceQuery
             ],
         ];
     }
+
+    public function validateResolved()
+    {
+        // no-op
+    }
 }

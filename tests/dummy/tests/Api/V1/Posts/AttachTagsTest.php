@@ -60,7 +60,9 @@ class AttachTagsTest extends TestCase
             ->withData($ids)
             ->post(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
 
-        $response->assertNoContent();
+        $response->assertFetchedToMany(
+            $this->identifiersFor('tags', $existing->merge($tags)),
+        );
 
         $this->assertSame($existing->count() + $tags->count(), $this->post->tags()->count());
 
