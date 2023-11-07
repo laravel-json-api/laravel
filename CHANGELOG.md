@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Changed
+
+- Registering routes no longer results in the server instance being thread-cached. This more accurately reflects
+  production environments, where routes would be cached so there would be no thread-cached JSON:API server when handling
+  a HTTP request. This means tests (and development environments where routes are not cached) more accurately behave in
+  the same way as production environments.
+
 ## [3.1.0] - 2023-07-20
 
 ### Added
