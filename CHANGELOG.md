@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [3.2.0] - 2023-11-08
+
 ### Added
 
 - Exceptions converted to JSON:API errors when debug mode is on now include all previous exceptions.
