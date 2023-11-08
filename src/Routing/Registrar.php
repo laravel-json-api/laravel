@@ -57,7 +57,7 @@ class Registrar
     {
         return new PendingServerRegistration(
             $this->router,
-            $this->servers->server($name)
+            $this->servers->once($name),
         );
     }
 }
