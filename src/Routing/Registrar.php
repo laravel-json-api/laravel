@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Laravel\Routing;
 
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use LaravelJsonApi\Contracts\Server\Repository;
+use LaravelJsonApi\Core\Server\ServerRepository;
 
 class Registrar
 {
@@ -55,9 +56,15 @@ class Registrar
      */
     public function server(string $name): PendingServerRegistration
     {
+        // TODO add the `once` method to the server repository interface
+        $server = match(true) {
+            $this->servers instanceof ServerRepository => $this->servers->once($name),
+            default => $this->servers->server($name),
+        };
+
         return new PendingServerRegistration(
             $this->router,
-            $this->servers->server($name)
+            $server,
         );
     }
 }

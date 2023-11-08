@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+## [3.2.0] - 2023-11-08
+
+### Added
+
+- Exceptions converted to JSON:API errors when debug mode is on now include all previous exceptions.
+
+### Changed
+
+- Registering routes no longer results in the server instance being thread-cached. This more accurately reflects
+  production environments, where routes would be cached so there would be no thread-cached JSON:API server when handling
+  a HTTP request. This means tests (and development environments where routes are not cached) more accurately behave in
+  the same way as production environments.
+- Exceptions thrown during the encoding process are no longer caught and re-thrown as previous exceptions. This is due
+  to the number of questions we receive from developers who do not check previous exceptions, despite exception messages
+  stating that there is a previous exception to look at.
+
 ## [3.1.0] - 2023-07-20
 
 ### Added
