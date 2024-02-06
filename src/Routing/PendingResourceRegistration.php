@@ -189,6 +189,20 @@ class PendingResourceRegistration
 
         return $this;
     }
+    
+
+    /**
+     * Add middleware to the resource routes.
+     *
+     * @param Closure|array<string, string|string[]> $middleware
+     * @return $this
+     */
+    public function routeActionMiddleware(array|Closure $middleware): self
+    {
+        $this->options['route_action_middleware'] = $middleware;
+
+        return $this;
+    }
 
     /**
      * Specify middleware that should be removed from the resource routes.

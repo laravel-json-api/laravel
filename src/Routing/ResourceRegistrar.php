@@ -349,6 +349,23 @@ class ResourceRegistrar
         if (isset($options['excluded_middleware'])) {
             $action['excluded_middleware'] = $options['excluded_middleware'];
         }
+        
+        if (isset($options['route_action_middleware'])) {
+            /** @var \closure<string[], string, string, string>|array<string, string|string[]> $routeMiddlewareMap */
+            $routeMiddlewareMap = $options['route_action_middleware'];
+            /** @var string|string[] $routeActionMiddleware */
+            $routeActionMiddleware = is_callable($routeMiddlewareMap) ? $routeMiddlewareMap(
+                Str::classify($resourceType),
+                Str::classify($method),
+            ) : ($routeMiddlewareMap[$method] ?? []);
+            /** @var string[] $newMiddleware */
+            $newMiddleware = is_array($routeActionMiddleware) ? $routeActionMiddleware : [$routeActionMiddleware];
+            /** @var string[] $oldMiddleware */
+            $oldMiddleware = $action['middleware'] ?? [];
+
+            // dd($oldMiddleware, $routeActionMiddleware);
+            $action['middleware'] = array_merge($oldMiddleware, $newMiddleware);
+        }
 
         $action['where'] = $this->getWheres($resourceType, $parameter, $options);
 
