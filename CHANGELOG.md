@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+
+- [#265](https://github.com/laravel-json-api/laravel/issues/265) Allow registration of middleware per action on both
+  resource routes and relationship routes.
+
 ## [3.2.0] - 2023-11-08
 
 ### Added

@@ -23,6 +23,7 @@ use Closure;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Support\Str;
 
@@ -337,13 +338,14 @@ class ResourceRegistrar
         string $method,
         ?string $parameter,
         array $options
-    ) {
+    ): array {
         $name = $this->getResourceRouteName($resourceType, $method, $options);
 
         $action = ['as' => $name, 'uses' => $controller.'@'.$method];
+        $middleware = $this->getMiddleware($method, $options);
 
-        if (isset($options['middleware'])) {
-            $action['middleware'] = $options['middleware'];
+        if (!empty($middleware)) {
+            $action['middleware'] = $middleware;
         }
 
         if (isset($options['excluded_middleware'])) {
@@ -353,6 +355,22 @@ class ResourceRegistrar
         $action['where'] = $this->getWheres($resourceType, $parameter, $options);
 
         return $action;
+    }
+
+    /**
+     * @param string $action
+     * @param array $options
+     * @return array
+     */
+    private function getMiddleware(string $action, array $options): array
+    {
+        $all = $options['middleware'] ?? [];
+        $actions = $options['action_middleware'] ?? [];
+
+        return [
+            ...$all,
+            ...Arr::wrap($actions[$action] ?? null),
+        ];
     }
 
     /**

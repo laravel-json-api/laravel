@@ -144,13 +144,95 @@ class HasManyTest extends TestCase
                 ->middleware('foo')
                 ->resources(function ($server) {
                     $server->resource('posts')->middleware('bar')->relationships(function ($relations) {
-                        $relations->hasMany('tags')->middleware('baz');
+                        $relations->hasMany('tags')->middleware('baz1', 'baz2');
                     });
                 });
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz1', 'baz2'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @dataProvider genericProvider
+     */
+    public function testMiddlewareAsArrayList(string $method, string $uri): void
+    {
+        $server = $this->createServer('v1');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'tags');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function ($server) {
+                    $server->resource('posts')->middleware('bar')->relationships(function ($relations) {
+                        $relations->hasMany('tags')->middleware(['baz1', 'baz2']);
+                    });
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz1', 'baz2'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @dataProvider genericProvider
+     */
+    public function testActionMiddleware(string $method, string $uri, string $action): void
+    {
+        $actions = [
+            '*' => ['baz1', 'baz2'],
+            'showRelated' => 'showRelated1',
+            'showRelationship' => ['showRelationship1', 'showRelationship2'],
+            'updateRelationship' => 'updateRelationship1',
+            'attachRelationship' => ['attachRelationship1', 'attachRelationship2'],
+            'detachRelationship' => 'detachRelationship1',
+        ];
+
+        $expected = [
+            'api',
+            'jsonapi:v1',
+            'foo',
+            'bar',
+            ...$actions['*'],
+            ...Arr::wrap($actions[$action]),
+        ];
+
+        $server = $this->createServer('v1');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'tags');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($actions) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function ($server) use ($actions) {
+                    $server->resource('posts')->middleware('bar')->relationships(
+                        function ($relations) use ($actions) {
+                            $relations->hasMany('tags')->middleware([
+                                '*' => $actions['*'],
+                                'related' => $actions['showRelated'],
+                                'show' => $actions['showRelationship'],
+                                'update' => $actions['updateRelationship'],
+                                'attach' => $actions['attachRelationship'],
+                                'detach' => $actions['detachRelationship'],
+                            ]);
+                        },
+                    );
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame($expected, $route->action['middleware']);
     }
 
     /**
