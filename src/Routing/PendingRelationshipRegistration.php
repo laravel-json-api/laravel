@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Routing;
 
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 
 class PendingRelationshipRegistration
 {
@@ -155,12 +156,30 @@ class PendingRelationshipRegistration
     /**
      * Add middleware to the resource routes.
      *
-     * @param string ...$middleware
+     * @param mixed ...$middleware
      * @return $this
      */
-    public function middleware(string ...$middleware): self
+    public function middleware(...$middleware): self
     {
-        $this->options['middleware'] = $middleware;
+        if (count($middleware) === 1) {
+            $middleware = Arr::wrap($middleware[0]);
+        }
+
+        if (array_is_list($middleware)) {
+            $this->options['middleware'] = $middleware;
+            return $this;
+        }
+
+        $this->options['middleware'] = Arr::wrap($middleware['*'] ?? null);
+
+        foreach ($this->map as $alias => $action) {
+            if (isset($middleware[$alias])) {
+                $middleware[$action] = $middleware[$alias];
+                unset($middleware[$alias]);
+            }
+        }
+
+        $this->options['action_middleware'] = $middleware;
 
         return $this;
     }

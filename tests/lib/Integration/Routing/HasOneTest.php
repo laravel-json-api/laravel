@@ -22,6 +22,8 @@ namespace LaravelJsonApi\Laravel\Tests\Integration\Routing;
 use Illuminate\Contracts\Routing\Registrar;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
+use LaravelJsonApi\Laravel\Routing\Relationships;
+use LaravelJsonApi\Laravel\Routing\ResourceRegistrar;
 
 class HasOneTest extends TestCase
 {
@@ -117,11 +119,9 @@ class HasOneTest extends TestCase
     /**
      * @param string $method
      * @param string $uri
-     * @param string $action
-     * @param string $name
      * @dataProvider genericProvider
      */
-    public function testMiddleware(string $method, string $uri, string $action, string $name): void
+    public function testMiddleware(string $method, string $uri): void
     {
         $server = $this->createServer('v1');
         $schema = $this->createSchema($server, 'posts', '\d+');
@@ -134,13 +134,91 @@ class HasOneTest extends TestCase
                 ->middleware('foo')
                 ->resources(function ($server) {
                     $server->resource('posts')->middleware('bar')->relationships(function ($relations) {
-                        $relations->hasOne('author')->middleware('baz');
+                        $relations->hasOne('author')->middleware('baz1', 'baz2');
                     });
                 });
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz1', 'baz2'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @dataProvider genericProvider
+     */
+    public function testMiddlewareAsArrayList(string $method, string $uri): void
+    {
+        $server = $this->createServer('v1');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function (ResourceRegistrar $server) {
+                    $server->resource('posts')->middleware('bar')->relationships(function (Relationships $relations) {
+                        $relations->hasOne('author')->middleware(['baz1', 'baz2']);
+                    });
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar', 'baz1', 'baz2'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @dataProvider genericProvider
+     */
+    public function testActionMiddleware(string $method, string $uri, string $action): void
+    {
+        $actions = [
+            '*' => ['baz1', 'baz2'],
+            'showRelated' => 'showRelated1',
+            'showRelationship' => ['showRelationship1', 'showRelationship2'],
+            'updateRelationship' => 'updateRelationship1',
+        ];
+
+        $expected = [
+            'api',
+            'jsonapi:v1',
+            'foo',
+            'bar',
+            ...$actions['*'],
+            ...Arr::wrap($actions[$action]),
+        ];
+
+        $server = $this->createServer('v1');
+        $schema = $this->createSchema($server, 'posts', '\d+');
+        $this->createRelation($schema, 'author');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($actions) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function (ResourceRegistrar $server) use ($actions) {
+                    $server->resource('posts')->middleware('bar')->relationships(
+                        function (Relationships $relations) use ($actions) {
+                            $relations->hasOne('author')->middleware([
+                                '*' => $actions['*'],
+                                'related' => $actions['showRelated'],
+                                'show' => $actions['showRelationship'],
+                                'update' => $actions['updateRelationship'],
+                            ]);
+                        },
+                    );
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame($expected, $route->action['middleware']);
     }
 
     /**
