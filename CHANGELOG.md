@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [3.2.0] - 2024-02-14
+
 ### Added
 
 - [#265](https://github.com/laravel-json-api/laravel/issues/265) Allow registration of middleware per action on both
