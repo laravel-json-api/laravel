@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2023 Cloud Creativity Limited
+ * Copyright 2024 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Laravel\Routing;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Support\Str;
 
@@ -272,9 +273,10 @@ class RelationshipRegistrar
         $name = $this->getRelationRouteName($method, $defaultName, $options);
 
         $action = ['as' => $name, 'uses' => $this->controller.'@'.$method];
+        $middleware = $this->getMiddleware($method, $options);
 
-        if (isset($options['middleware'])) {
-            $action['middleware'] = $options['middleware'];
+        if (!empty($middleware)) {
+            $action['middleware'] = $middleware;
         }
 
         if (isset($options['excluded_middleware'])) {
@@ -282,6 +284,22 @@ class RelationshipRegistrar
         }
 
         return $action;
+    }
+
+    /**
+     * @param string $action
+     * @param array $options
+     * @return array
+     */
+    private function getMiddleware(string $action, array $options): array
+    {
+        $all = $options['middleware'] ?? [];
+        $actions = $options['action_middleware'] ?? [];
+
+        return [
+            ...$all,
+            ...Arr::wrap($actions[$action] ?? null),
+        ];
     }
 
     /**

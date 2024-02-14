@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2023 Cloud Creativity Limited
+ * Copyright 2024 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Laravel\Routing;
 
 use Closure;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use function is_string;
 
@@ -180,12 +181,22 @@ class PendingResourceRegistration
     /**
      * Add middleware to the resource routes.
      *
-     * @param string ...$middleware
+     * @param mixed ...$middleware
      * @return $this
      */
-    public function middleware(string ...$middleware): self
+    public function middleware(...$middleware): self
     {
-        $this->options['middleware'] = $middleware;
+        if (count($middleware) === 1) {
+            $middleware = Arr::wrap($middleware[0]);
+        }
+
+        if (array_is_list($middleware)) {
+            $this->options['middleware'] = $middleware;
+            return $this;
+        }
+
+        $this->options['middleware'] = Arr::wrap($middleware['*'] ?? null);
+        $this->options['action_middleware'] = $middleware;
 
         return $this;
     }
@@ -196,7 +207,7 @@ class PendingResourceRegistration
      * @param string ...$middleware
      * @return $this
      */
-    public function withoutMiddleware(string ...$middleware)
+    public function withoutMiddleware(string ...$middleware): self
     {
         $this->options['excluded_middleware'] = array_merge(
             (array) ($this->options['excluded_middleware'] ?? []),
