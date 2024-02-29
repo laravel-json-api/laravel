@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Console;
 
-use Illuminate\Support\Str;
+use LaravelJsonApi\Laravel\Console\Concerns\ReplacesModel;
 use Symfony\Component\Console\Input\InputOption;
 use function array_keys;
 use function array_values;
@@ -27,6 +27,7 @@ use function str_replace;
 
 class MakeSchema extends GeneratorCommand
 {
+    use ReplacesModel;
 
     /**
      * @var string
@@ -47,7 +48,7 @@ class MakeSchema extends GeneratorCommand
      * @var string
      */
     protected $classType = 'Schema';
-
+    
     /**
      * @inheritDoc
      */
@@ -65,7 +66,7 @@ class MakeSchema extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = parent::buildClass($name);
+        $stub = $this->replaceSchema(parent::buildClass($name));
 
         $model = $this->option('model') ?: $this->guessModel();
 
@@ -77,24 +78,11 @@ class MakeSchema extends GeneratorCommand
      * @param string $model
      * @return string
      */
-    protected function replaceModel(string $stub, string $model): string
+    protected function replaceSchema(string $stub): string
     {
-        $model = str_replace('/', '\\', $model);
-
-        if (Str::startsWith($model, '\\')) {
-            $namespacedModel = trim($model, '\\');
-        } else {
-            $namespacedModel = $this->qualifyModel($model);
-        }
-
-        $model = class_basename($model);
         $schema = $this->option('proxy') ? 'ProxySchema' : 'Schema';
 
         $replace = [
-            '{{ namespacedModel }}' => $namespacedModel,
-            '{{namespacedModel}}' => $namespacedModel,
-            '{{ model }}' => $model,
-            '{{model}}' => $model,
             '{{ schema }}' => $schema,
             '{{schema}}' => $schema,
         ];
@@ -117,5 +105,4 @@ class MakeSchema extends GeneratorCommand
             ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the schema exists in.'],
         ];
     }
-
 }
