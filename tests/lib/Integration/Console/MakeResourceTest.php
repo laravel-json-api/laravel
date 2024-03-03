@@ -25,7 +25,6 @@ use LaravelJsonApi\Laravel\Tests\Integration\TestCase;
 
 class MakeResourceTest extends TestCase
 {
-
     /**
      * @return void
      */
@@ -58,6 +57,33 @@ class MakeResourceTest extends TestCase
 
         $this->assertSame(0, $result);
         $this->assertResourceCreated();
+    }
+
+    public function testModelWithoutNamespace(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:resource posts --model BlogPost');
+
+        $this->assertSame(0, $result);
+        $this->assertResourceCreated('App\Models\BlogPost', 'BlogPost');
+    }
+
+    public function testModelWithNamespace(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:resource', [
+            'name' => 'posts',
+            '--model' => '\App\Foo\Bar\BlogPost',
+        ]);
+
+        $this->assertSame(0, $result);
+        $this->assertResourceCreated('App\Foo\Bar\BlogPost', 'BlogPost');
     }
 
     public function testServer(): void
@@ -104,9 +130,14 @@ class MakeResourceTest extends TestCase
     }
 
     /**
+     * @param string $namespacedModel
+     * @param string $model
      * @return void
      */
-    private function assertResourceCreated(): void
+    private function assertResourceCreated(
+        string $namespacedModel = 'App\Models\Post',
+        string $model = 'Post'
+    ): void
     {
         $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostResource.php'));
         $content = file_get_contents($path);
@@ -115,6 +146,8 @@ class MakeResourceTest extends TestCase
             'namespace App\JsonApi\V1\Posts;',
             'use LaravelJsonApi\Core\Resources\JsonApiResource;',
             'class PostResource extends JsonApiResource',
+            "use {$namespacedModel};",
+            "@property {$model} \$resource",
         ];
 
         foreach ($tests as $expected) {

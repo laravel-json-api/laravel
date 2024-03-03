@@ -2,9 +2,13 @@
 
 namespace {{ namespace }};
 
+use {{ namespacedModel }};
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
+/**
+ * @property {{ model }} $resource
+ */
 class {{ class }} extends JsonApiResource
 {
 
@@ -17,8 +21,8 @@ class {{ class }} extends JsonApiResource
     public function attributes($request): iterable
     {
         return [
-            'createdAt' => $this->created_at,
-            'updatedAt' => $this->updated_at,
+            'createdAt' => $this->resource->created_at,
+            'updatedAt' => $this->resource->updated_at,
         ];
     }
 

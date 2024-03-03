@@ -19,10 +19,12 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Console;
 
+use LaravelJsonApi\Laravel\Console\Concerns\ReplacesModel;
 use Symfony\Component\Console\Input\InputOption;
 
 class MakeResource extends GeneratorCommand
 {
+    use ReplacesModel;
 
     /**
      * @var string
@@ -55,12 +57,24 @@ class MakeResource extends GeneratorCommand
     /**
      * @inheritDoc
      */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        $model = $this->option('model') ?: $this->guessModel();
+
+        return $this->replaceModel($stub, $model);
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getOptions()
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the resource already exists'],
+            ['model', 'm', InputOption::VALUE_REQUIRED, 'The model that the resource applies to.'],
             ['server', 's', InputOption::VALUE_REQUIRED, 'The JSON:API server the resource exists in.'],
         ];
     }
-
 }
