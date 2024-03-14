@@ -11,7 +11,7 @@
     "support": {
         "issues": "https://github.com/laravel-json-api/laravel/issues"
     },
-    "license": "Apache-2.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Cloud Creativity Ltd",
