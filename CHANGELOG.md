@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Changed
+
+- **BREAKING** Package now requires Laravel 11.
+- Minimum PHP version is now `8.2`.
+
 ## [3.4.0] - 2024-03-03
 
 ### Added
