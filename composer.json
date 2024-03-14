@@ -11,7 +11,7 @@
     "support": {
         "issues": "https://github.com/laravel-json-api/laravel/issues"
     },
-    "license": "Apache-2.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Cloud Creativity Ltd",
@@ -23,20 +23,20 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
-        "laravel-json-api/core": "^3.3",
-        "laravel-json-api/eloquent": "^3.1",
-        "laravel-json-api/encoder-neomerx": "^3.1",
-        "laravel-json-api/exceptions": "^2.1",
-        "laravel-json-api/spec": "^2.0",
-        "laravel-json-api/validation": "^3.0",
-        "laravel/framework": "^10.0"
+        "laravel-json-api/core": "^4.0",
+        "laravel-json-api/eloquent": "^4.0",
+        "laravel-json-api/encoder-neomerx": "^4.0",
+        "laravel-json-api/exceptions": "^3.0",
+        "laravel-json-api/spec": "^3.0",
+        "laravel-json-api/validation": "^4.0",
+        "laravel/framework": "^11.0"
     },
     "require-dev": {
-        "laravel-json-api/testing": "^2.1",
-        "orchestra/testbench": "^8.0",
-        "phpunit/phpunit": "^10.0"
+        "laravel-json-api/testing": "^3.0",
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^10.5"
     },
     "autoload": {
         "psr-4": {
@@ -53,7 +53,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "3.x-dev"
+            "dev-develop": "4.x-dev"
         },
         "laravel": {
             "aliases": {
