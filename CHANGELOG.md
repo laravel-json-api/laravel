@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [4.0.0] - 2024-03-14
+
+### Changed
+
+- Package is now licensed under the MIT License.
+- **BREAKING** Package now requires Laravel 11.
+- Minimum PHP version is now `8.2`.
+
+## [3.4.0] - 2024-03-03
+
+### Added
+
+- [#272](https://github.com/laravel-json-api/laravel/pull/272) Added a model property type-hint to the resource stub and
+  allowed it to be replaced via a model option on the command.
+
+## [3.3.0] - 2024-02-14
+
+### Added
+
+- [#265](https://github.com/laravel-json-api/laravel/issues/265) Allow registration of middleware per action on both
+  resource routes and relationship routes.
+
 ## [3.2.0] - 2023-11-08
 
 ### Added

@@ -1,18 +1,10 @@
 <?php
 /*
- * Copyright 2023 Cloud Creativity Limited
+ * Copyright 2024 Cloud Creativity Limited
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE file or at
+ * https://opensource.org/licenses/MIT.
  */
 
 declare(strict_types=1);
@@ -25,7 +17,6 @@ use LaravelJsonApi\Laravel\Tests\Integration\TestCase;
 
 class MakeResourceTest extends TestCase
 {
-
     /**
      * @return void
      */
@@ -58,6 +49,33 @@ class MakeResourceTest extends TestCase
 
         $this->assertSame(0, $result);
         $this->assertResourceCreated();
+    }
+
+    public function testModelWithoutNamespace(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:resource posts --model BlogPost');
+
+        $this->assertSame(0, $result);
+        $this->assertResourceCreated('App\Models\BlogPost', 'BlogPost');
+    }
+
+    public function testModelWithNamespace(): void
+    {
+        config()->set('jsonapi.servers', [
+            'v1' => Server::class,
+        ]);
+
+        $result = $this->artisan('jsonapi:resource', [
+            'name' => 'posts',
+            '--model' => '\App\Foo\Bar\BlogPost',
+        ]);
+
+        $this->assertSame(0, $result);
+        $this->assertResourceCreated('App\Foo\Bar\BlogPost', 'BlogPost');
     }
 
     public function testServer(): void
@@ -104,9 +122,14 @@ class MakeResourceTest extends TestCase
     }
 
     /**
+     * @param string $namespacedModel
+     * @param string $model
      * @return void
      */
-    private function assertResourceCreated(): void
+    private function assertResourceCreated(
+        string $namespacedModel = 'App\Models\Post',
+        string $model = 'Post'
+    ): void
     {
         $this->assertFileExists($path = app_path('JsonApi/V1/Posts/PostResource.php'));
         $content = file_get_contents($path);
@@ -115,6 +138,8 @@ class MakeResourceTest extends TestCase
             'namespace App\JsonApi\V1\Posts;',
             'use LaravelJsonApi\Core\Resources\JsonApiResource;',
             'class PostResource extends JsonApiResource',
+            "use {$namespacedModel};",
+            "@property {$model} \$resource",
         ];
 
         foreach ($tests as $expected) {

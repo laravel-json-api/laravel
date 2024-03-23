@@ -1,18 +1,10 @@
 <?php
 /*
- * Copyright 2023 Cloud Creativity Limited
+ * Copyright 2024 Cloud Creativity Limited
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE file or at
+ * https://opensource.org/licenses/MIT.
  */
 
 declare(strict_types=1);
@@ -20,6 +12,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Routing;
 
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 
 class PendingRelationshipRegistration
 {
@@ -155,12 +148,30 @@ class PendingRelationshipRegistration
     /**
      * Add middleware to the resource routes.
      *
-     * @param string ...$middleware
+     * @param mixed ...$middleware
      * @return $this
      */
-    public function middleware(string ...$middleware): self
+    public function middleware(...$middleware): self
     {
-        $this->options['middleware'] = $middleware;
+        if (count($middleware) === 1) {
+            $middleware = Arr::wrap($middleware[0]);
+        }
+
+        if (array_is_list($middleware)) {
+            $this->options['middleware'] = $middleware;
+            return $this;
+        }
+
+        $this->options['middleware'] = Arr::wrap($middleware['*'] ?? null);
+
+        foreach ($this->map as $alias => $action) {
+            if (isset($middleware[$alias])) {
+                $middleware[$action] = $middleware[$alias];
+                unset($middleware[$alias]);
+            }
+        }
+
+        $this->options['action_middleware'] = $middleware;
 
         return $this;
     }

@@ -1,18 +1,10 @@
 <?php
 /*
- * Copyright 2023 Cloud Creativity Limited
+ * Copyright 2024 Cloud Creativity Limited
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE file or at
+ * https://opensource.org/licenses/MIT.
  */
 
 declare(strict_types=1);
@@ -23,6 +15,7 @@ use App\Http\Controllers\Api\V1\PostController;
 use Illuminate\Contracts\Routing\Registrar;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
+use LaravelJsonApi\Laravel\Routing\ResourceRegistrar;
 
 class ResourceTest extends TestCase
 {
@@ -217,14 +210,14 @@ class ResourceTest extends TestCase
             JsonApiRoute::server('v1')
                 ->prefix('v1')
                 ->namespace('Api\\V1')
-                ->middleware('foo')
+                ->middleware('foo', 'bar')
                 ->resources(function ($server) {
                     $server->resource('posts');
                 });
         });
 
         $route = $this->assertMatch($method, $uri);
-        $this->assertSame(['api', 'jsonapi:v1', 'foo'], $route->action['middleware']);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar'], $route->action['middleware']);
     }
 
     /**
@@ -249,6 +242,97 @@ class ResourceTest extends TestCase
 
         $route = $this->assertMatch($method, $uri);
         $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @dataProvider routeProvider
+     */
+    public function testResourceWithMultipleMiddleware(string $method, string $uri): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function ($server) {
+                    $server->resource('posts')->middleware('bar1', 'bar2');
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar1', 'bar2'], $route->action['middleware']);
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @dataProvider routeProvider
+     */
+    public function testResourceMiddlewareArrayList(string $method, string $uri): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function (ResourceRegistrar $server) {
+                    $server->resource('posts')->middleware(['bar1', 'bar2']);
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame(['api', 'jsonapi:v1', 'foo', 'bar1', 'bar2'], $route->action['middleware']);
+    }
+
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @dataProvider routeProvider
+     */
+    public function testResourceActionMiddleware(string $method, string $uri, string $action): void
+    {
+        $actions = [
+            '*' => ['bar1', 'bar2'],
+            'index' => 'index1',
+            'store' => ['store1', 'store2'],
+            'show' => ['show1'],
+            'update' => 'update1',
+            'destroy' => 'destroy1',
+        ];
+
+        $expected = [
+            'api',
+            'jsonapi:v1',
+            'foo',
+            ...$actions['*'],
+            ...Arr::wrap($actions[$action]),
+        ];
+
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () use ($actions) {
+            JsonApiRoute::server('v1')
+                ->prefix('v1')
+                ->namespace('Api\\V1')
+                ->middleware('foo')
+                ->resources(function (ResourceRegistrar $server) use ($actions) {
+                    $server->resource('posts')->middleware($actions);
+                });
+        });
+
+        $route = $this->assertMatch($method, $uri);
+        $this->assertSame($expected, $route->action['middleware']);
     }
 
     /**
