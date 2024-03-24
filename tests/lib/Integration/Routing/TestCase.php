@@ -18,6 +18,8 @@ use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\StaticSchema\StaticContainer;
+use LaravelJsonApi\Contracts\Schema\StaticSchema\StaticSchema;
 use LaravelJsonApi\Contracts\Server\Repository;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Laravel\Tests\Integration\TestCase as BaseTestCase;
@@ -45,9 +47,9 @@ class TestCase extends BaseTestCase
 
     /**
      * @param string $name
-     * @return Server|MockObject
+     * @return Server&MockObject
      */
-    protected function createServer(string $name): Server
+    protected function createServer(string $name): Server&MockObject
     {
         $mock = $this->createMock(Server::class);
         $mock->method('name')->willReturn($name);
@@ -57,27 +59,33 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * @param Server|MockObject $server
+     * @param Server&MockObject $server
      * @param string $name
      * @param string|null $pattern
      * @param string|null $uriType
-     * @return Schema|MockObject
+     * @return Schema&MockObject
      */
     protected function createSchema(
-        Server $server,
+        Server&MockObject $server,
         string $name,
         string $pattern = null,
         string $uriType = null
-    ): Schema
+    ): Schema&MockObject
     {
+        $static = $this->createMock(StaticSchema::class);
+        $static->method('getUriType')->willReturn($uriType ?: $name);
+
+        $statics = $this->createMock(StaticContainer::class);
+        $statics->method('schemaForType')->with($name)->willReturn($static);
+
         $schema = $this->createMock(Schema::class);
-        $schema->method('uriType')->willReturn($uriType ?: $name);
         $schema->method('id')->willReturn($id = $this->createMock(ID::class));
         $id->method('pattern')->willReturn($pattern ?: '[0-9]+');
 
         $schemas = $this->createMock(Container::class);
         $schemas->method('schemaFor')->with($name)->willReturn($schema);
 
+        $server->method('statics')->willReturn($statics);
         $server->method('schemas')->willReturn($schemas);
 
         return $schema;

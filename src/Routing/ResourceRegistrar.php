@@ -309,9 +309,9 @@ class ResourceRegistrar
     private function getResourceUri(string $resourceType): string
     {
         return $this->server
-            ->schemas()
-            ->schemaFor($resourceType)
-            ->uriType();
+            ->statics()
+            ->schemaForType($resourceType)
+            ->getUriType();
     }
 
     /**

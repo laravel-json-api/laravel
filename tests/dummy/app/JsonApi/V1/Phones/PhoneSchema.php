@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Phones;
 
 use App\Models\Phone;
+use LaravelJsonApi\Core\Schema\Attributes\Model;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Schema;
 
+#[Model(Phone::class)]
 class PhoneSchema extends Schema
 {
     /**

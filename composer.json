@@ -26,7 +26,7 @@
         "php": "^8.2",
         "ext-json": "*",
         "laravel-json-api/core": "^5.0",
-        "laravel-json-api/eloquent": "^5.0",
+        "laravel-json-api/eloquent": "dev-feature/validation",
         "laravel-json-api/encoder-neomerx": "^5.0",
         "laravel-json-api/exceptions": "^4.0",
         "laravel-json-api/spec": "^4.0",

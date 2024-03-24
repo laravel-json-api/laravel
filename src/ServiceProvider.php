@@ -74,9 +74,6 @@ class ServiceProvider extends BaseServiceProvider
 
         /** @TODO wtf? why isn't it working without this? */
         $this->app->bind(Pipeline::class, \Illuminate\Pipeline\Pipeline::class);
-
-        /** @TODO will need to remove this temporary wiring */
-        $this->app->bind(Contracts\Validation\Container::class, Validation\Container::class);
     }
 
     /**
