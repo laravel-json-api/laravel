@@ -45,8 +45,8 @@ class UserSchema extends Schema
     public function filters(): array
     {
         return [
-            WhereIdIn::make($this)->delimiter(','),
-            Where::make('email')->singular(),
+            WhereIdIn::make($this)->delimiter(',')->onlyToMany(),
+            Where::make('email')->singular()->rules('email'),
         ];
     }
 

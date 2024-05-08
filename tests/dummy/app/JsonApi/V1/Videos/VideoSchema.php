@@ -30,7 +30,7 @@ class VideoSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make()->uuid()->clientIds(),
+            ID::make()->uuid()->clientIds()->nullable(),
             DateTime::make('createdAt')->sortable()->readOnly(),
             BelongsToMany::make('tags')->canCount(),
             Str::make('title')->sortable(),

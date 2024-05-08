@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Posts;
 
 use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use LaravelJsonApi\Core\Schema\Attributes\Model;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
@@ -25,7 +27,6 @@ use LaravelJsonApi\Eloquent\Filters\OnlyTrashed;
 use LaravelJsonApi\Eloquent\Filters\Scope;
 use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
-use LaravelJsonApi\Eloquent\Pagination\MultiPagination;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use LaravelJsonApi\Eloquent\SoftDeletes;
@@ -57,7 +58,7 @@ class PostSchema extends Schema
             ID::make(),
             BelongsTo::make('author')->type('users')->readOnly(),
             HasMany::make('comments')->canCount()->readOnly(),
-            Str::make('content'),
+            Str::make('content')->rules('required'),
             DateTime::make('createdAt')->sortable()->readOnly(),
             SoftDelete::make('deletedAt')->sortable(),
             MorphToMany::make('media', [
@@ -65,10 +66,13 @@ class PostSchema extends Schema
                 BelongsToMany::make('videos'),
             ])->canCount(),
             DateTime::make('publishedAt')->sortable(),
-            Str::make('slug'),
-            Str::make('synopsis'),
+            Str::make('slug')
+                ->rules('required')
+                ->creationRules(Rule::unique('posts'))
+                ->updateRules(fn($r, Post $model) => Rule::unique('posts')->ignore($model)),
+            Str::make('synopsis')->rules('required'),
             BelongsToMany::make('tags')->canCount()->mustValidate(),
-            Str::make('title')->sortable(),
+            Str::make('title')->sortable()->rules('required'),
             DateTime::make('updatedAt')->sortable()->readOnly(),
         ];
     }
@@ -79,9 +83,9 @@ class PostSchema extends Schema
     public function filters(): array
     {
         return [
-            WhereIdIn::make($this)->delimiter(','),
+            WhereIdIn::make($this)->delimiter(',')->onlyToMany(),
             Scope::make('published', 'wherePublished')->asBoolean(),
-            Where::make('slug')->singular(),
+            Where::make('slug')->singular()->rules('string'),
             OnlyTrashed::make('trashed'),
         ];
     }
@@ -99,15 +103,52 @@ class PostSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function pagination(): MultiPagination
+    public function pagination(): PagePagination
     {
-        return new MultiPagination(
-            PagePagination::make()->withoutNestedMeta(),
-            PagePagination::make()
-                ->withoutNestedMeta()
-                ->withSimplePagination()
-                ->withPageKey('current-page')
-                ->withPerPageKey('per-page')
-        );
+        // TODO add validation to the multi-paginator.
+//        return new MultiPagination(
+//            PagePagination::make()->withoutNestedMeta(),
+//            PagePagination::make()
+//                ->withoutNestedMeta()
+//                ->withSimplePagination()
+//                ->withPageKey('current-page')
+//                ->withPerPageKey('per-page')
+//        );
+
+        return PagePagination::make()
+            ->withoutNestedMeta()
+            ->withMaxPerPage(200);
+    }
+
+    /**
+     * @return array
+     */
+    public function deletionRules(): array
+    {
+        return [
+            'meta.no_comments' => 'accepted',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function deletionMessages(): array
+    {
+        return [
+            'meta.no_comments.accepted' => 'Cannot delete a post with comments.',
+        ];
+    }
+
+    /**
+     * @param Request|null $request
+     * @param Post $post
+     * @return array
+     */
+    public function metaForDeletion(?Request $request, Post $post): array
+    {
+        return [
+            'no_comments' => $post->comments()->doesntExist(),
+        ];
     }
 }
