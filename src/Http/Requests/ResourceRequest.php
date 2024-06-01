@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
@@ -62,13 +63,14 @@ class ResourceRequest extends FormRequest
      * Resolve the request instance for the specified resource type.
      *
      * @param string $resourceType
+     * @param RequestMethod|null $requestMethod
      * @return ResourceRequest
      */
-    public static function forResource(string $resourceType): ResourceRequest
+    public static function forResource(string $resourceType, RequestMethod $requestMethod = null): ResourceRequest
     {
         $resolver = self::$requestResolver ?: new RequestResolver(RequestResolver::REQUEST);
 
-        return $resolver($resourceType);
+        return $resolver($resourceType, false, $requestMethod);
     }
 
     /**

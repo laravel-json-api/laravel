@@ -16,6 +16,7 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Support\Str;
+use LaravelJsonApi\Laravel\Http\Requests\RequestMethod;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 use LogicException;
@@ -41,7 +42,8 @@ trait AttachRelationship
         }
 
         $request = ResourceRequest::forResource(
-            $resourceType = $route->resourceType()
+            $resourceType = $route->resourceType(),
+            RequestMethod::ATTACH_RELATIONSHIP
         );
 
         $query = ResourceQuery::queryMany($relation->inverse());

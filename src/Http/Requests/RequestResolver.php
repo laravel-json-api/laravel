@@ -81,15 +81,23 @@ class RequestResolver
     /**
      * @param string $resourceType
      * @param bool $allowNull whether null can be returned for non-existent classes.
+     * @param RequestMethod|null $requestMethod
      * @return FormRequest|null
      */
-    public function __invoke(string $resourceType, bool $allowNull = false): ?FormRequest
+    public function __invoke(string $resourceType, bool $allowNull = false, RequestMethod $requestMethod = null): ?FormRequest
     {
         $app = app();
 
         $fqn = $this->custom($resourceType) ?: Str::replaceLast('Schema', $this->type, get_class(
             $app->make(SchemaContainer::class)->schemaFor($resourceType)
         ));
+
+        if ($requestMethod) {
+            $requestFqn = Str::replaceLast($resourceType, $requestMethod->value . $resourceType, $fqn);
+            if (class_exists($requestFqn) || $app->bound($requestFqn)) {
+                $fqn = $requestFqn;
+            }
+        }
 
         if (!class_exists($fqn) && !$app->bound($fqn)) {
             if (true === $allowNull) {

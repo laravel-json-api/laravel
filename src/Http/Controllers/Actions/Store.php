@@ -16,6 +16,7 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Laravel\Http\Requests\RequestMethod;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
@@ -32,7 +33,8 @@ trait Store
     public function store(Route $route, StoreContract $store)
     {
         $request = ResourceRequest::forResource(
-            $resourceType = $route->resourceType()
+            $resourceType = $route->resourceType(),
+            RequestMethod::STORE
         );
 
         $query = ResourceQuery::queryOne($resourceType);

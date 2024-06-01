@@ -17,6 +17,7 @@ use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
 use LaravelJsonApi\Core\Support\Str;
+use LaravelJsonApi\Laravel\Http\Requests\RequestMethod;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceQuery;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
@@ -37,7 +38,8 @@ trait UpdateRelationship
             ->relationship($fieldName = $route->fieldName());
 
         $request = ResourceRequest::forResource(
-            $resourceType = $route->resourceType()
+            $resourceType = $route->resourceType(),
+            RequestMethod::UPDATE_RELATIONSHIP
         );
 
         $query = $relation->toOne() ?
