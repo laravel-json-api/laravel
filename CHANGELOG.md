@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [4.1.0] - 2024-06-26
+
 ### Fixed
 
 - [core#17](https://github.com/laravel-json-api/core/pull/17) Fix incorrect `self` link in related resource responses,
