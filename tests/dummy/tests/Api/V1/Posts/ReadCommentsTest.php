@@ -48,15 +48,10 @@ class ReadCommentsTest extends TestCase
         $response = $this
             ->withoutExceptionHandling()
             ->jsonApi('comments')
-            ->get($related = url('/api/v1/posts', [$this->post, 'comments']));
-
-        $links = [
-            'self' => url('/api/v1/posts', [$this->post, 'relationships', 'comments']),
-            'related' => $related,
-        ];
+            ->get($self = url('/api/v1/posts', [$this->post, 'comments']));
 
         $response->assertFetchedMany($expected)
-            ->assertLinks($links)
+            ->assertLinks(['self' => $self])
             ->assertExactMeta(['count' => 3]);
     }
 

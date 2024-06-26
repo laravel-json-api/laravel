@@ -25,7 +25,7 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "laravel-json-api/core": "^4.0",
+        "laravel-json-api/core": "^4.1",
         "laravel-json-api/eloquent": "^4.0",
         "laravel-json-api/encoder-neomerx": "^4.0",
         "laravel-json-api/exceptions": "^3.0",

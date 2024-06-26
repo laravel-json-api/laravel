@@ -15,6 +15,7 @@ use App\JsonApi\V1\Posts\PostSchema;
 use App\Models\Post;
 use App\Models\Tag;
 use Closure;
+use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
@@ -60,7 +61,7 @@ class ToManyLinksTest extends TestCase
     /**
      * @return array[]
      */
-    public static function scenarioProvider(): array
+    public static function relationshipProvider(): array
     {
         return [
             'hidden' => [
@@ -99,7 +100,70 @@ class ToManyLinksTest extends TestCase
     /**
      * @param Closure $scenario
      * @return void
-     * @dataProvider scenarioProvider
+     * @dataProvider relationshipProvider
+     */
+    public function testRelationship(Closure $scenario): void
+    {
+        $expected = $scenario($this->schema, $this->post);
+
+        $response = $this
+            ->withoutExceptionHandling()
+            ->jsonApi('tags')
+            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
+
+        $response->assertFetchedToMany([$this->tag]);
+
+        if (is_array($expected)) {
+            $response->assertLinks($expected);
+        }
+    }
+
+
+    /**
+     * @return array[]
+     */
+    public static function relatedProvider(): array
+    {
+        return [
+            'hidden' => [
+                static function (PostSchema $schema) {
+                    $schema->relationship('tags')->hidden();
+                    return null;
+                },
+            ],
+            'no links' => [
+                static function (PostSchema $schema) {
+                    $schema->relationship('tags')->serializeUsing(
+                        static fn($relation) => $relation->withoutLinks()
+                    );
+                    return null;
+                },
+            ],
+            'no self link' => [
+                static function (PostSchema $schema, Post $post) {
+                    $schema->relationship('tags')->serializeUsing(
+                        static fn($relation) => $relation->withoutSelfLink()
+                    );
+                    // related becomes self.
+                    return ['self' => url('/api/v1/posts', [$post, 'tags'])];
+                },
+            ],
+            'no related link' => [
+                static function (PostSchema $schema, Post $post) {
+                    $schema->relationship('tags')->serializeUsing(
+                        static fn($relation) => $relation->withoutRelatedLink()
+                    );
+                    // related becomes self, but it's missing so we can't do that.
+                    return null;
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @param Closure $scenario
+     * @return void
+     * @dataProvider relatedProvider
      */
     public function testRelated(Closure $scenario): void
     {
@@ -111,27 +175,6 @@ class ToManyLinksTest extends TestCase
             ->get(url('/api/v1/posts', [$this->post, 'tags']));
 
         $response->assertFetchedMany([$this->tag]);
-
-        if (is_array($expected)) {
-            $response->assertLinks($expected);
-        }
-    }
-
-    /**
-     * @param Closure $scenario
-     * @return void
-     * @dataProvider scenarioProvider
-     */
-    public function testSelf(Closure $scenario): void
-    {
-        $expected = $scenario($this->schema, $this->post);
-
-        $response = $this
-            ->withoutExceptionHandling()
-            ->jsonApi('tags')
-            ->get(url('/api/v1/posts', [$this->post, 'relationships', 'tags']));
-
-        $response->assertFetchedToMany([$this->tag]);
 
         if (is_array($expected)) {
             $response->assertLinks($expected);

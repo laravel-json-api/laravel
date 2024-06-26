@@ -43,11 +43,12 @@ class ReadTagsTest extends TestCase
 
         $response = $this
             ->jsonApi('tags')
-            ->get(url('/api/v1/posts', [$this->post, 'tags']));
+            ->get($self = url('/api/v1/posts', [$this->post, 'tags']));
 
-        $response->assertFetchedMany($expected)->assertExactMeta([
-            'count' => count($expected)
-        ]);
+        $response
+            ->assertFetchedMany($expected)
+            ->assertExactMeta(['count' => count($expected)])
+            ->assertLinks(['self' => $self]);
     }
 
     public function testSort(): void
