@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. This projec
 - [core#17](https://github.com/laravel-json-api/core/pull/17) Fix incorrect `self` link in related resource responses,
   and remove `related` link that should not exist. This has been incorrect for some time, but is definitely what
   the [spec defines here.](https://jsonapi.org/format/1.0/#document-top-level)
+- [eloquent#36](https://github.com/laravel-json-api/eloquent/pull/36) Support Eloquent dynamic relationships.
 
 ## [4.0.0] - 2024-03-14
 
