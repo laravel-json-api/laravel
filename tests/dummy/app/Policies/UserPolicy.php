@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -50,4 +51,17 @@ class UserPolicy
     {
         return $user->is($other);
     }
+
+    /**
+     * Determine if the user can delete the other user.
+     *
+     * @param User $user
+     * @param User $other
+     * @return bool|Response
+     */
+    public function delete(User $user, User $other)
+    {
+        return $user->is($other) ? true : Response::denyAsNotFound('not found message');
+    }
+
 }

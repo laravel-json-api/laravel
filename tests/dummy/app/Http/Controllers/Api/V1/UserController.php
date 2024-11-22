@@ -19,6 +19,7 @@ use LaravelJsonApi\Laravel\Http\Controllers\Actions;
 class UserController extends Controller
 {
     use Actions\FetchOne;
+    use Actions\Destroy;
     use Actions\FetchRelated;
     use Actions\FetchRelationship;
     use Actions\UpdateRelationship;
