@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
@@ -104,9 +105,9 @@ class ResourceQuery extends FormRequest implements QueryParameters
      * Perform resource authorization.
      *
      * @param Authorizer $authorizer
-     * @return bool
+     * @return bool|Response
      */
-    public function authorizeResource(Authorizer $authorizer): bool
+    public function authorizeResource(Authorizer $authorizer): bool|Response
     {
         if ($this->isViewingAny()) {
             return $authorizer->index(

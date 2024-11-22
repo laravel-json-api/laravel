@@ -25,7 +25,7 @@ JsonApiRoute::server('v1')
         });
 
         /** Users */
-        $server->resource('users')->only('show')->relationships(function ($relationships) {
+        $server->resource('users')->only('show','destroy')->relationships(function ($relationships) {
             $relationships->hasOne('phone');
         })->actions(function ($actions) {
             $actions->get('me');
