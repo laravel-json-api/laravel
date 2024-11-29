@@ -229,7 +229,7 @@ class PendingResourceRegistration
      * @param Closure|null $callback
      * @return $this
      */
-    public function actions($prefixOrCallback, Closure $callback = null): self
+    public function actions($prefixOrCallback, ?Closure $callback = null): self
     {
         if ($prefixOrCallback instanceof Closure && null === $callback) {
             $this->actionsPrefix = null;
