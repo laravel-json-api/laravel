@@ -77,7 +77,7 @@ class ActionRegistrar
         string $resourceType,
         array $options,
         string $controller,
-        string $prefix = null
+        ?string $prefix = null
     ) {
         $this->router = $router;
         $this->resource = $resource;
@@ -106,7 +106,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function get(string $uri, string $method = null): ActionProxy
+    public function get(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('get', $uri, $method);
     }
@@ -118,7 +118,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function post(string $uri, string $method = null): ActionProxy
+    public function post(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('post', $uri, $method);
     }
@@ -130,7 +130,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function patch(string $uri, string $method = null): ActionProxy
+    public function patch(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('patch', $uri, $method);
     }
@@ -142,7 +142,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function put(string $uri, string $method = null): ActionProxy
+    public function put(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('put', $uri, $method);
     }
@@ -154,7 +154,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function delete(string $uri, string $method = null): ActionProxy
+    public function delete(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('delete', $uri, $method);
     }
@@ -166,7 +166,7 @@ class ActionRegistrar
      * @param string|null $method
      * @return ActionProxy
      */
-    public function options(string $uri, string $method = null): ActionProxy
+    public function options(string $uri, ?string $method = null): ActionProxy
     {
         return $this->register('options', $uri, $method);
     }
@@ -177,7 +177,7 @@ class ActionRegistrar
      * @param string|null $action
      * @return ActionProxy
      */
-    public function register(string $method, string $uri, string $action = null): ActionProxy
+    public function register(string $method, string $uri, ?string $action = null): ActionProxy
     {
         $action = $action ?: $this->guessControllerAction($uri);
         $parameter = $this->getParameter();
