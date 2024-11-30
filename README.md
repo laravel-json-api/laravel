@@ -97,7 +97,7 @@ See our website, [laraveljsonapi.io](https://laraveljsonapi.io)
 ### Tutorial
 
 New to JSON:API and/or Laravel JSON:API? Then
-the [Laravel JSON:API tutorial](https://laraveljsonapi.io/docs/2.0/tutorial/)
+the [Laravel JSON:API tutorial](https://laraveljsonapi.io/4.x/tutorial/)
 is a great way to learn!
 
 Follow the tutorial to build a blog application with a JSON:API compliant API.

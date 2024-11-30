@@ -66,8 +66,8 @@ class TestCase extends BaseTestCase
     protected function createSchema(
         Server $server,
         string $name,
-        string $pattern = null,
-        string $uriType = null
+        ?string $pattern = null,
+        ?string $uriType = null
     ): Schema
     {
         $schema = $this->createMock(Schema::class);
@@ -89,7 +89,7 @@ class TestCase extends BaseTestCase
      * @param string|null $uriName
      * @return void
      */
-    protected function createRelation(MockObject $schema, string $fieldName, string $uriName = null): void
+    protected function createRelation(MockObject $schema, string $fieldName, ?string $uriName = null): void
     {
         $relation = $this->createMock(Relation::class);
         $relation->method('name')->willReturn($fieldName);

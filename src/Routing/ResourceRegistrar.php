@@ -51,7 +51,7 @@ class ResourceRegistrar
      * @param string|null $controller
      * @return PendingResourceRegistration
      */
-    public function resource(string $resourceType, string $controller = null): PendingResourceRegistration
+    public function resource(string $resourceType, ?string $controller = null): PendingResourceRegistration
     {
         return new PendingResourceRegistration(
             $this,

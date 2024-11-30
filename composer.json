@@ -25,16 +25,16 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "laravel-json-api/core": "^4.1",
-        "laravel-json-api/eloquent": "^4.1",
-        "laravel-json-api/encoder-neomerx": "^4.0",
-        "laravel-json-api/exceptions": "^3.0",
-        "laravel-json-api/spec": "^3.0",
-        "laravel-json-api/validation": "^4.0",
+        "laravel-json-api/core": "^4.3.2",
+        "laravel-json-api/eloquent": "^4.4",
+        "laravel-json-api/encoder-neomerx": "^4.1",
+        "laravel-json-api/exceptions": "^3.1",
+        "laravel-json-api/spec": "^3.1",
+        "laravel-json-api/validation": "^4.2",
         "laravel/framework": "^11.0"
     },
     "require-dev": {
-        "laravel-json-api/testing": "^3.0",
+        "laravel-json-api/testing": "^3.0.2",
         "orchestra/testbench": "^9.0",
         "phpunit/phpunit": "^10.5"
     },
