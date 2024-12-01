@@ -2,6 +2,7 @@
 
 namespace {{ namespace }};
 
+use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 
@@ -13,9 +14,9 @@ class {{ class }} implements Authorizer
      *
      * @param Request $request
      * @param string $modelClass
-     * @return bool
+     * @return bool|Response
      */
-    public function index(Request $request, string $modelClass): bool
+    public function index(Request $request, string $modelClass): bool|Response
     {
         // TODO: Implement index() method.
     }
@@ -25,9 +26,9 @@ class {{ class }} implements Authorizer
      *
      * @param Request $request
      * @param string $modelClass
-     * @return bool
+     * @return bool|Response
      */
-    public function store(Request $request, string $modelClass): bool
+    public function store(Request $request, string $modelClass): bool|Response
     {
         // TODO: Implement store() method.
     }
@@ -37,9 +38,9 @@ class {{ class }} implements Authorizer
      *
      * @param Request $request
      * @param object $model
-     * @return bool
+     * @return bool|Response
      */
-    public function show(Request $request, object $model): bool
+    public function show(Request $request, object $model): bool|Response
     {
         // TODO: Implement show() method.
     }
@@ -49,9 +50,9 @@ class {{ class }} implements Authorizer
      *
      * @param object $model
      * @param Request $request
-     * @return bool
+     * @return bool|Response
      */
-    public function update(Request $request, object $model): bool
+    public function update(Request $request, object $model): bool|Response
     {
         // TODO: Implement update() method.
     }
@@ -61,9 +62,9 @@ class {{ class }} implements Authorizer
      *
      * @param Request $request
      * @param object $model
-     * @return bool
+     * @return bool|Response
      */
-    public function destroy(Request $request, object $model): bool
+    public function destroy(Request $request, object $model): bool|Response
     {
         // TODO: Implement destroy() method.
     }
@@ -74,9 +75,9 @@ class {{ class }} implements Authorizer
      * @param Request $request
      * @param object $model
      * @param string $fieldName
-     * @return bool
+     * @return bool|Response
      */
-    public function showRelated(Request $request, object $model, string $fieldName): bool
+    public function showRelated(Request $request, object $model, string $fieldName): bool|Response
     {
         // TODO: Implement showRelated() method.
     }
@@ -87,9 +88,9 @@ class {{ class }} implements Authorizer
      * @param Request $request
      * @param object $model
      * @param string $fieldName
-     * @return bool
+     * @return bool|Response
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool
+    public function showRelationship(Request $request, object $model, string $fieldName): bool|Response
     {
         // TODO: Implement showRelationship() method.
     }
@@ -100,9 +101,9 @@ class {{ class }} implements Authorizer
      * @param Request $request
      * @param object $model
      * @param string $fieldName
-     * @return bool
+     * @return bool|Response
      */
-    public function updateRelationship(Request $request, object $model, string $fieldName): bool
+    public function updateRelationship(Request $request, object $model, string $fieldName): bool|Response
     {
         // TODO: Implement updateRelationship() method.
     }
@@ -113,9 +114,9 @@ class {{ class }} implements Authorizer
      * @param Request $request
      * @param object $model
      * @param string $fieldName
-     * @return bool
+     * @return bool|Response
      */
-    public function attachRelationship(Request $request, object $model, string $fieldName): bool
+    public function attachRelationship(Request $request, object $model, string $fieldName): bool|Response
     {
         // TODO: Implement attachRelationship() method.
     }
@@ -126,9 +127,9 @@ class {{ class }} implements Authorizer
      * @param Request $request
      * @param object $model
      * @param string $fieldName
-     * @return bool
+     * @return bool|Response
      */
-    public function detachRelationship(Request $request, object $model, string $fieldName): bool
+    public function detachRelationship(Request $request, object $model, string $fieldName): bool|Response
     {
         // TODO: Implement detachRelationship() method.
     }

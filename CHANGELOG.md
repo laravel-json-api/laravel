@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.0] - 2025-12-01
+
+### Changed
+
+- [#298](https://github.com/laravel-json-api/laravel/pull/298)
+  and [#70](https://github.com/laravel-json-api/laravel/issues/70) The authorizer implementation now allows methods to
+  return either `bool` or an Illuminate Auth `Response`.
+- **BREAKING** The return type for the `authorizeResource()` method on both resource and query request classes has
+  changed to `bool|Response` (where response is the Illuminate Auth response). If you are manually calling this method
+  and relying on the return value being a boolean, this change is breaking. However, the vast majority of applications
+  should be able to upgrade without any changes.
+
 ## [4.1.1] - 2024-11-30
 
 ### Fixed
