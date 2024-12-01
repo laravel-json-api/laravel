@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.0] - 2025-12-01
+
 ### Changed
 
 - [#298](https://github.com/laravel-json-api/laravel/pull/298)
