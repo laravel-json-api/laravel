@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.1] - 2025-12-02
+
+### Fixed
+
+- [#301](https://github.com/laravel-json-api/laravel/pull/301) Do not override response status when authorization
+  exception is thrown.
+
 ## [5.0.0] - 2025-12-01
 
 ### Changed

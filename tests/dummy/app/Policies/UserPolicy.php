@@ -55,13 +55,13 @@ class UserPolicy
     /**
      * Determine if the user can delete the other user.
      *
-     * @param User $user
+     * @param ?User $user
      * @param User $other
      * @return bool|Response
      */
-    public function delete(User $user, User $other)
+    public function delete(?User $user, User $other)
     {
-        return $user->is($other) ? true : Response::denyAsNotFound('not found message');
+        return $user?->is($other) ? true : Response::denyAsNotFound('not found message');
     }
 
 }

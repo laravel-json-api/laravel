@@ -254,7 +254,9 @@ class FormRequest extends BaseFormRequest
             }
 
         } catch (AuthorizationException $ex) {
-            $this->failIfUnauthenticated();
+            if (!$ex->hasStatus()) {
+                $this->failIfUnauthenticated();
+            }
             throw $ex;
         }
         return true;
