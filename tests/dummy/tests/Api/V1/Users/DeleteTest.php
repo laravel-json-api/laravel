@@ -35,4 +35,22 @@ class DeleteTest extends TestCase
             'title' => 'Not Found',
         ]);
     }
+
+    public function testUnauthenticated(): void
+    {
+        $user = User::factory()->createOne();
+
+        $expected = $this->serializer
+            ->user($user);
+        $response = $this
+            ->jsonApi('users')
+            ->delete(url('/api/v1/users', $expected['id']));
+
+        $response->assertNotFound()
+            ->assertHasError(404, [
+                'detail' => 'not found message',
+                'status' => '404',
+                'title' => 'Not Found',
+            ]);
+    }
 }
