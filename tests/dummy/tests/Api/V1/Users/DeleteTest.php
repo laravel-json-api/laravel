@@ -16,20 +16,16 @@ use App\Tests\Api\V1\TestCase;
 
 class DeleteTest extends TestCase
 {
-
     public function test(): void
     {
         $user = User::factory()->createOne();
 
-        $expected = $this->serializer
-            ->user($user);
         $response = $this
             ->actingAs(User::factory()->createOne())
             ->jsonApi('users')
-            ->delete(url('/api/v1/users', $expected['id']));
+            ->delete(url('/api/v1/users', $user));
 
-        $response->assertNotFound()
-            ->assertHasError(404, [
+        $response->assertNotFound()->assertErrorStatus([
             'detail' => 'not found message',
             'status' => '404',
             'title' => 'Not Found',
@@ -40,14 +36,11 @@ class DeleteTest extends TestCase
     {
         $user = User::factory()->createOne();
 
-        $expected = $this->serializer
-            ->user($user);
         $response = $this
             ->jsonApi('users')
-            ->delete(url('/api/v1/users', $expected['id']));
+            ->delete(url('/api/v1/users', $user));
 
-        $response->assertNotFound()
-            ->assertHasError(404, [
+        $response->assertNotFound()->assertErrorStatus([
                 'detail' => 'not found message',
                 'status' => '404',
                 'title' => 'Not Found',
