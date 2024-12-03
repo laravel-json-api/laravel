@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Laravel\Http\Controllers\Actions;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response as AuthResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
@@ -63,13 +64,24 @@ trait Destroy
          * So we need to trigger authorization in this case.
          */
         if (!$request) {
-            $check = $route->authorizer()->destroy(
+            $result = $route->authorizer()->destroy(
                 $request = \request(),
                 $model,
             );
 
-            throw_if(false === $check && Auth::guest(), new AuthenticationException());
-            throw_if(false === $check, new AuthorizationException());
+            if ($result instanceof AuthResponse) {
+                try {
+                    $result->authorize();
+                } catch (AuthorizationException $ex) {
+                    if (!$ex->hasStatus()) {
+                        throw_if(Auth::guest(), new AuthenticationException());
+                    }
+                    throw $ex;
+                }
+            }
+
+            throw_if(false === $result && Auth::guest(), new AuthenticationException());
+            throw_if(false === $result, new AuthorizationException());
         }
 
         $response = null;

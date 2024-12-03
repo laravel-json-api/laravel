@@ -8,6 +8,7 @@
  */
 
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
+use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
 
 JsonApiRoute::server('v1')
     ->prefix('v1')
@@ -35,4 +36,6 @@ JsonApiRoute::server('v1')
         $server->resource('videos')->relationships(function ($relationships) {
             $relationships->hasMany('tags');
         });
+
+        $server->resource('tags', '\\' . JsonApiController::class)->only('destroy');
     });

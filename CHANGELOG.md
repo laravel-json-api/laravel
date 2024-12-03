@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.2] - 2025-12-03
+
+### Fixed
+
+- [#302](https://github.com/laravel-json-api/laravel/pull/302) Ensure auth response is used when deleting a resource
+  that does not have a resource response class.
+
 ## [5.0.1] - 2025-12-02
 
 ### Fixed
