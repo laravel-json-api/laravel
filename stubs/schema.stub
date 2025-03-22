@@ -24,9 +24,9 @@ class {{ class }} extends {{ schema }}
     /**
      * Get the resource fields.
      *
-     * @return iterable
+     * @return array<mixed>
      */
-    public function fields(): iterable
+    public function fields(): array
     {
         return [
             ID::make(),
@@ -38,9 +38,9 @@ class {{ class }} extends {{ schema }}
     /**
      * Get the resource filters.
      *
-     * @return iterable<Filter>
+     * @return array<Filter>
      */
-    public function filters(): iterable
+    public function filters(): array
     {
         return [
             WhereIdIn::make($this),
