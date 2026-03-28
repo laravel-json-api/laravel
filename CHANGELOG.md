@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.2.0] - 2026-03-28
+
+### Added
+
+- Package now supports Laravel 13.
+
 ## [5.1.0] - 2025-02-24
 
 ### Added
