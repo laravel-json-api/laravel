@@ -19,23 +19,23 @@
         },
         {
             "name": "Christopher Gammie",
-            "email": "contact@gammie.co.uk"
+            "email": "chris@cloudcreativity.co.uk"
         }
     ],
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "laravel-json-api/core": "^5.2",
-        "laravel-json-api/eloquent": "^4.5",
-        "laravel-json-api/encoder-neomerx": "^4.2",
-        "laravel-json-api/exceptions": "^3.2",
-        "laravel-json-api/spec": "^3.2",
-        "laravel-json-api/validation": "^4.3",
-        "laravel/framework": "^11.0|^12.0"
+        "laravel-json-api/core": "^5.3",
+        "laravel-json-api/eloquent": "^4.7",
+        "laravel-json-api/encoder-neomerx": "^4.3",
+        "laravel-json-api/exceptions": "^3.3",
+        "laravel-json-api/spec": "^3.3",
+        "laravel-json-api/validation": "^4.4",
+        "laravel/framework": "^11.0|^12.1|^13.0"
     },
     "require-dev": {
         "laravel-json-api/testing": "^3.1",
-        "orchestra/testbench": "^9.0|^10.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
         "phpunit/phpunit": "^10.5|^11.0"
     },
     "autoload": {
@@ -65,7 +65,7 @@
             ]
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
