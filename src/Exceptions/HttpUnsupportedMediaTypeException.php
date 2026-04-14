@@ -25,7 +25,7 @@ class HttpUnsupportedMediaTypeException extends HttpException
      * @param array $headers
      * @param int $code
      */
-    public function __construct(string $message = null, Throwable $previous = null, array $headers = [], int $code = 0)
+    public function __construct(?string $message = null, ?Throwable $previous = null, array $headers = [], int $code = 0)
     {
         if (null === $message) {
             $message = __('The request entity has a media type which the server or resource does not support.');
