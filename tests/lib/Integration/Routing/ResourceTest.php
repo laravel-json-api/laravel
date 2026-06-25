@@ -585,4 +585,45 @@ class ResourceTest extends TestCase
         $this->assertMatch($method, '/api/v1/posts/123');
         $this->assertNotFound($method, '/api/v1/posts/123abc');
     }
+
+    /**
+     *
+     * @param string $method
+     * @dataProvider resourceMethodProvider
+     */
+    public function testIdConstraintAppliedViaGetWheres(string $method): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '[a-z]+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
+                $server->resource('posts');
+            });
+        });
+
+        $route = $this->assertMatch($method, '/api/v1/posts/abc');
+        $this->assertSame('[a-z]+', $route->action['where']['post'] ?? null);
+        $this->assertNotFound($method, '/api/v1/posts/123');
+    }
+
+    /**
+     * @param string $method
+     * @dataProvider resourceMethodProvider
+     */
+    public function testIdConstraintWithCustomParameter(string $method): void
+    {
+        $server = $this->createServer('v1');
+        $this->createSchema($server, 'posts', '\d+');
+
+        $this->defaultApiRoutesWithNamespace(function () {
+            JsonApiRoute::server('v1')->prefix('v1')->namespace('Api\\V1')->resources(function ($server) {
+                $server->resource('posts')->parameter('blog_post');
+            });
+        });
+
+        $route = $this->assertMatch($method, '/api/v1/posts/123');
+        $this->assertSame('\d+', $route->action['where']['blog_post'] ?? null);
+        $this->assertNotFound($method, '/api/v1/posts/abc');
+    }
 }
