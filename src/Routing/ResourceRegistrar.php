@@ -194,7 +194,7 @@ class ResourceRegistrar
     {
         $where = $options['wheres'] ?? [];
 
-        if ($parameter && !isset($action['where'][$parameter])) {
+        if ($parameter && !isset($where[$parameter])) {
             $where[$parameter] = $this->getIdPattern($resourceType);
         }
 
