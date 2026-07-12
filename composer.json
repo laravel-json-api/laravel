@@ -31,7 +31,7 @@
         "laravel-json-api/exceptions": "^3.3",
         "laravel-json-api/spec": "^3.3",
         "laravel-json-api/validation": "^4.4",
-        "laravel/framework": "^12.1|^13.0"
+        "laravel/framework": "^12.61.1|^13.0"
     },
     "require-dev": {
         "laravel-json-api/testing": "^3.2",
