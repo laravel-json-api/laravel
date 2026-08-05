@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use {{ namespacedModel }};
+use LaravelJsonApi\Eloquent\Contracts\Filter;
 use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
@@ -23,7 +24,7 @@ class {{ class }} extends {{ schema }}
     /**
      * Get the resource fields.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function fields(): array
     {
@@ -37,7 +38,7 @@ class {{ class }} extends {{ schema }}
     /**
      * Get the resource filters.
      *
-     * @return array
+     * @return array<Filter>
      */
     public function filters(): array
     {
