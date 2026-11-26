@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Laravel\Http\Requests;
 
+use Closure;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
@@ -234,10 +235,20 @@ class ResourceQuery extends FormRequest implements QueryParameters
     /**
      * Get the model that the request relates to, if the URL has a resource id.
      *
+     * When a key is given, the model identified by that input is retrieved instead,
+     * using the form request model helpers that Laravel provides from 13.44.
+     *
+     * @param string|null $key
+     * @param class-string<Model>|Closure|null $modelClass
+     * @param Closure|null $callback
      * @return Model|object|null
      */
-    protected function model(): ?object
+    public function model($key = null, $modelClass = null, ?Closure $callback = null): ?object
     {
+        if ($key !== null) {
+            return parent::model($key, $modelClass, $callback);
+        }
+
         $route = $this->jsonApi()->route();
 
         if ($route->hasResourceId()) {
@@ -250,10 +261,20 @@ class ResourceQuery extends FormRequest implements QueryParameters
     /**
      * Get the model that the request relates to, or fail if there is none.
      *
+     * When a key is given, the model identified by that input is retrieved instead,
+     * using the form request model helpers that Laravel provides from 13.44.
+     *
+     * @param string|null $key
+     * @param class-string<Model>|Closure|null $modelClass
+     * @param Closure|null $callback
      * @return Model|object
      */
-    protected function modelOrFail(): object
+    public function modelOrFail($key = null, $modelClass = null, ?Closure $callback = null): object
     {
+        if ($key !== null) {
+            return parent::modelOrFail($key, $modelClass, $callback);
+        }
+
         if ($model = $this->model()) {
             return $model;
         }
